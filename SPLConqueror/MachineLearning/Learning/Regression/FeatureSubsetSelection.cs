@@ -32,6 +32,7 @@ namespace MachineLearning.Learning.Regression
         protected List<Feature> bruteForceCandidates = new List<Feature>();
         protected IDictionary<Feature, double> bruteForceCandidateRate = new Dictionary<Feature, double>();
         public double finalError = 0.0;
+        private int iteration = 0;
 
         //Learning and validation data sets
         protected List<Configuration> learningSet = new List<Configuration>();
@@ -250,46 +251,60 @@ namespace MachineLearning.Learning.Regression
             }
         }
 
-
-        /// <summary>
-        /// Makes one further step in learning. That is, it adds a further feature to the current model.
-        /// </summary>
-        /// <param name="previousRound">State of the learning process untill this forward step.</param>
-        /// <returns>Returns a new model (i.e. learning round) with an additional feature.</returns>
-        internal LearningRound performForwardStep(LearningRound previousRound)
+        private ModelFit learnWithCandidatesRegularization(List<Feature> candidates, LearningRound previousRound)
         {
-            //Error in this round (depends on crossvalidation)
-            double minimalRoundError = Double.MaxValue;
-            double maximalRoundScore = Double.MinValue;
-            IDictionary<Feature, double> bfCandidateRate = null;
-            List<Feature> bestModel = null;
-
-            //Go through each feature of the initial set and combine them with the already present features to build new candidates
-            List<Feature> candidates = new List<Feature>();
-            if (this.MLsettings.bruteForceCandidates)
+            List<Feature> modelWithAllFeatures = copyCombination(previousRound.FeatureSet);
+            foreach (Feature candidate in candidates)
             {
-                candidates = generateBruteForceCandidates(previousRound.FeatureSet, initialFeatures, out bfCandidateRate);
+                modelWithAllFeatures.Add(candidate);
             }
-            else
+            ModelFit fi = evaluateCandidate(modelWithAllFeatures, MLsettings.considerEpsilonTube);
+            return fi;
+        }
+
+        private List<Feature> evaluateCandidatesRegularization(ModelFit fit, LearningRound previousRound,
+            out double maximalRoundScore, out double minimalRoundError)
+        {
+            minimalRoundError = Double.MaxValue;
+            maximalRoundScore = Double.MinValue;
+            List<Feature> fittedModel = fit.newModel;
+            List<Feature> addedFeatures = getCandidatesOfSize(fittedModel, iteration + 1);
+
+            addedFeatures.Sort(delegate (Feature left, Feature right)
             {
-                candidates = generateCandidates(previousRound.FeatureSet, this.initialFeatures);
+                if (Math.Abs(left.Constant) == Math.Abs(right.Constant)) return 0;
+                else if (Math.Abs(left.Constant) < Math.Abs(right.Constant)) return 1;
+                else return -1;
+            });
+            double t = Math.Pow(this.MLsettings.l2ratio / 100, iteration + 1);
+            int numberOfFeaturesToConsider = Convert.ToInt32(addedFeatures.Count() * Math.Pow(this.MLsettings.l2ratio / 100, iteration + 1));
+            double highestInfluence = 0;
+            fittedModel.ForEach(x => { if (Math.Abs(x.Constant) >= highestInfluence)
+                    highestInfluence = x.Constant;
+            });
+            for (int i = 0; i < addedFeatures.Count; i++)
+            {
+                if (i >= numberOfFeaturesToConsider)
+                {
+                    fittedModel.Remove(addedFeatures[i]);
+                } else if(addedFeatures[i].Constant == 0 || 
+                    Math.Abs(addedFeatures[i].Constant) <= this.MLsettings.l2Threshold * Math.Abs(highestInfluence))
+                {
+                    fittedModel.Remove(addedFeatures[i]);
+                }
             }
 
-            //If we got no candidates and we perform hierachical learning, we go one step further
-            if (candidates.Count == 0 && this.MLsettings.withHierarchy)
-            {
-                if (this.hierachyLevel > 10)
-                    return null;
-                this.hierachyLevel++;
-                return performForwardStep(previousRound);
-            }
+            List<Feature> bestModel = copyCombination(fittedModel);
+            ModelFit fi = evaluateCandidate(bestModel, MLsettings.considerEpsilonTube);
+            maximalRoundScore = previousRound.validationError_relative - fi.error;
+            minimalRoundError = fi.error;
+            return bestModel;
+        }
 
-            ConcurrentDictionary<Feature, double> errorOfFeature = new ConcurrentDictionary<Feature, double>();
-            ConcurrentDictionary<Feature, List<Feature>> errorOfFeatureWithModel = new ConcurrentDictionary<Feature, List<Feature>>();
-            Feature bestCandidate = null;
-            
+        internal void learnWithCandidates(List<Feature> candidates, ConcurrentDictionary<Feature, double> errorOfFeature, 
+            ConcurrentDictionary<Feature, List<Feature>> errorOfFeatureWithModel, LearningRound previousRound)
+        {
             List<Task> tasks = new List<Task>();
-
             //Learn for each candidate a new model and compute the error for each newly learned model
             foreach (Feature candidate in candidates)
             {
@@ -303,7 +318,7 @@ namespace MachineLearning.Learning.Regression
                 {
                     continue;
                 }
-                    
+
                 List<Feature> newModel = copyCombination(previousRound.FeatureSet);
                 newModel.Add(threadCandidate);
                 if (this.MLsettings.parallelization)
@@ -334,16 +349,22 @@ namespace MachineLearning.Learning.Regression
             }
             if (this.MLsettings.parallelization)
                 Task.WaitAll(tasks.ToArray());
+        }
 
-            if (candidates.Count == 0)
-                return null;
-
+        internal List<Feature> evaluateCandidates(ConcurrentDictionary<Feature, double> errorOfFeature,
+            ConcurrentDictionary<Feature, List<Feature>> errorOfFeatureWithModel, LearningRound previousRound,
+            out double maximalRoundScore, out double minimalRoundError, out Feature bestCandidate)
+        {
+            List<Feature> bestModel = null;
+            minimalRoundError = Double.MaxValue;
+            maximalRoundScore = Double.MinValue;
             // Evaluation of the candidates
             List<Feature> sortedFeatures = errorOfFeature.Keys.ToList();
             sortedFeatures.Sort(sortedFeatures.First());
+            bestCandidate = sortedFeatures.First();
             if (MLsettings.scoreMeasure == ML_Settings.ScoreMeasure.RELERROR)
             {
-				foreach (Feature candidate in sortedFeatures)
+                foreach (Feature candidate in sortedFeatures)
                 {
                     var candidateError = errorOfFeature[candidate];
                     var candidateScore = previousRound.validationError_relative - candidateError;
@@ -359,27 +380,29 @@ namespace MachineLearning.Learning.Regression
                             minimalRoundError = errorOfFeature[candidate];
                             bestCandidate = candidate;
                             bestModel = errorOfFeatureWithModel[candidate];
-                        } else
+                        }
+                        else
                         {
-                            candidate.Constant = 1;                        
+                            candidate.Constant = 1;
                         }
                     }
                 }
-            } else if (MLsettings.scoreMeasure == ML_Settings.ScoreMeasure.INFLUENCE)
+            }
+            else if (MLsettings.scoreMeasure == ML_Settings.ScoreMeasure.INFLUENCE)
             {
                 throw new NotImplementedException();
-//                foreach (Feature candidate in errorOfFeature.Keys)
-//                {
-//                    double candidateRate = bfCandidateRate[candidate];
-//                    double candidateWeightedAbsoluteInfluence = Math.Abs(candidate.Constant) * candidateRate;
-//                    if (candidateWeightedAbsoluteInfluence > maximalWeightedAbsoluteRoundInfluence)
-//                    {
-//                        maximalWeightedAbsoluteRoundInfluence = candidateWeightedAbsoluteInfluence;
-//                        bestCandidate = candidate;
-//                        bestModel = errorOfFeatureWithModel[candidate];
-//                    } else
-//                        candidate.Constant = 1;
-//                }
+                //                foreach (Feature candidate in errorOfFeature.Keys)
+                //                {
+                //                    double candidateRate = bfCandidateRate[candidate];
+                //                    double candidateWeightedAbsoluteInfluence = Math.Abs(candidate.Constant) * candidateRate;
+                //                    if (candidateWeightedAbsoluteInfluence > maximalWeightedAbsoluteRoundInfluence)
+                //                    {
+                //                        maximalWeightedAbsoluteRoundInfluence = candidateWeightedAbsoluteInfluence;
+                //                        bestCandidate = candidate;
+                //                        bestModel = errorOfFeatureWithModel[candidate];
+                //                    } else
+                //                        candidate.Constant = 1;
+                //                }
             }
 
             //error computations and logging stuff
@@ -388,6 +411,91 @@ namespace MachineLearning.Learning.Regression
             {
                 addFeaturesToIgnore(errorOfFeature);
             }
+
+            return bestModel;
+        }
+
+
+        /// <summary>
+        /// Makes one further step in learning. That is, it adds a further feature to the current model.
+        /// </summary>
+        /// <param name="previousRound">State of the learning process untill this forward step.</param>
+        /// <returns>Returns a new model (i.e. learning round) with an additional feature.</returns>
+        internal LearningRound performForwardStep(LearningRound previousRound)
+        {
+            //Error in this round (depends on crossvalidation)
+            double minimalRoundError = Double.MaxValue;
+            double maximalRoundScore = Double.MinValue;
+            IDictionary<Feature, double> bfCandidateRate = null;
+            List<Feature> bestModel = null;
+
+            //Go through each feature of the initial set and combine them with the already present features to build new candidates
+            List<Feature> candidates = new List<Feature>();
+            if (this.MLsettings.bruteForceCandidates)
+            {
+                if (this.MLsettings.useL2Regularization)
+                    candidates = generateCandidatesBruteforceRegularization(previousRound.FeatureSet, initialFeatures, out bfCandidateRate);
+                else
+                    candidates = generateBruteForceCandidates(previousRound.FeatureSet, initialFeatures, out bfCandidateRate);
+            }
+            else
+            {
+                if (this.MLsettings.useL2Regularization)
+                    candidates = generateCandidatesRegularization(previousRound.FeatureSet, this.initialFeatures);
+                else
+                    candidates = generateCandidates(previousRound.FeatureSet, this.initialFeatures);
+            }
+
+            //If we got no candidates and we perform hierachical learning, we go one step further
+            if (candidates.Count == 0 && this.MLsettings.withHierarchy)
+            {
+                if (this.hierachyLevel > 10)
+                    return null;
+                this.hierachyLevel++;
+                return performForwardStep(previousRound);
+            }
+
+            ConcurrentDictionary<Feature, double> errorOfFeature = new ConcurrentDictionary<Feature, double>();
+            ConcurrentDictionary<Feature, List<Feature>> errorOfFeatureWithModel = new ConcurrentDictionary<Feature, List<Feature>>();
+            Feature bestCandidate = null;
+
+            if (this.MLsettings.useL2Regularization)
+            {
+                ModelFit fit = learnWithCandidatesRegularization(candidates, previousRound);
+
+                if (candidates.Count == 0)
+                    return null;
+
+                bestModel = evaluateCandidatesRegularization(fit, previousRound,out maximalRoundScore, out minimalRoundError);
+                double coeffPenalty = 0;
+                foreach(Feature added in getCandidatesOfSize(bestModel, iteration + 1))
+                {
+                    if (added.Constant > coeffPenalty)
+                    {
+                        coeffPenalty = added.Constant;
+                    }
+                }
+                StringBuilder sb = new StringBuilder();
+                getCandidatesOfSize(bestModel, iteration + 1).ForEach(x => sb.Append(x.getPureString() + " +"));
+                if (sb.Length == 0)
+                {
+                    sb.Append("No candidate added");
+                } else
+                {
+                    sb.Length--;
+                }
+                bestCandidate = new Feature(sb.ToString(), infModel.Vm);
+            } else
+            {
+                learnWithCandidates(candidates, errorOfFeature, errorOfFeatureWithModel, previousRound);
+
+                if (candidates.Count == 0)
+                    return null;
+
+                bestModel = evaluateCandidates(errorOfFeature, errorOfFeatureWithModel, previousRound,
+                    out maximalRoundScore, out minimalRoundError, out bestCandidate);
+            }
+
             if (bestModel == null)
             {
                 return null;
@@ -402,6 +510,9 @@ namespace MachineLearning.Learning.Regression
                 newRound.bestCandidate = bestCandidate;
                 newRound.bestCandidateSize = bestCandidate.getNumberOfParticipatingOptions();
                 newRound.bestCandidateScore = maximalRoundScore;
+
+                if (this.MLsettings.useL2Regularization)
+                    iteration += 1;
                 return newRound;
             }
         }
@@ -468,6 +579,31 @@ namespace MachineLearning.Learning.Regression
                 return false;
             return true;
         }
+
+        protected List<Feature> generateCandidatesRegularization(List<Feature> currentModel, List<Feature> basicFeatures)
+        {
+            List<Feature> unfilteredCandidates = generateCandidates(currentModel, basicFeatures);
+            return getCandidatesOfSize(unfilteredCandidates, iteration + 1);
+        }
+
+        protected List<Feature> generateCandidatesBruteforceRegularization(List<Feature> currentModel,
+            List<Feature> basicFeatures, out IDictionary<Feature, double> bfCandidateRate)
+        {
+            List<Feature> unfilteredCandidates = generateBruteForceCandidates(currentModel, basicFeatures, out bfCandidateRate);
+            return getCandidatesOfSize(unfilteredCandidates, iteration + 1);
+        }
+
+
+        private List<Feature> getCandidatesOfSize(List<Feature> unfilteredCandidates, int requiredSize)
+        {
+            return unfilteredCandidates.Where(candidate => getSizeOfFeature(candidate) == requiredSize).ToList();
+        }
+        
+        private int getSizeOfFeature(Feature feature)
+        {
+            int sizeOfFeature = feature.getPureString().Count(x => x == '*') + 1;
+            return sizeOfFeature;
+        } 
 
 
         /// <summary>

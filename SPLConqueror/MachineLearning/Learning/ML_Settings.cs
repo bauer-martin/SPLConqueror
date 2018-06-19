@@ -115,6 +115,15 @@ namespace MachineLearning.Learning
         /// </summary>
         public double minImprovementPerRound = 0.1;
 
+        public double l2ratio = 80;
+
+        public bool useL2Regularization = false;
+
+        /// <summary>
+        /// Percentage of influence relatively to the feature with the highest influence required for a feature to be added to the function.
+        /// </summary>
+        public double l2Threshold = 0.03;
+
         /// <summary>
         /// Defines whether we learn our model in hierachical steps
         /// </summary>
