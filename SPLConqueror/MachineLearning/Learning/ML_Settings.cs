@@ -14,7 +14,7 @@ namespace MachineLearning.Learning
         /// <summary>
         /// The score of the candidated has to be computed only on configurations that are affected bny the candidate.
         /// </summary>
-        public bool scoreByRelevantConfigurations = true;
+        public bool scoreByRelevantConfigurations = false;
         
         /// <summary>
         /// The epsilon within the error of the loss Function will be 0.
