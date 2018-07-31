@@ -345,20 +345,8 @@ namespace MachineLearning.Learning.Regression
             {
 				foreach (Feature candidate in sortedFeatures)
                 {
-                    var candidateError = errorOfFeature[candidate];
-                    var candidateScore = previousRound.validationError_relative - candidateError;
-
-                    if (MLsettings.scoreByRelevantConfigurations)
-                    {
-                        List<Feature> newModel = copyCombination(previousRound.FeatureSet);
-                        newModel.Add(candidate);
-
-                        double errorLastRound = evaluateCandidateOnRelevantConfigurations(previousRound.FeatureSet, MLsettings.considerEpsilonTube, candidate).error;
-                        double errorCurrRound = evaluateCandidateOnRelevantConfigurations(newModel, MLsettings.considerEpsilonTube, candidate).error;
-
-                        candidateScore = errorLastRound - errorCurrRound;
-
-                    }
+                    double candidateError = errorOfFeature[candidate];
+                    double candidateScore = previousRound.validationError_relative - candidateError;
 
                     if (candidateScore > 0)
                     {
@@ -396,7 +384,6 @@ namespace MachineLearning.Learning.Regression
             }
 
             //error computations and logging stuff
-            double relativeErrorEval = 0;
             if (MLsettings.ignoreBadFeatures)
             {
                 addFeaturesToIgnore(errorOfFeature);
@@ -423,7 +410,6 @@ namespace MachineLearning.Learning.Regression
         {
             ModelFit fit = new ModelFit();
             fit.complete = fitModel(model);
-            double temp;
             fit.error = computeModelError(model, newCandidate);
             fit.newModel = model;
             return fit;
@@ -1213,9 +1199,23 @@ namespace MachineLearning.Learning.Regression
                 current.terminationReason = "abortError";
                 return true;
             }
+
+			double currentImprovement = current.bestCandidateScore;
+
+            // If the relevant configurations should 
+			if (MLsettings.scoreByRelevantConfigurations) {
+				List<Feature> newModel = copyCombination (previous.FeatureSet);
+				newModel.Add (current.bestCandidate);
+
+				double errorLastRound = evaluateCandidateOnRelevantConfigurations (previous.FeatureSet, MLsettings.considerEpsilonTube, current.bestCandidate).error;
+				double errorCurrRound = evaluateCandidateOnRelevantConfigurations (newModel, MLsettings.considerEpsilonTube, current.bestCandidate).error;
+
+				currentImprovement = errorLastRound - errorCurrRound;
+
+			}
             
             //if (minimalRequiredImprovement(current) + current.validationError_relative > oldRoundRelativeError)
-            if (MLsettings.minImprovementPerRound > current.bestCandidateScore)
+			if (MLsettings.minImprovementPerRound > currentImprovement)
             {
                 if (this.MLsettings.withHierarchy)
                 {
