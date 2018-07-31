@@ -347,6 +347,19 @@ namespace MachineLearning.Learning.Regression
                 {
                     var candidateError = errorOfFeature[candidate];
                     var candidateScore = previousRound.validationError_relative - candidateError;
+
+                    if (MLsettings.scoreByRelevantConfigurations)
+                    {
+                        List<Feature> newModel = copyCombination(previousRound.FeatureSet);
+                        newModel.Add(candidate);
+
+                        double errorLastRound = evaluateCandidateOnRelevantConfigurations(previousRound.FeatureSet, MLsettings.considerEpsilonTube, candidate).error;
+                        double errorCurrRound = evaluateCandidateOnRelevantConfigurations(newModel, MLsettings.considerEpsilonTube, candidate).error;
+
+                        candidateScore = errorLastRound - errorCurrRound;
+
+                    }
+
                     if (candidateScore > 0)
                     {
                         if (MLsettings.candidateSizePenalty)
@@ -406,12 +419,20 @@ namespace MachineLearning.Learning.Regression
             }
         }
 
+        private ModelFit evaluateCandidateOnRelevantConfigurations(List<Feature> model, bool considerEpsilonTube, Feature newCandidate)
+        {
+            ModelFit fit = new ModelFit();
+            fit.complete = fitModel(model);
+            double temp;
+            fit.error = computeModelError(model, newCandidate);
+            fit.newModel = model;
+            return fit;
+        }
 
         private ModelFit evaluateCandidate(List<Feature> model, bool considerEpsilonTube)
         {
             ModelFit fit = new ModelFit();
             fit.complete = fitModel(model);
-            double temp;
             fit.error = computeModelError(model);
             fit.newModel = model;
             return fit;
@@ -877,6 +898,11 @@ namespace MachineLearning.Learning.Regression
             return computeError(currentModel, this.validationSet, false);
         }
 
+        private double computeValidationError(List<Feature> currentModel, Feature candidate)
+        {
+            return computeError(currentModel, this.validationSet, false);
+        }
+
         /// <summary>
         /// This mestode produces an estimated for the given configuration based on the given model.
         /// </summary>
@@ -1000,6 +1026,96 @@ namespace MachineLearning.Learning.Regression
             return error_sum / (configs.Count - skips);
         }
 
+
+        public double computeError(List<Feature> currentModel, List<Configuration> configs, bool considerEpsilonTube, Feature candidate)
+        {
+            double error_sum = 0;
+            int skips = 0;
+            foreach (Configuration c in configs)
+            {
+                if (!c.Contains(candidate.participatingBoolOptions.ToList()))
+                    continue;
+
+                double estimatedValue = estimate(currentModel, c);
+                double realValue = 0;
+                try
+                {
+                    if (!c.nfpValues.Keys.Contains(GlobalState.currentNFP))
+                    {
+                        skips++;
+                        continue;
+                    }
+                    realValue = c.GetNFPValue(GlobalState.currentNFP);
+                }
+                catch (ArgumentException argEx)
+                {
+                    GlobalState.logError.logLine(argEx.Message);
+                    realValue = c.GetNFPValue();
+                }
+
+                //How to handle near-zero values???
+                //http://math.stackexchange.com/questions/677852/how-to-calculate-relative-error-when-true-value-is-zero
+                //http://stats.stackexchange.com/questions/86708/how-to-calculate-relative-error-when-the-true-value-is-zero
+                //if (Math.Abs(realValue) < 0.001)
+                //{
+                //    skips++;
+                //    continue;
+                //}
+
+                double error = 0;
+                switch (this.MLsettings.lossFunction)
+                {
+                    case ML_Settings.LossFunction.RELATIVE:
+                        //if (Math.Abs(realValue) < 0.001)
+                        //{
+                        //    error = Math.Abs(((2 * (realValue - estimatedValue) / (realValue + estimatedValue)) - 1) * 100);
+                        //}
+                        //else
+
+                        error = Math.Abs((estimatedValue - realValue) / realValue) * 100;
+
+                        //    error = Math.Abs(100 - ((estimatedValue * 100) / realValue));
+
+                        // Consider epsilon tube
+                        if (considerEpsilonTube)
+                        {
+                            if (error <= (this.MLsettings.epsilon * 100))
+                            {
+                                error = 0.0;
+                            }
+                        }
+                        break;
+                    case ML_Settings.LossFunction.LEASTSQUARES:
+                        error = Math.Pow(realValue - estimatedValue, 2);
+
+                        if (considerEpsilonTube)
+                        {
+                            if (error <= this.MLsettings.epsilon)
+                            {
+                                error = 0.0;
+                            }
+                        }
+
+                        break;
+                    case ML_Settings.LossFunction.ABSOLUTE:
+                        error = Math.Abs(realValue - estimatedValue);
+
+
+                        break;
+                }
+                error_sum += error;
+            }
+
+            if (configs.Count == skips)
+            {
+                GlobalState.logInfo.logLine("All features have an error < 1.");
+                return 0.0;
+            }
+
+            return error_sum / (configs.Count - skips);
+        }
+
+
         /// <summary>
         /// Computes the error of the current model for all configurations in the learning set.
         /// </summary>
@@ -1009,6 +1125,11 @@ namespace MachineLearning.Learning.Regression
         private double computeLearningError(List<Feature> currentModel)
         {
             return computeError(currentModel, this.learningSet, MLsettings.considerEpsilonTube);
+        }
+
+        private double computeLearningError(List<Feature> currentModel, Feature candidate)
+        {
+            return computeError(currentModel, this.learningSet, MLsettings.considerEpsilonTube, candidate);
         }
 
         /// <summary>
@@ -1025,6 +1146,18 @@ namespace MachineLearning.Learning.Regression
             {
                 //todo k-fold
                 return (computeLearningError(currentModel) + computeValidationError(currentModel) / 2);
+            }
+
+        }
+
+        private double computeModelError(List<Feature> currentModel, Feature newCandidate)
+        {
+            if (!this.MLsettings.crossValidation)
+                return computeValidationError(currentModel, newCandidate);
+            else
+            {
+                //todo k-fold
+                return (computeLearningError(currentModel, newCandidate) + computeValidationError(currentModel, newCandidate) / 2);
             }
 
         }

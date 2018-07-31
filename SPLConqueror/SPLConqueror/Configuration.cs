@@ -16,6 +16,22 @@ namespace SPLConqueror_Core
         private Dictionary<BinaryOption, BinaryOption.BinaryValue> binaryOptions = new Dictionary<BinaryOption, BinaryOption.BinaryValue>();
 
         /// <summary>
+        /// Returns true iff all binary options of the parameter list are selected in the configuration.
+        /// </summary>
+        /// <param name="partialConfiguration">List of binary configuration option that are tested whether they are selected in the configuration.</param>
+        /// <returns>True if all configuration options are selected in the configuration.</returns>
+        public bool Contains(List<BinaryOption> partialConfiguration)
+        {
+            foreach(BinaryOption binOpt in partialConfiguration)
+            {
+                if (binaryOptions[binOpt] == BinaryOption.BinaryValue.Deselected)
+                    return false; 
+            }
+            return true;
+        }
+
+
+        /// <summary>
         /// Binary options of this configuration. For each option it is stored whether the option is selceted or deselected in this configuration.
         /// </summary>
         public Dictionary<BinaryOption, BinaryOption.BinaryValue> BinaryOptions
