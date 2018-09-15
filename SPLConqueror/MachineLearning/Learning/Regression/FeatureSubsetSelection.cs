@@ -282,7 +282,7 @@ namespace MachineLearning.Learning.Regression
         /// <returns>Returns a new model (i.e. learning round) with an additional feature.</returns>
         internal LearningRound performForwardStep(LearningRound previousRound)
         {
-            //Error in this round (depends on crossvalidation)
+            // Error in this round (depends on crossvalidation)
             double minimalRoundError = Double.MaxValue;
             double maximalRoundScore = Double.MinValue;
             IDictionary<Feature, double> bfCandidateRate = null;

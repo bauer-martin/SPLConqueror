@@ -71,8 +71,9 @@ namespace CommandLine
         public const string COMMAND_PREDICT_ALL_CONFIGURATIONS_SPLC = "predict-all-configs-splconqueror";
         // deprecated
         public const string COMMAND_PREDICT_ALL_CONFIGURATIONS = "predictall";
-        #endregion
-        
+	 #endregion
+
+	 public const string COMMAND_EVALUATE_MODEL = "evaluate-model";
         public const string COMMAND_ANALYZE_LEARNING = "analyze-learning";
 
         #region splconqueror predict configurations
@@ -395,6 +396,59 @@ namespace CommandLine
     				}
 
 				    break;
+
+    			case COMMAND_EVALUATE_MODEL:
+    				// For this option, two arguments can be provided.
+                    // The first option is mandatory and represents the path of the model.
+                    // The second option is optional and represents the path to the file where the predictions should be written to.
+				    string [] filePaths = task.Trim ().Split (' ');
+    				if (!File.Exists (filePaths[0].Trim ())) {
+    					GlobalState.logError.logLine ("The given file '" + filePaths [0].Trim () + "' does not exist.");
+                    }
+                    // A file may contain multiple models
+				    StreamReader modelReader = new StreamReader (filePaths [0].Trim ());
+                    List<string> models = new List<string> ();
+                    while (!modelReader.EndOfStream) {
+                        models.Add (modelReader.ReadLine ());
+                    }
+                    modelReader.Close ();
+                    
+                    // Initialization
+    				InfluenceModel infModel = new InfluenceModel (GlobalState.varModel, GlobalState.currentNFP);
+				    FeatureSubsetSelection fSS = new FeatureSubsetSelection (infModel, this.mlSettings);
+                    
+                    // Evaluate each model in the input file
+				    for (int i = 0; i < models.Count; i++) {
+					    string m = models [i];
+    					string [] terms = m.Split ('+');
+    					List<Feature> currentModel = new List<Feature> ();
+
+    					foreach (string term in terms) {
+    						string[] elements = term.Split ('*');
+    						string coefficient = elements [0];
+    						string variables = string.Join (" * ", elements.Skip (1).ToArray ());
+    						Feature f = new Feature (variables, GlobalState.varModel);
+    						f.Constant = double.Parse (coefficient);
+
+    						currentModel.Add(f);
+    					}
+
+
+    					LearningRound lR = fSS.LearnWithTrueModel (currentModel);
+					    GlobalState.logInfo.logLine (lR.ToString ());
+
+    					// Now, predict all configurations
+                        if (filePaths.Length == 2) {
+    						string currentPath = filePaths [1];
+						    currentPath = Path.GetDirectoryName(currentPath) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension (currentPath) + "_" + i + Path.GetExtension (currentPath);
+    						GlobalState.logInfo.logLine ("Writing the predictions to " + currentPath + ".");
+    						predict (currentPath, null, lR.FeatureSet);
+                        } else {
+                            GlobalState.logInfo.logLine ("As no path is given, no predictions are written into a file.");
+                        }
+    				}
+
+                    break;
 
                 case COMMAND_SUBSCRIPT:
                     {
@@ -1792,16 +1846,22 @@ namespace CommandLine
                 GlobalState.logInfo.logLine("The learning set is empty! Cannot start learning!");
                 return;
             }
-
-            GlobalState.logInfo.logLine("Learning: " + "NumberOfConfigurationsLearning:" + configurations_Learning.Count);
-            exp.models.Clear();
-            var mod = exp.models;
-            exp = new Learning(configurations_Learning, configurations_Learning);
-            exp.models = mod;
-            exp.metaModel = infMod;
-            exp.mlSettings = this.mlSettings;
-            exp.learn();
-            GlobalState.logInfo.logLine("Finished");
+            
+	     GlobalState.logInfo.logLine ("Learning: " + "NumberOfConfigurationsLearning:" + configurations_Learning.Count);
+	     if (this.mlSettings.crossValidation) {
+		KFoldCrossValidation crossValidation = new KFoldCrossValidation (this.mlSettings, configurations_Learning);
+		crossValidation.learn ();
+		exp = crossValidation.experiment;
+	     } else {
+		exp.models.Clear ();
+		var mod = exp.models;
+		exp = new Learning (configurations_Learning, configurations_Learning);
+		exp.models = mod;
+		exp.metaModel = infMod;
+		exp.mlSettings = this.mlSettings;
+		exp.learn ();            
+	     }
+	     GlobalState.logInfo.logLine ("Finished");
         }
 
         private void learnWithSampling()
@@ -1814,34 +1874,40 @@ namespace CommandLine
                 out configurationsLearning, out configurationsValidation))
                 return;
 
-            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models. 
-            if (!hasLearnData)
-            {
-                exp.models.Clear();
-                var mod = exp.models;
-                exp = new MachineLearning.Learning.Regression.Learning(configurationsLearning, configurationsValidation);
-                exp.models = mod;
+		// Perform cross validation
+		if (mlSettings.crossValidation) {
+			KFoldCrossValidation crossValidation = new KFoldCrossValidation (this.mlSettings, learnAndValidation.Item1);
+			crossValidation.learn ();
+			exp = crossValidation.experiment;
+			return;
+		} 
 
-                exp.metaModel = infMod;
-                exp.mlSettings = this.mlSettings;
-                exp.learn();
-            }
-            else
-            {
-                GlobalState.logInfo.logLine("Continue learning");
-                exp.models.Clear();
-                var mod = exp.models;
-                exp = new MachineLearning.Learning.Regression.Learning(configurationsLearning, configurationsValidation);
-                exp.models = mod;
-                exp.metaModel = infMod;
-                exp.mlSettings = this.mlSettings;
-                List<LearningRound> lr = new List<LearningRound>();
-                foreach (string lrAsString in CommandPersistence.learningHistory.Item2)
-                {
-                    lr.Add(LearningRound.FromString(lrAsString, GlobalState.varModel));
-                }
-                exp.continueLearning(lr);
-            }
+		// Otherwise, if no cross validation is performed, perform usual learning
+		// We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models. 
+		if (!hasLearnData) {
+			exp.models.Clear ();
+			var mod = exp.models;
+			exp = new Learning (configurationsLearning, configurationsValidation);
+			exp.models = mod;
+
+			exp.metaModel = infMod;
+			exp.mlSettings = this.mlSettings;
+			exp.learn ();
+		} else {
+			GlobalState.logInfo.logLine ("Continue learning");
+			exp.models.Clear ();
+			var mod = exp.models;
+			exp = new Learning (configurationsLearning, configurationsValidation);
+			exp.models = mod;
+			exp.metaModel = infMod;
+			exp.mlSettings = this.mlSettings;
+			List<LearningRound> lr = new List<LearningRound> ();
+			foreach (string lrAsString in CommandPersistence.learningHistory.Item2) {
+				lr.Add (LearningRound.FromString (lrAsString, GlobalState.varModel));
+			}
+			exp.continueLearning (lr);
+		}
+
             GlobalState.logInfo.logLine("average model: \n" + exp.metaModel.printModelAsFunction());
             double relativeerror = 0;
             if (GlobalState.evaluationSet.Configurations.Count > 0)

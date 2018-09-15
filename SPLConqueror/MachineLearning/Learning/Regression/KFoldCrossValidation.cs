@@ -17,6 +17,7 @@ namespace MachineLearning.Learning.Regression
 
         ML_Settings settings;
         List<Configuration> trainingSet = null;
+	 public Learning experiment { get; private set; } = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:MachineLearning.Learning.Regression.KFoldCrossValidation"/> class.
@@ -58,11 +59,11 @@ namespace MachineLearning.Learning.Regression
                     }
                 }
 
-                Learning experiment = new MachineLearning.Learning.Regression.Learning(currTrainingSet, subsets[i]);
+                experiment = new Learning(currTrainingSet, subsets[i]);
                 experiment.mlSettings = settings;
                 experiment.learn();
                 lastModels.Add(experiment.models[0].LearningHistory[experiment.models[0].LearningHistory.Count - 1]);
-
+                
             }
 
             double error = 0;
