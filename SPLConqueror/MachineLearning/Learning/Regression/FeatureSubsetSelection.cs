@@ -1113,7 +1113,7 @@ namespace MachineLearning.Learning.Regression
             }
 
             //if (minimalRequiredImprovement(current) + current.validationError_relative > oldRoundRelativeError)
-            if (MLsettings.minImprovementPerRound > current.bestCandidateScore)
+            if (previous.bestCandidateScore != 0 && MLsettings.minImprovementPerRound > previous.bestCandidateScore - current.bestCandidateScore)
             {
                 if (this.MLsettings.withHierarchy)
                 {
