@@ -562,7 +562,7 @@ namespace MachineLearning.Learning.Regression
                     }
                 }
 
-                //if basic feature represents a numeric option and logarithmic function support is activated, then we add a feature representing a logarithmic functions of this feature 
+                //if basic feature represents a numeric option and logarithmic function support is activated, then we add a feature representing a logarithmic functions of this feature
                 if (this.MLsettings.learn_logFunction && basicFeature.participatingNumOptions.Count > 0 && basicFeature.canNotEvaluateToZero())
                 {
                     Feature newCandidate = new Feature("log10(" + basicFeature.getPureString() + ")", basicFeature.getVariabilityModel());
@@ -662,7 +662,7 @@ namespace MachineLearning.Learning.Regression
 
 
         /// <summary>
-        /// Checks whether a new candidate is valid. 
+        /// Checks whether a new candidate is valid.
         /// </summary>
         /// <param name="partOfTheModel">Part of the model that is learned in the previous round.</param>
         /// <param name="newCandidate">The new candidate that have to be checked.</param>
@@ -828,7 +828,7 @@ namespace MachineLearning.Learning.Regression
         }
 
         /// <summary>
-        /// Given the elements in interable, generate combinations of them of the length up to n 
+        /// Given the elements in interable, generate combinations of them of the length up to n
         /// starting with length 1.
         /// </summary>
         /// <returns>Combinations up to the length n.</returns>
@@ -848,7 +848,7 @@ namespace MachineLearning.Learning.Regression
 
 
         /// <summary>
-        /// The backward steps aims at removing already learned features from the model if they have only a small impact on the prediction accuracy. 
+        /// The backward steps aims at removing already learned features from the model if they have only a small impact on the prediction accuracy.
         /// This should help keeping the model simple, reducing the danger of overfitting, and leaving local optima.
         /// </summary>
         /// <param name="current">The model learned so far containing the features that might be removed. Strictly mandatory features will not be removed.</param>
@@ -1259,7 +1259,7 @@ namespace MachineLearning.Learning.Regression
 
         #region Constructing data matrix for regression
         /// <summary>
-        /// This is an essential method for fitting the constants of features. It constructs the data matrix. 
+        /// This is an essential method for fitting the constants of features. It constructs the data matrix.
         /// The matrix has as rows the configurations of the training set and the columns represent the features (i.e., configuration options and interactions) of the model.
         /// A cell contains a value signaling the configured value of the option (or interaction) for the respective configuration. A column representing a binary option can, thus, have only 0 (not in configuration) or 1 (selected).
         /// For numeric options, the cell contains the value parameter of that option. If the feature represents a higher polynomial function, the value paramter is transformed according to the function (e.g., x = 10, we want to fit x^2 -> cell contains 10 * 10).
@@ -1353,7 +1353,7 @@ namespace MachineLearning.Learning.Regression
                 System.Array ret = Array.CreateInstance(typeof(T), A.S.ToIntArray().Reverse().ToArray());
                 // fetch underlying system array
                 T[] workArr = A.GetArrayForRead();
-                // copy memory block 
+                // copy memory block
                 Buffer.BlockCopy(workArr, 0, ret, 0, Marshal.SizeOf(typeof(T)) * A.S.NumberOfElements);
                 return ret;
             }

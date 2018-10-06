@@ -24,7 +24,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Numeric option of this configuration. The selected value for each numeric option is stored in the value. 
+        /// Numeric option of this configuration. The selected value for each numeric option is stored in the value.
         /// </summary>
         public Dictionary<NumericOption, double> NumericOptions
         {
@@ -34,7 +34,7 @@ namespace SPLConqueror_Core
         private Dictionary<NumericOption, double> numericOptions = new Dictionary<NumericOption, double>();
 
         /// <summary>
-        /// All measured values of the non-functional properties. 
+        /// All measured values of the non-functional properties.
         /// </summary>
         public Dictionary<NFProperty, double> nfpValues = new Dictionary<NFProperty, double>();
 
@@ -133,8 +133,8 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Updates the identifyer of the configuration, it also adds the configuration to a index structre that is used to access 
-        /// the configurations as fast as possible. 
+        /// Updates the identifyer of the configuration, it also adds the configuration to a index structre that is used to access
+        /// the configurations as fast as possible.
         /// </summary>
         public void update()
         {
@@ -179,8 +179,8 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Returns an identifier describing the choice of binary configuration options and numeric configuration-option values of the configuration. 
-        /// The default separator is used in the identifier. 
+        /// Returns an identifier describing the choice of binary configuration options and numeric configuration-option values of the configuration.
+        /// The default separator is used in the identifier.
         /// </summary>
         /// <returns>The identifier for that configuration.</returns>
         public string getIdentifier()
@@ -191,8 +191,8 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Returns the identifier describing the choice of binary configuration options and numeric configuration-option values of the configuration. 
-        /// The separator is used in the identifier. 
+        /// Returns the identifier describing the choice of binary configuration options and numeric configuration-option values of the configuration.
+        /// The separator is used in the identifier.
         /// </summary>
         /// <param name="separator">The configuration options </param>
         /// <returns>the identifier with the specified separator</returns>
@@ -238,7 +238,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method returns the configuration specific value of the property. 
+        /// This method returns the configuration specific value of the property.
         /// </summary>
         /// <param name="property">A non functional property.</param>
         /// <returns>The value of the property stored in the configuration.</returns>
@@ -250,7 +250,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// String representing the configuration. 
+        /// String representing the configuration.
         /// </summary>
         /// <returns>The identifier of the configuration.</returns>
         public override string ToString()
@@ -259,7 +259,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison. 
+        /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
         /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
@@ -269,7 +269,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison. 
+        /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
         /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
@@ -282,7 +282,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Compares one configuration with an other configuration. 
+        /// Compares one configuration with an other configuration.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
         /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
@@ -305,7 +305,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method retuns the hash code of this configuration. 
+        /// This method retuns the hash code of this configuration.
         /// </summary>
         /// <returns>The hash code of the configuration based one the identifier.</returns>
         public override int GetHashCode()
@@ -391,7 +391,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Compare two lists of binary configuration options. If both lists contains the same binary options, the mehthod retuns true and otherwise false. 
+        /// Compare two lists of binary configuration options. If both lists contains the same binary options, the mehthod retuns true and otherwise false.
         /// </summary>
         /// <param name="oneConfiguration">A list of binary configuration options.</param>
         /// <param name="otherBinaryConfiguration">A list of binary configuration options.</param>
@@ -421,7 +421,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Compare two dictionaries of numerical configuration options. If both dictionaries contains the same numerical options with the same values selected, the mehthod retuns true and otherwise false. 
+        /// Compare two dictionaries of numerical configuration options. If both dictionaries contains the same numerical options with the same values selected, the mehthod retuns true and otherwise false.
         /// </summary>
         /// <param name="oneConfiguration">A dictionary of numerical configuration options.</param>
         /// <param name="otherNumericalConfiguration">A dictionary of numerical configuration options.</param>
@@ -435,7 +435,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates a list of configurations conststing of the cartesian product of the lists of binary and numerical selections. 
+        /// Creates a list of configurations conststing of the cartesian product of the lists of binary and numerical selections.
         /// </summary>
         /// <param name="binarySelections">A list of binary selections.</param>
         /// <param name="numericSelections">A list of numerical selections.</param>
@@ -592,7 +592,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Prints a string that respects the variant generation setting of each option. 
+        /// Prints a string that respects the variant generation setting of each option.
         /// This function should be called if we want to get the parameter string to fit it to a program.
         /// </summary>
         /// <returns>The parameter string of the configuration</returns>

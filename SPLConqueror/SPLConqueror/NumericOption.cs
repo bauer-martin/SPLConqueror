@@ -130,8 +130,8 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Gives the step number for a given parameter starting by 0 representing the minValue: For example, minVal = 5; maxVal = 20; stepSize = 5; getStep(15) returns 2; 
-        /// Required for drawing the influence model 
+        /// Gives the step number for a given parameter starting by 0 representing the minValue: For example, minVal = 5; maxVal = 20; stepSize = 5; getStep(15) returns 2;
+        /// Required for drawing the influence model
         /// </summary>
         /// <param name="parameter">The value for which we want to know the step</param>
         /// <returns>The step within the value range</returns>
@@ -184,7 +184,7 @@ namespace SPLConqueror_Core
 
             if (stepFunction == null)
             {
-                // if there are less values defined than the number of steps 
+                // if there are less values defined than the number of steps
                 if (step > values.Values.Count())
                     return value;
 
@@ -279,7 +279,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Loads all information about the numeric connfiguration option from the XML file consisting of the variability model. 
+        /// Loads all information about the numeric connfiguration option from the XML file consisting of the variability model.
         /// </summary>
         /// <param name="node">The root note of the numeric configuration option.</param>
         internal new void loadFromXML(XmlElement node)
@@ -313,7 +313,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method returns the valid value with the smallest distance to the value given.  
+        /// This method returns the valid value with the smallest distance to the value given.
         /// </summary>
         /// <param name="inputValue">A value the nearest valid have to be computet for.</param>
         /// <returns>The valid value with the smallest distance to the input value.</returns>
@@ -353,7 +353,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Returns the center value of the value domain of the numeric configuration option. 
+        /// Returns the center value of the value domain of the numeric configuration option.
         /// </summary>
         /// <returns>The center value of the value domain.</returns>
         public double getCenterValue()

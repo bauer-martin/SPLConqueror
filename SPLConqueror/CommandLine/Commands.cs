@@ -39,7 +39,7 @@ namespace CommandLine
 
         public const string RESUME_FROM_DUMP = "resume-dump";
 
-        //resume a A script with only log files. 
+        //resume a A script with only log files.
         public const string RESUME_FROM_LOG = "resume-log";
 
         //save current SPLConqueror state to a file.
@@ -82,7 +82,7 @@ namespace CommandLine
         public const string COMMAND_PREDICT_CONFIGURATIONS = "predict-configurations";
         #endregion
 
-        // using this option, a partial or full option order can be defined. The order is used in printconfigs. To define an order, the names of the options have to be defined separated with whitespace. If an option is not defined in the order its name and the value is printed at the end of the configurtion. 
+        // using this option, a partial or full option order can be defined. The order is used in printconfigs. To define an order, the names of the options have to be defined separated with whitespace. If an option is not defined in the order its name and the value is printed at the end of the configurtion.
         public const string COMMAND_SAMPLING_OPTIONORDER = "optionorder";
         public const string COMMAND_PRINT_CONFIGURATIONS = "printconfigs";
         public const string COMMAND_PRINT_MLSETTINGS = "printsettings";
@@ -191,7 +191,7 @@ namespace CommandLine
         public static string pyResult = "";
 
         /// <summary>
-        /// Performs the functionality of one command. If no functionality is found for the command, the command is retuned by this method. 
+        /// Performs the functionality of one command. If no functionality is found for the command, the command is retuned by this method.
         /// </summary>
         /// <param name="line">One command with its parameters.</param>
         /// <returns>Returns an empty string if the command could be performed by the method. If the command could not be performed by the method, the original command is returned.</returns>
@@ -946,7 +946,7 @@ namespace CommandLine
 
                         foreach (ML_Settings parameters in parameterSettings)
                         {
-                            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models. 
+                            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models.
                             KFoldCrossValidation kFold = new KFoldCrossValidation(parameters, configurationsLearning);
                             double error = kFold.learn();
 
@@ -1120,7 +1120,7 @@ namespace CommandLine
 
                         foreach (ML_Settings parameters in parameterSettings)
                         {
-                            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models. 
+                            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models.
                             KFoldCrossValidation kFold = new KFoldCrossValidation(parameters, configurationsLearning);
                             double error = kFold.learn();
 
@@ -1165,7 +1165,7 @@ namespace CommandLine
                     }
 
                 case COMMAND_SAMPLE_NEGATIVE_OPTIONWISE:
-                    // TODO there are two different variants in generating NegFW configurations. 
+                    // TODO there are two different variants in generating NegFW configurations.
                     addBinSamplingNoParams(SamplingStrategies.NEGATIVE_OPTIONWISE,
                         "NEGOW", taskAsParameter.Contains(COMMAND_VALIDATION));
                     break;
@@ -1482,7 +1482,7 @@ namespace CommandLine
 
         /// <summary>
         /// This method sets the according variables to perform the hybrid sampling strategy.
-        /// Note: A hybrid sampling strategy might have parameters and also consider only a specific set of numeric options. 
+        /// Note: A hybrid sampling strategy might have parameters and also consider only a specific set of numeric options.
         ///         [option1,option3,...,optionN] param1:value param2:value
         /// </summary>
         /// <param name="task">the task containing the name of the sampling strategy and the parameters</param>
@@ -1723,8 +1723,8 @@ namespace CommandLine
 
 
         /// <summary>
-        /// 
-        /// Note: An experimental design might have parameters and also consider only a specific set of numeric options. 
+        ///
+        /// Note: An experimental design might have parameters and also consider only a specific set of numeric options.
         ///         [option1,option3,...,optionN] param1:value param2:value
         /// </summary>
         /// <param name="task"></param>
@@ -1880,7 +1880,7 @@ namespace CommandLine
                 out configurationsLearning, out configurationsValidation))
                 return;
 
-            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models. 
+            // We have to reuse the list of models because of a NotifyCollectionChangedEventHandlers that might be attached to the list of models.
             if (!hasLearnData)
             {
                 exp.models.Clear();
