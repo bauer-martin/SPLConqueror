@@ -317,7 +317,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// This method searches for a corresponding methods in the dynamically loaded assemblies and calls it if found. It prefers due to performance reasons the Microsoft Solver Foundation implementation.
         /// </summary>
-        /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
+        /// <param name="config">The (partial) configuration which needs to be expanded to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
@@ -472,7 +472,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Based on a given (partial) configuration and a variability, we aim at finding all optimally maximal or minimal (in terms of selected binary options) configurations.
         /// </summary>
-        /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
+        /// <param name="config">The (partial) configuration which needs to be expanded to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
@@ -505,7 +505,7 @@ namespace MachineLearning.Solver
                     }
                     else
                     {
-                        // Element is part of an altnerative Group  ... we want to select always the same option of the group, so we give different weights to the member of the group
+                        // Element is part of an alternative Group  ... we want to select always the same option of the group, so we give different weights to the member of the group
                         //Functionality deactivated... todo needs further handling
                         /*if (binOpt.getAlternatives().Count != 0)
                         {

@@ -82,7 +82,7 @@ namespace CommandLine
         public const string COMMAND_PREDICT_CONFIGURATIONS = "predict-configurations";
         #endregion
 
-        // using this option, a partial or full option order can be defined. The order is used in printconfigs. To define an order, the names of the options have to be defined separated with whitespace. If an option is not defined in the order its name and the value is printed at the end of the configurtion.
+        // using this option, a partial or full option order can be defined. The order is used in printconfigs. To define an order, the names of the options have to be defined separated with whitespace. If an option is not defined in the order its name and the value is printed at the end of the configuration.
         public const string COMMAND_SAMPLING_OPTIONORDER = "optionorder";
         public const string COMMAND_PRINT_CONFIGURATIONS = "printconfigs";
         public const string COMMAND_PRINT_MLSETTINGS = "printsettings";
@@ -132,7 +132,7 @@ namespace CommandLine
         List<SamplingStrategies> binaryToSample = new List<SamplingStrategies>();
 
         #region Intern commands
-        // shouldnt be used by user.
+        // shouldn't be used by user.
         public const string ROLLBACK_FLAG = "rollback";
         #endregion
 
@@ -191,7 +191,7 @@ namespace CommandLine
         public static string pyResult = "";
 
         /// <summary>
-        /// Performs the functionality of one command. If no functionality is found for the command, the command is retuned by this method.
+        /// Performs the functionality of one command. If no functionality is found for the command, the command is returned by this method.
         /// </summary>
         /// <param name="line">One command with its parameters.</param>
         /// <returns>Returns an empty string if the command could be performed by the method. If the command could not be performed by the method, the original command is returned.</returns>
@@ -257,7 +257,7 @@ namespace CommandLine
                         Tuple<ML_Settings, List<SamplingStrategies>, List<SamplingStrategies>> recoveredData = CommandPersistence.recoverDataFromDump(taskAsParameter);
                         if (recoveredData == null)
                         {
-                            GlobalState.logError.logLine("Couldnt recover.");
+                            GlobalState.logError.logLine("Couldn't recover.");
                         }
                         else
                         {
@@ -530,8 +530,8 @@ namespace CommandLine
                     catch (ArgumentNullException)
                     {
                         throw new ArgumentException("There was a problem when reading your configuration file." +
-                            " Please check the error log for further inforamtion about the cause of the error." +
-                            " Filename of the file that caused the error:\"" + task.TrimEnd() + "\"");
+                            " Please check the error log for further information about the cause of the error." +
+                            " Filename of the file that caused the error: \"" + task.TrimEnd() + "\"");
                     }
 
                     List<Configuration> invalid = GlobalState.allMeasurements.Configurations
@@ -541,7 +541,7 @@ namespace CommandLine
                         .Where(conf => !constraintSystem.checkConfigurationSAT(conf.BinaryOptions.ToList()
                         .Where(kv => kv.Value == BinaryOption.BinaryValue.Selected).ToList()
                         .Select(kv => kv.Key).ToList(), GlobalState.varModel, false))).ToList();
-                    invalid.ForEach(conf => GlobalState.logError.logLine("Invalid configuration:" + conf.ToString()));
+                    invalid.ForEach(conf => GlobalState.logError.logLine("Invalid configuration: " + conf.ToString()));
 
                     GlobalState.measurementSource = task.TrimEnd();
                     string attachement = "";
@@ -804,7 +804,7 @@ namespace CommandLine
                         }
                         else
                         {
-                            GlobalState.logInfo.logLine("Couldnt print configs");
+                            GlobalState.logInfo.logLine("Couldn't print configs");
                             GlobalState.logError.logLine("Error cant print configs without at least a outputfile");
                         }
 
@@ -1205,7 +1205,7 @@ namespace CommandLine
                     }
                     else
                     {
-                        GlobalState.logError.logLine("Arguement " + name + " has no value.");
+                        GlobalState.logError.logLine("Argument " + name + " has no value.");
                     }
                 }
             }
@@ -1245,7 +1245,7 @@ namespace CommandLine
         private string createSamplingIdentifier()
         {
             StringBuilder sb = new StringBuilder();
-            // add binay sampling strategy to the identifier
+            // add binary sampling strategy to the identifier
             sb.Append(this.exp.info.binarySamplings_Learning + "_");
 
             // add numeric sampling strategy to the identifier
@@ -1859,7 +1859,7 @@ namespace CommandLine
                 return;
             }
 
-            GlobalState.logInfo.logLine("Learning: " + "NumberOfConfigurationsLearning:" + configurations_Learning.Count);
+            GlobalState.logInfo.logLine("Learning: NumberOfConfigurationsLearning:" + configurations_Learning.Count);
             exp.models.Clear();
             var mod = exp.models;
             exp = new Learning(configurations_Learning, configurations_Learning);
@@ -2013,7 +2013,7 @@ namespace CommandLine
             {
                 configurationsValidation = configurationsLearning;
             }
-            GlobalState.logInfo.logLine("Learning: " + "NumberOfConfigurationsLearning:" + configurationsLearning.Count + " NumberOfConfigurationsValidation:" + configurationsValidation.Count);
+            GlobalState.logInfo.logLine("Learning: NumberOfConfigurationsLearning:" + configurationsLearning.Count + " NumberOfConfigurationsValidation:" + configurationsValidation.Count);
             return true;
         }
 

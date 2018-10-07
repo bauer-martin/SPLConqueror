@@ -92,7 +92,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Restuns the name of the parent feature.
+        /// Returns the name of the parent feature.
         /// </summary>
         public String ParentName
         {
@@ -336,7 +336,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// String reprensentation of the configuration option.
+        /// String representation of the configuration option.
         /// </summary>
         /// <returns>String representation.</returns>
         public override string ToString()

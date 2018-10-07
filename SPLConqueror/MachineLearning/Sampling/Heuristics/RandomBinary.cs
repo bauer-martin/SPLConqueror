@@ -18,7 +18,7 @@ namespace MachineLearning.Sampling.Heuristics
         private VariabilityModel varModel;
 
         /// <summary>
-        /// The constructror of this class.
+        /// The constructor of this class.
         /// </summary>
         /// <param name="varModel">The variability model defining the configuration space.</param>
         public RandomBinary(VariabilityModel varModel)
@@ -29,15 +29,15 @@ namespace MachineLearning.Sampling.Heuristics
         /// <summary>
         /// Returns a set of random binary partial configurations. 
         /// </summary>
-        /// <param name="parameters">Parameters for this random sampling. The following paramters are supported:
+        /// <param name="parameters">Parameters for this random sampling. The following parameters are supported:
         /// seed = the seed for the random generator (int required)
         /// numConfigs = the number of configurations that have to be selected. 
         ///              To be able ot select a number of configurations equal to the number selected by the OW heuristic or 
-        ///              the TWise heuristics, two special values can be given for this paramter. To select a number equal to 
+        ///              the TWise heuristics, two special values can be given for this parameter. To select a number equal to 
         ///              the OW heuristics use "asOW" as value and to select a number equal to a TWise heuristics with a t of X
         ///              use "asTWX".
         /// </param>
-        /// <returns>A list of random binary partial configuartions.</returns>
+        /// <returns>A list of random binary partial configurations.</returns>
         public List<List<BinaryOption>> getRandomConfigs(Dictionary<String, String> parameters)
         {
             configurations.Clear();

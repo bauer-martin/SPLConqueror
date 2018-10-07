@@ -66,7 +66,7 @@ namespace SPLConqueror_Core
                 }
                 catch (FileNotFoundException)
                 {
-                    GlobalState.logError.logLine("Configuration file \"" + file + "\" coud not be found."
+                    GlobalState.logError.logLine("Configuration file \"" + file + "\" could not be found."
                         + " Could not read configurations.");
                     return null;
                 }
@@ -89,7 +89,7 @@ namespace SPLConqueror_Core
         private static char decimalDelimiter = ',';
         private static char separator = ',';
 
-        private const string decimal_delimeter_tag = "decimalDelimiter";
+        private const string decimal_delimiter_tag = "decimalDelimiter";
         private const string separator_tag = "separator";
         // TODO Abort deviation for different nfps
         private const string abort_deviation_tag = "deviation";
@@ -249,7 +249,7 @@ namespace SPLConqueror_Core
                 {
                     if (configurations.Contains(c))
                     {
-                        GlobalState.logError.logLine("Mutiple definition of one configuration in the configurations file:  " + c.ToString());
+                        GlobalState.logError.logLine("Multiple definition of one configuration in the configurations file:  " + c.ToString());
                     }
                     else
                     {
@@ -304,13 +304,13 @@ namespace SPLConqueror_Core
             }
 
             // Retrieve the decimal delimiter and the separator sign if included
-            if (currentElemt.HasAttribute(decimal_delimeter_tag) && currentElemt.HasAttribute(separator_tag))
+            if (currentElemt.HasAttribute(decimal_delimiter_tag) && currentElemt.HasAttribute(separator_tag))
             {
                 // I assume that the decimal delimiter as well as the separator are only one symbol
-                ConfigurationReader.decimalDelimiter = currentElemt.GetAttribute(decimal_delimeter_tag)[0];
+                ConfigurationReader.decimalDelimiter = currentElemt.GetAttribute(decimal_delimiter_tag)[0];
                 ConfigurationReader.separator = currentElemt.GetAttribute(separator_tag)[0];
 
-                if (currentElemt.GetAttribute(decimal_delimeter_tag).Length > 1 || currentElemt.GetAttribute(separator_tag).Length > 1)
+                if (currentElemt.GetAttribute(decimal_delimiter_tag).Length > 1 || currentElemt.GetAttribute(separator_tag).Length > 1)
                 {
                     GlobalState.logError.log("The decimal delimiter and the separator must consist of only one symbol.");
                 }
@@ -319,10 +319,10 @@ namespace SPLConqueror_Core
                     GlobalState.logError.log("The decimal delimiter symbol and the separator symbol must be different.");
                 }
             }
-            else if (currentElemt.HasAttribute(decimal_delimeter_tag))
+            else if (currentElemt.HasAttribute(decimal_delimiter_tag))
             {
-                ConfigurationReader.decimalDelimiter = currentElemt.GetAttribute(decimal_delimeter_tag)[0];
-                if (currentElemt.GetAttribute(decimal_delimeter_tag).Length > 1)
+                ConfigurationReader.decimalDelimiter = currentElemt.GetAttribute(decimal_delimiter_tag)[0];
+                if (currentElemt.GetAttribute(decimal_delimiter_tag).Length > 1)
                 {
                     GlobalState.logError.log("The decimal delimiter must consist of only one symbol.");
                 }
@@ -341,7 +341,7 @@ namespace SPLConqueror_Core
         /// Parses the binary options, represented as string, of a configuration.
         /// </summary>
         /// <param name="binaryString">The string representation of the selected binary configuration options.</param>
-        /// <param name="binaryOptions">The data strcutre containing the parsed binary options and their values.</param>
+        /// <param name="binaryOptions">The data structure containing the parsed binary options and their values.</param>
         /// <param name="varModel">The variability model the configuration is defined for.</param>
         /// <returns>True if the configuration is valid.</returns>
         private static bool parseBinaryOptionString(string binaryString, out Dictionary<BinaryOption, BinaryOption.BinaryValue> binaryOptions, VariabilityModel varModel)
@@ -379,7 +379,7 @@ namespace SPLConqueror_Core
         /// Parses the numeric options, represented as string, of a configuration.
         /// </summary>
         /// <param name="numericString">The string representation of the numeric configuration options.</param>
-        /// <param name="numericOptions">The data strcutre containing the parsed numeric options and their values.</param>
+        /// <param name="numericOptions">The data structure containing the parsed numeric options and their values.</param>
         /// <param name="varModel">The variability model the configuration is defined for.</param>
         /// <returns>True if the configuration is valid</returns>
         private static bool parseNumericOptionString(string numericString, out Dictionary<NumericOption, double> numericOptions, VariabilityModel varModel)
@@ -426,7 +426,7 @@ namespace SPLConqueror_Core
 
         /// <summary>
         /// Returns the of list of non function properties (nfps) measured for the configurations of the given file. To tune up performance, 
-        /// we consider only the first configurtion of the file and assume that all configurations have the same nfps. 
+        /// we consider only the first configuration of the file and assume that all configurations have the same nfps. 
         /// </summary>
         /// <param name="file">The xml file consisting of configurations.</param>
         /// <returns>The list of nfps the configurations have measurements.</returns>
@@ -461,10 +461,10 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method reads all configurations specified in the .csv file. In this mehtod, we assume that the file has a header. 
+        /// This method reads all configurations specified in the .csv file. In this method, we assume that the file has a header. 
         /// </summary>
         /// <param name="file"></param>
-        /// <param name="model">The variabiliy model for the configurations.</param>
+        /// <param name="model">The variability model for the configurations.</param>
         /// <returns>A list of all configurations </returns>
         public static List<Configuration> readConfigurations_Header_CSV(String file, VariabilityModel model)
         {
@@ -556,7 +556,7 @@ namespace SPLConqueror_Core
             return configurations;
         }
 
-        //Two formats are possible: with header and 0,1s for binary selection or no header and giving the names of config options per per line (this excludex numeric options)
+        //Two formats are possible: with header and 0,1s for binary selection or no header and giving the names of config options per per line (this excludes numeric options)
         private static List<Configuration> readCSV(string file, VariabilityModel model)
         {
             StreamReader sr;

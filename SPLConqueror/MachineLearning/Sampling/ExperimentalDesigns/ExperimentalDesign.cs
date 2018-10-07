@@ -68,7 +68,7 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
         }
 
         /// <summary>
-        /// Instatiates a new experimental design based on a given string. the format is: "[NumericOption1,Num2,...] Parameter1:VALUE Parameter2:VALUE"
+        /// Instantiates a new experimental design based on a given string. the format is: "[NumericOption1,Num2,...] Parameter1:VALUE Parameter2:VALUE"
         /// </summary>
         /// <param name="param">The string containing the parameters and numeric options used by an experimental design</param>
         public ExperimentalDesign(String param)

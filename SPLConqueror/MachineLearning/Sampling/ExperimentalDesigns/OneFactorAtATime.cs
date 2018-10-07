@@ -12,7 +12,7 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
         private int distinctValuesPerOption;
 
         /// <summary>
-        /// Creates a new istance considering the provided numeric configuration options.
+        /// Creates a new instance considering the provided numeric configuration options.
         /// </summary>
         /// <param name="optionsToConsider">The set of configuration options that are considered in this design.</param>
         public OneFactorAtATime(List<NumericOption> optionsToConsider)
@@ -23,7 +23,7 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
         /// <summary>
         /// Creates a new instance considering the distinctValuePerOption parameter.
         /// </summary>
-        /// <param name="distinctValuePerOption">Distince value per option parameter.</param>
+        /// <param name="distinctValuePerOption">Distinct value per option parameter.</param>
         public OneFactorAtATime(int distinctValuePerOption = 3) : base()
         {
             this.distinctValuesPerOption = distinctValuePerOption;

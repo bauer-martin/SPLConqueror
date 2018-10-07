@@ -192,7 +192,7 @@ namespace MachineLearning.Learning
             defineParameterSpace(parameters, boolSettings, intSettings, doubleSettings, lossFuncInterval, scoreMeasureInterval,
                 learnTimeLimitInterval);
 
-            //initial cartesian product of Enumeratíon and other object Settings
+            //initial cartesian product of Enumeration and other object Settings
             var cartProduct = from lossFunc in lossFuncInterval.First().Value
                               from learnTime in learnTimeLimitInterval.First().Value
                               from scoreMeasure in scoreMeasureInterval.First().Value

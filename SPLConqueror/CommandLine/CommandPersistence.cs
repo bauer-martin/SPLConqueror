@@ -20,7 +20,7 @@ namespace CommandLine
         public static CommandHistory history = new CommandHistory();
 
         /// <summary>
-        /// Recovered learning informations. Bool value indicates if it has to be relearned.
+        /// Recovered learning information. Bool value indicates if it has to be relearned.
         /// </summary>
         public static Tuple<bool, List<string>> learningHistory;
 
@@ -64,7 +64,7 @@ namespace CommandLine
             }
             else
             {
-                GlobalState.logError.logLine("Couldnt dump the data. Not all target paths are given");
+                GlobalState.logError.logLine("Couldn't dump the data. Not all target paths are given");
             }
         }
 
@@ -88,13 +88,13 @@ namespace CommandLine
             }
             else
             {
-                GlobalState.logError.logLine("Couldnt recover from dump. Not all source paths are given");
+                GlobalState.logError.logLine("Couldn't recover from dump. Not all source paths are given");
                 return null;
             }
         }
 
         /// <summary>
-        /// Simulate the programm flow and find all relevant Commands
+        /// Simulate the program flow and find all relevant Commands
         /// </summary>
         /// <param name="aScript">A script file with the commands.</param>
         /// <param name="performedCommands">Empty dictionary to store the performed commands and arguments.</param>

@@ -24,7 +24,7 @@ namespace MachineLearning.Learning.Regression
         //Information about the state of learning
         public InfluenceModel infModel = null;
         protected ObservableCollection<LearningRound> learningHistory = new ObservableCollection<LearningRound>();
-        protected int hierachyLevel = 1;
+        protected int hierarchyLevel = 1;
         protected DateTime startTime;
         protected List<Feature> initialFeatures = new List<Feature>();
         protected List<Feature> strictlyMandatoryFeatures = new List<Feature>();
@@ -78,7 +78,7 @@ namespace MachineLearning.Learning.Regression
 
             if (this.MLsettings.crossValidation)
             {
-                // split the dataset in different test and trainingsets
+                // split the dataset in different test and training sets
             }
 
         }
@@ -208,7 +208,7 @@ namespace MachineLearning.Learning.Regression
         }
 
         /// <summary>
-        /// Based on the given learning round, the method intantiates the influence model.
+        /// Based on the given learning round, the method instantiates the influence model.
         /// </summary>
         /// <param name="current">The current learning round containing all determined features with their influences.</param>
         private void updateInfluenceModel()
@@ -278,11 +278,11 @@ namespace MachineLearning.Learning.Regression
         /// <summary>
         /// Makes one further step in learning. That is, it adds a further feature to the current model.
         /// </summary>
-        /// <param name="previousRound">State of the learning process untill this forward step.</param>
+        /// <param name="previousRound">State of the learning process until this forward step.</param>
         /// <returns>Returns a new model (i.e. learning round) with an additional feature.</returns>
         internal LearningRound performForwardStep(LearningRound previousRound)
         {
-            //Error in this round (depends on crossvalidation)
+            //Error in this round (depends on cross validation)
             double minimalRoundError = Double.MaxValue;
             double maximalRoundScore = Double.MinValue;
             IDictionary<Feature, double> bfCandidateRate = null;
@@ -299,12 +299,12 @@ namespace MachineLearning.Learning.Regression
                 candidates = generateCandidates(previousRound.FeatureSet, this.initialFeatures);
             }
 
-            //If we got no candidates and we perform hierachical learning, we go one step further
+            //If we got no candidates and we perform hierarchical learning, we go one step further
             if (candidates.Count == 0 && this.MLsettings.withHierarchy)
             {
-                if (this.hierachyLevel > 10)
+                if (this.hierarchyLevel > 10)
                     return null;
-                this.hierachyLevel++;
+                this.hierarchyLevel++;
                 return performForwardStep(previousRound);
             }
 
@@ -448,7 +448,7 @@ namespace MachineLearning.Learning.Regression
         }
 
         /// <summary>
-        /// Optimization: we do not want to consider candidates in the next X rounds that showed no or only a slight improvment in accuracy relative to all other candidates
+        /// Optimization: we do not want to consider candidates in the next X rounds that showed no or only a slight improvement in accuracy relative to all other candidates
         /// </summary>
         /// <param name="errorOfCandidates">The Dictionary containing all candidate features with their fitted error rate.</param>
         private void addFeaturesToIgnore(ConcurrentDictionary<Feature, double> errorOfCandidates)
@@ -520,7 +520,7 @@ namespace MachineLearning.Learning.Regression
                 if (!currentModel.Contains(basicFeature))
                     listOfCandidates.Add(basicFeature);
 
-                if (this.MLsettings.withHierarchy && this.hierachyLevel == 1)
+                if (this.MLsettings.withHierarchy && this.hierarchyLevel == 1)
                     continue;
 
                 foreach (Feature feature in currentModel)
@@ -632,8 +632,8 @@ namespace MachineLearning.Learning.Regression
                     }
                 }
 
-                // learn mirrowed function
-                if (this.MLsettings.learn_mirrowedFunction && basicFeature.participatingNumOptions.Count > 0)
+                // learn mirrored function
+                if (this.MLsettings.learn_mirroredFunction && basicFeature.participatingNumOptions.Count > 0)
                 {
 
                     Feature newCandidate = new Feature("(" + basicFeature.participatingNumOptions.First().Max_value + " - " + basicFeature.getPureString() + ")", varModel);
@@ -666,7 +666,7 @@ namespace MachineLearning.Learning.Regression
         /// </summary>
         /// <param name="partOfTheModel">Part of the model that is learned in the previous round.</param>
         /// <param name="newCandidate">The new candidate that have to be checked.</param>
-        /// <returns>Restuns false if the new candidate is not valid for the ml settings. Checks, for example, if the number of participating configuration options is larger than the defined featureSizeTreshold of the ML_Settings. </returns>
+        /// <returns>Returns false if the new candidate is not valid for the ml settings. Checks, for example, if the number of participating configuration options is larger than the defined featureSizeThreshold of the ML_Settings. </returns>
 		protected bool checkWhetherCandidateIsValid(Feature partOfTheModel, Feature newCandidate)
         {
             //We do not want to generate interactions with the root option
@@ -674,7 +674,7 @@ namespace MachineLearning.Learning.Regression
             || partOfTheModel.participatingNumOptions.Count == 0 && partOfTheModel.participatingBoolOptions.Count == 1 && partOfTheModel.participatingBoolOptions.ElementAt(0) == infModel.Vm.Root)
                 return false;
 
-            if (this.MLsettings.withHierarchy && newCandidate.getNumberOfParticipatingOptions() >= this.hierachyLevel)
+            if (this.MLsettings.withHierarchy && newCandidate.getNumberOfParticipatingOptions() >= this.hierarchyLevel)
                 return false;
             if (this.MLsettings.limitFeatureSize && (newCandidate.getNumberOfParticipatingOptions() == this.MLsettings.featureSizeTreshold))
                 return false;
@@ -690,11 +690,11 @@ namespace MachineLearning.Learning.Regression
         /// The basicFeatures comes from the pool of initial features (e.g., all configuration options of the variability model or predefined combinations of options).
         /// Further candidates are combinations of the basic features. That is, we generate candidates as representatives of interactions or higher polynomial functions.
         /// Which candidates (i.e. their maximum size) and polynomial degrees are generated depends on the parameters given in ML_settings.
-        /// Candidates that do not sattisfy the fieature model are removed.
+        /// Candidates that do not satisfy the feature model are removed.
         /// </summary>
         /// <param name="currentModel">The model containing the features found so far. These features are combined with the basic feature.</param>
         /// <param name="basicFeatures">The features for which we generate new candidates.</param>
-        /// <param name = "bfCandidateRate">Maps a set of binary configuration options from the feature to the number of configurations in which these options occure.</param>
+        /// <param name = "bfCandidateRate">Maps a set of binary configuration options from the feature to the number of configurations in which these options occur.</param>
         /// <returns>Returns a list of candidates that can be added to the current model.</returns>
         protected List<Feature> generateBruteForceCandidates(List<Feature> currentModel, List<Feature> basicFeatures, out IDictionary<Feature, double> bfCandidateRate)
         {
@@ -704,9 +704,9 @@ namespace MachineLearning.Learning.Regression
                 var listOfCombinations = new List<List<Feature>>();
                 if (this.MLsettings.withHierarchy)
                 {
-                    if (hierachyLevel <= MLsettings.featureSizeTreshold)
+                    if (hierarchyLevel <= MLsettings.featureSizeTreshold)
                     {
-                        listOfCombinations = combinations(basicFeatures, hierachyLevel);
+                        listOfCombinations = combinations(basicFeatures, hierarchyLevel);
                     }
                 }
                 else
@@ -727,7 +727,7 @@ namespace MachineLearning.Learning.Regression
                     {
                         bool isValid = false;
 
-                        // Use a SAT solver to check if the feature combination in the new candidate is vaild.
+                        // Use a SAT solver to check if the feature combination in the new candidate is valid.
                         //var configChecker = new CheckConfigSAT(null);
                         //isValid = configChecker.checkConfigurationSAT(newCandidate.participatingBoolOptions.ToList(), newCandidate.getVariabilityModel(), true);
 
@@ -828,7 +828,7 @@ namespace MachineLearning.Learning.Regression
         }
 
         /// <summary>
-        /// Given the elements in interable, generate combinations of them of the length up to n
+        /// Given the elements in iterable, generate combinations of them of the length up to n
         /// starting with length 1.
         /// </summary>
         /// <returns>Combinations up to the length n.</returns>
@@ -908,7 +908,7 @@ namespace MachineLearning.Learning.Regression
         }
 
         /// <summary>
-        /// This mestode produces an estimated for the given configuration based on the given model.
+        /// This method produces an estimated for the given configuration based on the given model.
         /// </summary>
         /// <param name="currentModel">The model containing all fitted features.</param>
         /// <param name="c">The configuration for which the estimation should be performed.</param>
@@ -1117,7 +1117,7 @@ namespace MachineLearning.Learning.Regression
             {
                 if (this.MLsettings.withHierarchy)
                 {
-                    hierachyLevel++;
+                    hierarchyLevel++;
                     return false;
                 }
                 else
@@ -1197,7 +1197,7 @@ namespace MachineLearning.Learning.Regression
             Y_learning = temparryLearn;
             Y_learning = Y_learning.T;
 
-            //Now, we genrate for each inidividual option the data column. We also remove options from the initial feature set that occur in all or no variants of the learning set
+            //Now, we generate for each individual option the data column. We also remove options from the initial feature set that occur in all or no variants of the learning set
             List<Feature> featuresToRemove = new List<Feature>();
             foreach (Feature f in this.initialFeatures)
             {
@@ -1253,7 +1253,7 @@ namespace MachineLearning.Learning.Regression
             Y_validation = Y_validation.T;
         }
 
-        //TODO: K-fold crossvalidation
+        //TODO: K-fold cross validation
         #endregion
 
 
@@ -1262,7 +1262,7 @@ namespace MachineLearning.Learning.Regression
         /// This is an essential method for fitting the constants of features. It constructs the data matrix.
         /// The matrix has as rows the configurations of the training set and the columns represent the features (i.e., configuration options and interactions) of the model.
         /// A cell contains a value signaling the configured value of the option (or interaction) for the respective configuration. A column representing a binary option can, thus, have only 0 (not in configuration) or 1 (selected).
-        /// For numeric options, the cell contains the value parameter of that option. If the feature represents a higher polynomial function, the value paramter is transformed according to the function (e.g., x = 10, we want to fit x^2 -> cell contains 10 * 10).
+        /// For numeric options, the cell contains the value parameter of that option. If the feature represents a higher polynomial function, the value parameter is transformed according to the function (e.g., x = 10, we want to fit x^2 -> cell contains 10 * 10).
         /// </summary>
         /// <param name="featureSet">The list of features for which we want to determine the coefficients.</param>
         /// <returns>Returns an array representing the values of each feature for the configurations of the learning set.</returns>

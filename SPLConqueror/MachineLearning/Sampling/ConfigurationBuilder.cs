@@ -234,7 +234,7 @@ namespace MachineLearning.Sampling
                 }
             }
 
-            // Filter configurations based on the NonBooleanConstratins
+            // Filter configurations based on the NonBooleanConstraints
             List<Configuration> filtered = new List<Configuration>();
             foreach (Configuration conf in result)
             {
@@ -341,7 +341,7 @@ namespace MachineLearning.Sampling
 
         private static List<Configuration> replaceReference(List<Configuration> sampled)
         {
-            // Replaces the reference of the sampled configuration with the corresponding measured configurstion if it exists
+            // Replaces the reference of the sampled configuration with the corresponding measured configuration if it exists
 
             var measured = GlobalState.allMeasurements.Configurations.Intersect(sampled);
             var notMeasured = sampled.Except(measured);

@@ -33,7 +33,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// A mapping from the index of an option to the object providing all information of the configuratio option.
+        /// A mapping from the index of an option to the object providing all information of the configuration option.
         /// </summary>
         public Dictionary<int, ConfigurationOption> optionToIndex = new Dictionary<int, ConfigurationOption>();
 
@@ -109,10 +109,10 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Retuns a list containing all numeric configuration options that are considered in the learning process.
+        /// Returns a list containing all numeric configuration options that are considered in the learning process.
         /// </summary>
         /// <param name="blacklist">A list containing all numeric options that should not be considered in the learning process.</param>
-        /// <returns>A list containing all numeric configuartion options that are considered in the learning process.</returns>
+        /// <returns>A list containing all numeric configuration options that are considered in the learning process.</returns>
         public List<NumericOption> getNonBlacklistedNumericOptions(List<String> blacklist)
         {
             List<NumericOption> result = new List<NumericOption>();
@@ -135,7 +135,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creastes a new variability model with a given name that consists only of a binary root option.
+        /// Creates a new variability model with a given name that consists only of a binary root option.
         /// </summary>
         /// <param name="name">The name of the variability model.</param>        
 
@@ -150,7 +150,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// Stores the current variability model into an XML file with the already stored path
         /// </summary>
-        /// <returns>Returns true if sucessfully saved, false otherwise</returns>
+        /// <returns>Returns true if successfully saved, false otherwise</returns>
         public bool saveXML()
         {
             if (this.path.Length > 0)
@@ -163,7 +163,7 @@ namespace SPLConqueror_Core
         /// Stores the current variability model into an XML file
         /// </summary>
         /// <param name="path">Path to which the XML file is stored</param>
-        /// <returns>Returns false if the saving was not successfull</returns>
+        /// <returns>Returns false if the saving was not successful</returns>
         public bool saveXML(String path)
         {
             //Create XML Document
@@ -256,11 +256,11 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Read a Feature model in SXFM format and create a new VaribilityModel that 
+        /// Read a Feature model in SXFM format and create a new VariabilityModel that 
         /// equals the Feature model.
         /// </summary>
         /// <param name="path">The path of the SXFM Feature model.</param>
-        /// <returns>VaribilityModel object that equals the SXFM Feature model.</returns>
+        /// <returns>VariabilityModel object that equals the SXFM Feature model.</returns>
         public static VariabilityModel loadFromSXFM(string path)
         {
             VariabilityModel model = new VariabilityModel("to_change");
@@ -275,10 +275,10 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Read a SXFM Feature Model and store all information in this VaribilityModel object.
+        /// Read a SXFM Feature Model and store all information in this VariabilityModel object.
         /// </summary>
         /// <param name="path">The path of the feature model.</param>
-        /// <returns>True if reading the model was succesful false otherwise.</returns>
+        /// <returns>True if reading the model was successful false otherwise.</returns>
         public bool loadSXFM(string path)
         {
             if (!File.Exists(path))
@@ -646,7 +646,7 @@ namespace SPLConqueror_Core
 
         /// <summary>
         /// Produce a reduced version of the variability model, containing only binary options
-        /// and at least the considered options. Is a considered option, all parent option will be inlcuded.
+        /// and at least the considered options. Is a considered option, all parent option will be included.
         /// Constraints between options(alternative groups, implication etc), will be included if enough options
         /// are present to (e.g. both options for implications or at least 2 options in alternative groups).
         /// </summary>
@@ -782,7 +782,7 @@ namespace SPLConqueror_Core
             if (option.Name.Contains('-') || option.Name.Contains('+'))
                 return false;
 
-            // the vitrual root configuration option does not have to be added to the variability model. 
+            // the virtual root configuration option does not have to be added to the variability model. 
             if (option.Name.Equals("root"))
                 return true;
 
@@ -852,7 +852,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method retuns the configuration with the given name.
+        /// This method returns the configuration with the given name.
         /// </summary>
         /// <param name="name">Name of the option under consideration.</param>
         /// <returns>The option with the given name or NULL of no option with the name is defined.</returns>

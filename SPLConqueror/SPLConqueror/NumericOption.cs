@@ -279,7 +279,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Loads all information about the numeric connfiguration option from the XML file consisting of the variability model.
+        /// Loads all information about the numeric configuration option from the XML file consisting of the variability model.
         /// </summary>
         /// <param name="node">The root note of the numeric configuration option.</param>
         internal new void loadFromXML(XmlElement node)
@@ -315,7 +315,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// This method returns the valid value with the smallest distance to the value given.
         /// </summary>
-        /// <param name="inputValue">A value the nearest valid have to be computet for.</param>
+        /// <param name="inputValue">A value the nearest valid have to be computed for.</param>
         /// <returns>The valid value with the smallest distance to the input value.</returns>
         public double nearestValidValue(double inputValue)
         {

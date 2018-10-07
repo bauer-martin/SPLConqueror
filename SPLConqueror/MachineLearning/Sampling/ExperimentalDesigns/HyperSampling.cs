@@ -46,8 +46,8 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
         }
 
         /*
-         * in: int precision; defines the densitiy of the grid. range from 0 - 100. 100 means full variant space. 0 means 0 variants.
-         * out: bool; whether the computation was sucessfull.
+         * in: int precision; defines the density of the grid. range from 0 - 100. 100 means full variant space. 0 means 0 variants.
+         * out: bool; whether the computation was successful.
          * Approach: For each binary configuration exist x configurations for metric configuration options
          * But we need not all x configurations but a percentage of all x configurations. precision acts as the percentage value.
          * We scale the percentage for all metric options, but use at least 2 different values
@@ -134,7 +134,7 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
          * in: VariableFeature vf; is the feature for which we have to know the sampling values
          * in: double percentage; range 0..1 the percentage of all values we need
          * out: void
-         * Sets the maximum sampling size according to the percentage. The logarithm must be used, because the values of a single metric value multplies with the values of all others leading to an exponential number
+         * Sets the maximum sampling size according to the percentage. The logarithm must be used, because the values of a single metric value multiplies with the values of all others leading to an exponential number
          * *****************/
         protected int setSamplingValue(NumericOption vf, double percentage)
         {

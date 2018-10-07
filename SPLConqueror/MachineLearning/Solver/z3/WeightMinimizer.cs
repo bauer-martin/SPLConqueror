@@ -17,8 +17,8 @@ namespace MachineLearning.Solver
         /// Try to find a configuration with low weight.
         /// </summary>
         /// <param name="sortedRanking">A list of binary options and their weight ordered by their weight.</param>
-        /// <param name="cache">A sat solver cache instance that already contains the contraints of 
-        /// size and unallowed features.</param>
+        /// <param name="cache">A sat solver cache instance that already contains the constraints of 
+        /// size and disallowed features.</param>
         /// <param name="vm">The variability model of the given system.</param>
         /// <returns>A configuration that has a small weight.</returns>
         public static List<BinaryOption> getSmallWeightConfig(List<KeyValuePair<List<BinaryOption>, int>> sortedRanking,

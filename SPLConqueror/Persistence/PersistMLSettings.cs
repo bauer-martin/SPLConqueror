@@ -32,7 +32,7 @@ namespace Persistence
         /// <summary>
         /// Recover a older ml settings from the persistent dump.
         /// </summary>
-        /// <param name="persistentDump">Persisten ml settings dump as string</param>
+        /// <param name="persistentDump">Persistent ml settings dump as string</param>
         /// <returns>Previous ML_Settings object</returns>
         public static ML_Settings recoverFromPersistentDump(string persistentDump)
         {

@@ -62,7 +62,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates an influence function based on the expression. All token wich are neither number nor operators are considered to be 
+        /// Creates an influence function based on the expression. All token which are neither number nor operators are considered to be 
         /// numeric configuration options. 
         /// </summary>
         /// <param name="expression">A function consisting of numbers, operators and configuration-option names.</param>
@@ -207,7 +207,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method creates an influence function that is the combination of the left and the right functions. Both funtions should
+        /// This method creates an influence function that is the combination of the left and the right functions. Both functions should
         /// be defined over the same variability model. 
         /// </summary>
         /// <param name="left">The first summand of the new influence function.</param>
@@ -590,7 +590,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Retuns the number of configuration options participating in the function. If an option apears multiple times in the function, it is counted multiple times.
+        /// Returns the number of configuration options participating in the function. If an option appears multiple times in the function, it is counted multiple times.
         /// </summary>
         /// <returns>The overall number of configuration-option occurrences in the function.</returns>
         public int getNumberOfParticipatingOptions()
@@ -599,7 +599,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Returns the number of different configuration options participating in the function. Mutliple occurrences of an option are ignored. 
+        /// Returns the number of different configuration options participating in the function. Multiple occurrences of an option are ignored. 
         /// </summary>
         /// <returns>The number of distinct options participating in the function.</returns>
         public int getNumberOfDistinctParticipatingOptions()
@@ -707,7 +707,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// The method evaluates the influence function with the configuration. 
         /// </summary>
-        /// <param name="config">A configurtion.</param>
+        /// <param name="config">A configuration.</param>
         /// <returns>The value of the influence function for the configuration.</returns>
         public double eval(Configuration config)
         {
@@ -765,7 +765,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Returns whether the influence function coints a specific configuration option. 
+        /// Returns whether the influence function contains a specific configuration option. 
         /// </summary>
         /// <param name="option"></param>
         /// <returns></returns>

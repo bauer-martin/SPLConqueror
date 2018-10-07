@@ -8,7 +8,7 @@ namespace SPLConqueror_Core
 
 
     /// <summary>
-    /// This class represents a non boolean constraint contraining the configuration space of the variability model. 
+    /// This class represents a non boolean constraint constraining the configuration space of the variability model. 
     /// </summary>
     public class NonBooleanConstraint
     {
@@ -104,10 +104,10 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Tests whether the given partial configuraion (consistsing only of the numeric-configuration options and their selected value) holds
+        /// Tests whether the given partial configuration (consisting only of the numeric-configuration options and their selected value) holds
         /// for the given non-functional constraint.
         /// </summary>
-        /// <param name="config">A parial configuration consisting of the numeric-configurations options and their selected values.</param>
+        /// <param name="config">A partial configuration consisting of the numeric-configurations options and their selected values.</param>
         /// <returns>True if the partial configuration holds for the non-functional property.</returns>
         public bool configIsValid(Dictionary<NumericOption, double> config)
         {

@@ -72,7 +72,7 @@ namespace MachineLearning.Learning
         public int featureSizeTreshold = 4;
 
         /// <summary>
-        /// The learner can learn quadratic functions of one numeric option, without learning the linear function apriory, if this property is true.
+        /// The learner can learn quadratic functions of one numeric option, without learning the linear function a priory, if this property is true.
         /// </summary>
         public bool quadraticFunctionSupport = true;
 
@@ -98,7 +98,7 @@ namespace MachineLearning.Learning
 
         public bool learn_ratioFunction = false;
 
-        public bool learn_mirrowedFunction = false;
+        public bool learn_mirroredFunction = false;
 
         /// <summary>
         /// Defines the number of rounds the learning process have to be performed. 
@@ -111,12 +111,12 @@ namespace MachineLearning.Learning
         public double backwardErrorDelta = 1;
 
         /// <summary>
-        /// Defines the minimum error in improved a round must reach before either the learnings is aborted or the hierachy is increased for hierarchy learning
+        /// Defines the minimum error in improved a round must reach before either the learnings is aborted or the hierarchy is increased for hierarchy learning
         /// </summary>
         public double minImprovementPerRound = 0.1;
 
         /// <summary>
-        /// Defines whether we learn our model in hierachical steps
+        /// Defines whether we learn our model in hierarchical steps
         /// </summary>
         public bool withHierarchy = false;
 
@@ -124,14 +124,14 @@ namespace MachineLearning.Learning
         /// Defines how candidate features are generated.  False - candidates 
         /// are generated in each step based on the features in the model and a
         /// set of initial features.  True - all possible combinations of initial
-        /// features (up to featureSizeTreshold) are generated and used as
-        /// candidates (brute force means, that features alredy present in the
-        /// model are not taken inot account).
+        /// features (up to featureSizeThreshold) are generated and used as
+        /// candidates (brute force means, that features already present in the
+        /// model are not taken into account).
         /// </summary>
         public bool bruteForceCandidates = false;
 
         /// <summary>
-        /// Enables an optimization: we do not want to consider candidates in the next X rounds that showed no or only a slight improvment in accuracy relative to all other candidates.
+        /// Enables an optimization: we do not want to consider candidates in the next X rounds that showed no or only a slight improvement in accuracy relative to all other candidates.
         /// </summary>
         public bool ignoreBadFeatures = false;
 
@@ -143,7 +143,7 @@ namespace MachineLearning.Learning
         /// <summary>
         /// If true, the candidate score (which is an average reduction of the 
         /// prediction error the candidate induces) is made dependent on its size.
-        /// See FeatureSubsetSelection.learn() for scroe calculation.
+        /// See FeatureSubsetSelection.learn() for score calculation.
         /// </summary>
         public bool candidateSizePenalty = true;
 
@@ -154,7 +154,7 @@ namespace MachineLearning.Learning
 
         public enum ScoreMeasure { RELERROR, INFLUENCE };
         /// <summary>
-        /// Defines which mesure is used to select the best candidate and to compute the score of a candidate. See ScoreMeasure enum for the available measures.
+        /// Defines which measure is used to select the best candidate and to compute the score of a candidate. See ScoreMeasure enum for the available measures.
         /// </summary>
         public ScoreMeasure scoreMeasure = ScoreMeasure.RELERROR;
 
@@ -168,7 +168,7 @@ namespace MachineLearning.Learning
         public List<string> blacklisted = new List<string>();
 
         /// <summary>
-        /// Returns a new settings object with the settings specified in the file as key value pair. Settings not beeing specified in this file will have the default value. 
+        /// Returns a new settings object with the settings specified in the file as key value pair. Settings not being specified in this file will have the default value. 
         /// </summary>
         /// <param name="settings">All settings to be changed in a string with whitespaces as separator .</param>
         /// <returns>A settings object with the values specified in the file.</returns>
@@ -198,7 +198,7 @@ namespace MachineLearning.Learning
         }
 
         /// <summary>
-        /// Returns a new settings object with the settings specified in the file as key value pair. Settings not beeing specified in this file will have the default value. 
+        /// Returns a new settings object with the settings specified in the file as key value pair. Settings not being specified in this file will have the default value. 
         /// </summary>
         /// <param name="settingLocation">Full qualified name of the settings file.</param>
         /// <returns>A settings object with the values specified in the file.</returns>
@@ -244,7 +244,7 @@ namespace MachineLearning.Learning
         /// <returns>True of the field could be set with the given value. False if there is no field with the given name.</returns>
         public bool setSetting(string name, string value)
         {
-            // Replace '-' in ml settings name with underscore since '-' isnt a valid symbol for names.
+            // Replace '-' in ml settings name with underscore since '-' isn't a valid symbol for names.
             // Now both underscore and '-' are supported for uniform naming.
             if (name.Contains("-"))
             {

@@ -8,7 +8,7 @@ using SPLConqueror_Core;
 namespace MachineLearning.Sampling.ExperimentalDesigns
 {
     /// <summary>
-    /// This design selects a speficied number of value combiantions for a set of numberic options. The value combinations are created using a random selection of values of the numeric options.
+    /// This design selects a specified number of value combinations for a set of numeric options. The value combinations are created using a random selection of values of the numeric options.
     /// </summary>
     public class RandomSampling : ExperimentalDesign
     {

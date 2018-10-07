@@ -6,7 +6,7 @@ using System.Text;
 namespace SPLConqueror_Core
 {
     /// <summary>
-    /// Representation of the non-functional property that is considered in the experiements.
+    /// Representation of the non-functional property that is considered in the experiments.
     /// </summary>
     public class NFProperty : IEquatable<NFProperty>
     {

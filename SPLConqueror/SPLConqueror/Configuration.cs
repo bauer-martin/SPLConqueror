@@ -16,7 +16,7 @@ namespace SPLConqueror_Core
         private Dictionary<BinaryOption, BinaryOption.BinaryValue> binaryOptions = new Dictionary<BinaryOption, BinaryOption.BinaryValue>();
 
         /// <summary>
-        /// Binary options of this configuration. For each option it is stored whether the option is selceted or deselected in this configuration.
+        /// Binary options of this configuration. For each option it is stored whether the option is selected or deselected in this configuration.
         /// </summary>
         public Dictionary<BinaryOption, BinaryOption.BinaryValue> BinaryOptions
         {
@@ -44,7 +44,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variablity model and not in the given set of binary options are assumed to have
+        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variability model and not in the given set of binary options are assumed to have
         /// their default value.
         /// </summary>
         /// <param name="binarySelection">A valid set of binary options.</param>
@@ -62,7 +62,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variablity model and not in the given set of binary options are assumed to have
+        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variability model and not in the given set of binary options are assumed to have
         /// their default value.
         /// </summary>
         /// <param name="binarySelection">A valid set of binary options.</param>
@@ -100,8 +100,8 @@ namespace SPLConqueror_Core
                         }
                         catch (KeyNotFoundException)
                         {
-                            GlobalState.logError.logLine(option.Value.Name + "not found in selected numeric options."
-                                + "This option is usually mandatory. Unless you removed it from your sampling domain"
+                            GlobalState.logError.logLine(option.Value.Name + " not found in selected numeric options."
+                                + " This option is usually mandatory. Unless you removed it from your sampling domain"
                                 + ", make sure your measurements contain all numeric options.");
                         }
                     }
@@ -133,7 +133,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Updates the identifyer of the configuration, it also adds the configuration to a index structre that is used to access
+        /// Updates the identifier of the configuration, it also adds the configuration to a index structure that is used to access
         /// the configurations as fast as possible.
         /// </summary>
         public void update()
@@ -161,7 +161,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// Creates a new configuration with the given set of binary and numeric configuration options.
         /// </summary>
-        /// <param name="binConfig">A set of SELECTED binary configuraiton options.</param>
+        /// <param name="binConfig">A set of SELECTED binary configuration options.</param>
         /// <param name="numConf">A set numeric configuration options with the values selected in this configuration.</param>
         public Configuration(List<BinaryOption> binConfig, Dictionary<NumericOption, double> numConf)
         {
@@ -262,7 +262,7 @@ namespace SPLConqueror_Core
         /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
-        /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
+        /// <returns>States whether the two configurations describes the same configuration option selection.</returns>
         public int CompareTo(Configuration other)
         {
             return this.identifier.CompareTo(other.identifier);
@@ -272,7 +272,7 @@ namespace SPLConqueror_Core
         /// Compares one configuration with an other configuration. The identifiers of the configurations are used in the comparison.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
-        /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
+        /// <returns>States whether the two configurations describes the same configuration option selection.</returns>
         public override bool Equals(Object other)
         {
             if (other == null)
@@ -285,7 +285,7 @@ namespace SPLConqueror_Core
         /// Compares one configuration with an other configuration.
         /// </summary>
         /// <param name="other">Configuration to compare</param>
-        /// <returns>States whether the two configurations desribes the same configuration option selection.</returns>
+        /// <returns>States whether the two configurations describes the same configuration option selection.</returns>
         public bool Equals(Configuration other)
         {
             if (other == null)
@@ -305,7 +305,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// This method retuns the hash code of this configuration.
+        /// This method returns the hash code of this configuration.
         /// </summary>
         /// <returns>The hash code of the configuration based one the identifier.</returns>
         public override int GetHashCode()
@@ -375,7 +375,7 @@ namespace SPLConqueror_Core
         /// </summary>
         /// <param name="setOfBinaryConfigurations">A list of binary selections. Each sublist represents a selection of binary configuration options.</param>
         /// <param name="binaryConfig">A list of binary configuration options.</param>
-        /// <returns>True if the list of binary selections contains in the list of binary configuration options, false otherwise. If one parameter is null this mehtod retuns false.</returns>
+        /// <returns>True if the list of binary selections contains in the list of binary configuration options, false otherwise. If one parameter is null this method returns false.</returns>
         public static bool containsBinaryConfiguration(List<List<BinaryOption>> setOfBinaryConfigurations, List<BinaryOption> binaryConfig)
         {
             if (setOfBinaryConfigurations == null || binaryConfig == null)
@@ -391,7 +391,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Compare two lists of binary configuration options. If both lists contains the same binary options, the mehthod retuns true and otherwise false.
+        /// Compare two lists of binary configuration options. If both lists contains the same binary options, the method returns true and otherwise false.
         /// </summary>
         /// <param name="oneConfiguration">A list of binary configuration options.</param>
         /// <param name="otherBinaryConfiguration">A list of binary configuration options.</param>
@@ -406,7 +406,7 @@ namespace SPLConqueror_Core
         /// </summary>
         /// <param name="setOfNumericConfigurations">A list of numeric selections. Each sublist represents a selection of numeric configuration options.</param>
         /// <param name="numericConfiguration">A list of numeric configuration options with selected values.</param>
-        /// <returns>True if the list of numeric selections contains in the list of numeric configuration options, false otherwise. If one parameter is null this mehtod retuns false.</returns>
+        /// <returns>True if the list of numeric selections contains in the list of numeric configuration options, false otherwise. If one parameter is null this method returns false.</returns>
         public static bool containsNumericConfiguration(List<Dictionary<NumericOption, double>> setOfNumericConfigurations, Dictionary<NumericOption, double> numericConfiguration)
         {
             if (setOfNumericConfigurations == null || numericConfiguration == null)
@@ -421,7 +421,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Compare two dictionaries of numerical configuration options. If both dictionaries contains the same numerical options with the same values selected, the mehthod retuns true and otherwise false.
+        /// Compare two dictionaries of numerical configuration options. If both dictionaries contains the same numerical options with the same values selected, the method returns true and otherwise false.
         /// </summary>
         /// <param name="oneConfiguration">A dictionary of numerical configuration options.</param>
         /// <param name="otherNumericalConfiguration">A dictionary of numerical configuration options.</param>
@@ -435,7 +435,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates a list of configurations conststing of the cartesian product of the lists of binary and numerical selections.
+        /// Creates a list of configurations consisting of the cartesian product of the lists of binary and numerical selections.
         /// </summary>
         /// <param name="binarySelections">A list of binary selections.</param>
         /// <param name="numericSelections">A list of numerical selections.</param>
@@ -485,9 +485,9 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Desines a measured value for a non-functional property.
+        /// Assignes a measured value for a non-functional property.
         /// </summary>
-        /// <param name="prop">The non-functional property the measuremed value is defined for.</param>
+        /// <param name="prop">The non-functional property the measured value is defined for.</param>
         /// <param name="val">The value for the non-functional property.</param>
         public void setMeasuredValue(NFProperty prop, double val)
         {
@@ -522,7 +522,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Returns an output string formated according to the given order.
+        /// Returns an output string formatted according to the given order.
         /// </summary>
         /// <param name="order">The order in which the configuration options should be printed.</param>
         /// <returns>A string sorted according to the given order.</returns>

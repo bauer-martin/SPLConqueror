@@ -112,7 +112,7 @@ namespace SPLConqueror_Core
             }
             else
             {
-                throw new ArgumentException("Illegal Reuqirement for mixed constraints");
+                throw new ArgumentException("Illegal Requirement for mixed constraints");
             }
         }
 
@@ -136,7 +136,7 @@ namespace SPLConqueror_Core
             }
             else
             {
-                throw new ArgumentException("Illegal Reuqirement for mixed constraints");
+                throw new ArgumentException("Illegal Requirement for mixed constraints");
             }
         }
 

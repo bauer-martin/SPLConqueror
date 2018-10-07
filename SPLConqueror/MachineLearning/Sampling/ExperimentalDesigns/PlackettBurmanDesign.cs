@@ -269,11 +269,11 @@ namespace MachineLearning.Sampling.ExperimentalDesigns
         }
 
         /// <summary>
-        /// Returns a seed specified by a given number of measurements and levels. If no seed for a given combiantion of measurements and levels is defined, the a seed using three level and 9
+        /// Returns a seed specified by a given number of measurements and levels. If no seed for a given combination of measurements and levels is defined, the a seed using three level and 9
         /// measurements is returned. 
         /// </summary>
         /// <param name="measurements">A number of measurements.</param>
-        /// <param name="level">Distinc values from one numeric option that have to be consided.</param>
+        /// <param name="level">Distinct values from one numeric option that have to be considered.</param>
         /// <returns>A seed defined by the measurements and levels. </returns>
         public static Seed getSeed(int measurements, int level)
         {

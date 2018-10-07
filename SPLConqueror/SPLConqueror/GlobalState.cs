@@ -28,7 +28,7 @@ namespace SPLConqueror_Core
         /// </summary>
         public static VariabilityModel varModel = null;
         /// <summary>
-        /// Path the variablity model is located.
+        /// Path the variability model is located.
         /// </summary>
         public static string vmSource = null;
 
@@ -58,7 +58,7 @@ namespace SPLConqueror_Core
         public static string measurementSource;
 
         /// <summary>
-        /// The object that encapsulates the configurations that can be used to evalue the learned predictor.
+        /// The object that encapsulates the configurations that can be used to evaluate the learned predictor.
         /// </summary>
         public static ResultDB evalutionSet = new ResultDB();
 
@@ -87,7 +87,7 @@ namespace SPLConqueror_Core
         private GlobalState() { }
 
         /// <summary>
-        /// Clears the global state. This mehtod should be used after performing all experiments of one case study. 
+        /// Clears the global state. This method should be used after performing all experiments of one case study. 
         /// </summary>
         public static void clear()
         {
@@ -101,7 +101,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// The mehtod returns non function property with the given name. If there is no property with the name, a new property is created. 
+        /// The method returns non function property with the given name. If there is no property with the name, a new property is created. 
         /// </summary>
         /// <param name="name">Name of the property</param>
         /// <returns>A non functional property with the specified name.</returns>
@@ -118,7 +118,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Adds a configration to the global state. 
+        /// Adds a configuration to the global state. 
         /// </summary>
         /// <param name="config">An configuration of the variability model.</param>
         public static void addConfiguration(Configuration config)
@@ -170,7 +170,7 @@ namespace SPLConqueror_Core
                    return getSimilarConfig(conf);
                }, c);
 
-                //var taskA = Task<Tuple<Configuration, Configuration>>.Factory.StartNew(() => getSimilarConfig(config)); // TDOD
+                //var taskA = Task<Tuple<Configuration, Configuration>>.Factory.StartNew(() => getSimilarConfig(config)); // TODO
                 taskList.Add(task);
             }
             Task.WaitAll(taskList.ToArray());

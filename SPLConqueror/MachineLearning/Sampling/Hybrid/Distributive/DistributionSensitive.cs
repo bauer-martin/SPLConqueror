@@ -66,7 +66,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
         /// <summary>
         /// Computes a distribution-aware sample set.
         /// </summary>
-        /// <returns><code>True</code> iff the process was successfull;<code>False</code> otherwise</returns>
+        /// <returns><code>True</code> iff the process was successful;<code>False</code> otherwise</returns>
         public override bool ComputeSamplingStrategy()
         {
             // Check configuration and set the according variables
@@ -405,7 +405,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
 
 
         /// <summary>
-        /// Computes the sum of the cartesion product of the given lists.
+        /// Computes the sum of the cartesian product of the given lists.
         /// Note that every bucket is only included once.
         /// </summary>
         /// <param name="remaining">the remaining lists</param>

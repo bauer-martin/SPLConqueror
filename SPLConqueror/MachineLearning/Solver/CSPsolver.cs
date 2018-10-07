@@ -129,7 +129,7 @@ namespace MicrosoftSolverFoundation
                     }
 
                     //Excluded option(s) as cross-tree constraint(s)
-                    List<List<ConfigurationOption>> nonAlternative = binOpt.getNonAlternativeExlcudedOptions();
+                    List<List<ConfigurationOption>> nonAlternative = binOpt.getNonAlternativeExcludedOptions();
                     if (nonAlternative.Count > 0)
                     {
                         foreach (var excludedOption in nonAlternative)
@@ -152,7 +152,7 @@ namespace MicrosoftSolverFoundation
                     foreach (List<ConfigurationOption> impliedOr in current.Implied_Options)
                     {
                         CspTerm[] orTerms = new CspTerm[impliedOr.Count];
-                        //Possible error: if a binary option impies a numeric option
+                        //Possible error: if a binary option implies a numeric option
                         for (int i = 0; i < impliedOr.Count; i++)
                             orTerms[i] = optionToTerm[(BinaryOption)impliedOr.ElementAt(i)];
                         S.AddConstraints(S.Implies(optionToTerm[current], S.Or(orTerms)));
@@ -213,7 +213,7 @@ namespace MicrosoftSolverFoundation
         /// <returns>The generated constraint system consisting of logical terms representing configuration options as well as their boolean constraints.</returns>
         internal static ConstraintSystem getConstraintSystem(out List<CspTerm> variables, out Dictionary<BinaryOption, CspTerm> optionToTerm, out Dictionary<CspTerm, BinaryOption> termToOption, VariabilityModel vm)
         {
-            //Reusing seems to not work correctely. The problem: configurations are realized as additional constraints for the system. 
+            //Reusing seems to not work correctly. The problem: configurations are realized as additional constraints for the system. 
             //however, when checking for the next config, the old config's constraints remain in the solver such that we have a wrong result.
             /*
             if (csystem != null && variables_global != null && optionToTerm_global != null && termToOption_global != null && vm != null)
@@ -297,7 +297,7 @@ namespace MicrosoftSolverFoundation
                     }
 
                     //Excluded option(s) as cross-tree constraint(s)
-                    List<List<ConfigurationOption>> nonAlternative = current.getNonAlternativeExlcudedOptions();
+                    List<List<ConfigurationOption>> nonAlternative = current.getNonAlternativeExcludedOptions();
                     if (nonAlternative.Count > 0)
                     {
                         foreach (var excludedOption in nonAlternative)
@@ -320,7 +320,7 @@ namespace MicrosoftSolverFoundation
                     foreach (List<ConfigurationOption> impliedOr in current.Implied_Options)
                     {
                         CspTerm[] orTerms = new CspTerm[impliedOr.Count];
-                        //Possible error: if a binary option impies a numeric option
+                        //Possible error: if a binary option implies a numeric option
                         for (int i = 0; i < impliedOr.Count; i++)
                             orTerms[i] = optionToTerm[(BinaryOption)impliedOr.ElementAt(i)];
                         S.AddConstraints(S.Implies(optionToTerm[current], S.Or(orTerms)));

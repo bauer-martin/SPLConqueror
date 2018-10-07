@@ -12,7 +12,7 @@ namespace SPLConqueror_Core
     public class BinaryOption : ConfigurationOption
     {
         /// <summary>
-        /// A binary option can either be selected or selected in a specific configuration of a programm.
+        /// A binary option can either be selected or selected in a specific configuration of a program.
         /// </summary>
         public enum BinaryValue
         {
@@ -67,8 +67,8 @@ namespace SPLConqueror_Core
         /// Creates a binary option based on the information stored in the xml node. The binary option is assigned to the variability model. 
         /// </summary>
         /// <param name="node">Node of the xml file holding the information of the binary option.</param>
-        /// <param name="vm">The variabilit model the binary option is assigned to. </param>
-        /// <returns>A binary option of the variabilit model with the information stored in the xml node.</returns>
+        /// <param name="vm">The variability model the binary option is assigned to. </param>
+        /// <returns>A binary option of the variability model with the information stored in the xml node.</returns>
         public static BinaryOption loadFromXML(XmlElement node, VariabilityModel vm)
         {
             BinaryOption option = new BinaryOption(vm, "temp");
@@ -77,7 +77,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Loads and strores all binary option specific information of an binary option.
+        /// Loads and stores all binary option specific information of an binary option.
         /// </summary>
         /// <param name="node">The base node of the binary option.</param>
         internal void loadFromXML(XmlElement node)
@@ -153,7 +153,7 @@ namespace SPLConqueror_Core
         /// Collects all options that are excluded by this option, but do not have the same parent (i.e., cross-tree constraints)
         /// </summary>
         /// <returns>The list of cross-tree excluded options.</returns>
-        public List<List<ConfigurationOption>> getNonAlternativeExlcudedOptions()
+        public List<List<ConfigurationOption>> getNonAlternativeExcludedOptions()
         {
             List<List<ConfigurationOption>> result = new List<List<ConfigurationOption>>();
             foreach (var exclOptions in Excluded_Options)

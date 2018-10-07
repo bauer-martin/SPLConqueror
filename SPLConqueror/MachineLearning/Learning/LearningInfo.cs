@@ -31,7 +31,7 @@ namespace MachineLearning
         /// <summary>
         /// Returns a textual representation of this object consisting of the names of numerical and binary sampling methods performed for this experimental state and a representation of the mlsettings. 
         /// </summary>
-        /// <returns>The textual reprentation.</returns>
+        /// <returns>The textual representation.</returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

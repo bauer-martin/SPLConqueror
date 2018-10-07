@@ -32,7 +32,7 @@ namespace ProcessWrapper
                 path = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar) + 1);
                 System.Random rand = new System.Random();
                 path += "predict" + rand.Next(99);
-                SPLConqueror_Core.GlobalState.logInfo.logLine("File name for predictions file was too long. Changed to" + path);
+                SPLConqueror_Core.GlobalState.logInfo.logLine("File name for predictions file was too long. Changed to " + path);
             }
             path += csv;
 

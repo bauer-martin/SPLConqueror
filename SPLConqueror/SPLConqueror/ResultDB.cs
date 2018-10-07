@@ -15,7 +15,7 @@ namespace SPLConqueror_Core
             new Dictionary<string, IDictionary<string, List<Configuration>>>();
 
         /// <summary>
-        /// This structre provides the maximum of the measured values for each non-functional property. 
+        /// This structure provides the maximum of the measured values for each non-functional property. 
         /// </summary>
         public IDictionary<NFProperty, double> maxMeasuredValue = new Dictionary<NFProperty, double>();
         private static int splitFactor = 2;

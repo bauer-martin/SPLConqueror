@@ -162,10 +162,10 @@ namespace ProcessWrapper
         /// At last sends the task that should be performed(learning or parameter tuning).
         /// This has to be performed before requesting results and can only be done once per lifetime of the process.
         /// </summary>
-        /// <param name="configsLearn">Path to the file that constains the configurations used for learning.</param>
-        /// <param name="configsPredict">Path to the file that constains the configurations used for prediction.</param>
+        /// <param name="configsLearn">Path to the file that constrains the configurations used for learning.</param>
+        /// <param name="configsPredict">Path to the file that constrains the configurations used for prediction.</param>
         /// <param name="nfpLearn">Path to the file that contains the nfp values that belong to the learning set.</param>
-        /// <param name="nfpPredict">Path to the file that contains the nfp vlaues that belong to the prediction set.</param>
+        /// <param name="nfpPredict">Path to the file that contains the nfp values that belong to the prediction set.</param>
         /// <param name="task">Task that should be performed by the learner. Can either be parameter tuning
         /// or learning.</param>
         /// <param name="model">Model that contains all the configuration options.</param>

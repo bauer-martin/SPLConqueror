@@ -129,7 +129,7 @@ namespace MachineLearning.Solver
                     }
 
                     //Excluded option(s) as cross-tree constraint(s)
-                    List<List<ConfigurationOption>> nonAlternative = current.getNonAlternativeExlcudedOptions();
+                    List<List<ConfigurationOption>> nonAlternative = current.getNonAlternativeExcludedOptions();
                     if (nonAlternative.Count > 0)
                     {
                         foreach (var excludedOption in nonAlternative)
@@ -152,7 +152,7 @@ namespace MachineLearning.Solver
                     foreach (List<ConfigurationOption> impliedOr in current.Implied_Options)
                     {
                         BoolExpr[] orTerms = new BoolExpr[impliedOr.Count];
-                        //Possible error: if a binary option impies a numeric option
+                        //Possible error: if a binary option implies a numeric option
                         for (int i = 0; i < impliedOr.Count; i++)
                             orTerms[i] = (BoolExpr)optionToTerm[(BinaryOption)impliedOr.ElementAt(i)];
                         andGroup.Add(context.MkImplies((BoolExpr)optionToTerm[current], context.MkOr(orTerms)));

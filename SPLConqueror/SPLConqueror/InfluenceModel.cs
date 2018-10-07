@@ -14,7 +14,7 @@ namespace SPLConqueror_Core
         private VariabilityModel vm = null;
 
         /// <summary>
-        /// The varaibility model the influence model is learned for.
+        /// The variability model the influence model is learned for.
         /// </summary>
         public VariabilityModel Vm
         {
@@ -26,7 +26,7 @@ namespace SPLConqueror_Core
         Dictionary<BinaryOption, InfluenceFunction> binaryOptionsInfluence = new Dictionary<BinaryOption, InfluenceFunction>();
 
         /// <summary>
-        /// The set of the individual influences identified for binary configration options.
+        /// The set of the individual influences identified for binary configuration options.
         /// </summary>
         public Dictionary<BinaryOption, InfluenceFunction> BinaryOptionsInfluence
         {
@@ -70,7 +70,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Estimates for the given confugration the corresponding value of the non-functional property based on the determined influences of all configuration options.
+        /// Estimates for the given configuration the corresponding value of the non-functional property based on the determined influences of all configuration options.
         /// </summary>
         /// <param name="c">The configuration for which the estimation should be calculated</param>
         /// <returns>Estimated value</returns>

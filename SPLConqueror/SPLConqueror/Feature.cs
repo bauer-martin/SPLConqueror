@@ -7,8 +7,8 @@ using SPLConqueror_Core;
 namespace SPLConqueror_Core
 {
     /// <summary>
-    /// A feature is part of a performance-influence model. Features consist of a set of partitcipating configuration options and a constant
-    /// describing the influence of the participating options on the non-functial property that is considered.
+    /// A feature is part of a performance-influence model. Features consist of a set of participating configuration options and a constant
+    /// describing the influence of the participating options on the non-functional property that is considered.
     /// </summary>
     public class Feature : InfluenceFunction, IEquatable<Feature>, IComparer<Feature>
     {
@@ -47,7 +47,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// Compares two features based on the components of the functions. 
         /// </summary>
-        /// <param name="obj">The object to comare with.</param>
+        /// <param name="obj">The object to compare with.</param>
         /// <returns>True if both features represents the same configuration option combination, false otherwise.</returns>
         public override bool Equals(object obj)
         {
@@ -100,10 +100,10 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates a new feature by concartinating two given features with a multiplication.
+        /// Creates a new feature by concatenating two given features with a multiplication.
         /// </summary>
-        /// <param name="original">The first feature to concatinate.</param>
-        /// <param name="toAdd">The second feature to concatinate.</param>
+        /// <param name="original">The first feature to concatenate.</param>
+        /// <param name="toAdd">The second feature to concatenate.</param>
         /// <param name="vm">The variability model, the two features are defined for.</param>
         public Feature(Feature original, Feature toAdd, VariabilityModel vm)
             : base(original.getPureString() + " * " + toAdd.getPureString(), vm)
@@ -114,7 +114,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// Creates a new feature based on the given expression. 
         /// </summary>
-        /// <param name="expression">The string represenation of the feature.</param>
+        /// <param name="expression">The string representation of the feature.</param>
         /// <param name="vm">The variability model the expression is defined for.</param>
         public Feature(String expression, VariabilityModel vm) : base(expression, vm)
         {
@@ -122,7 +122,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Resturns the string representation of the feature consisiting of the pariticipating configuration options and a constant describing
+        /// Returns the string representation of the feature consisting of the participating configuration options and a constant describing
         /// the influence of the feature.
         /// </summary>
         /// <returns>String representation of the feature.</returns>
@@ -150,7 +150,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// Compares two features based on their names.
         /// </summary>
-        /// <param name="x">First feature to comare with.</param>
+        /// <param name="x">First feature to compare with.</param>
         /// <param name="y">Second feature to compare with.</param>
         /// <returns>0 if both feature are the same, 1 and -1 otherwise.</returns>
         public int Compare(Feature x, Feature y)
@@ -169,10 +169,10 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// The string reprensentaion of the feature consisting of the participating configuration options and the coefficient describing the influence
+        /// The string representation of the feature consisting of the participating configuration options and the coefficient describing the influence
         /// of the feature.
         /// </summary>
-        /// <returns>String reprenstation of the feature.</returns>
+        /// <returns>String representation of the feature.</returns>
         public String getPureString()
         {
             return base.ToString();

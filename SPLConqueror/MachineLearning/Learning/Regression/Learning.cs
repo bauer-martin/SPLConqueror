@@ -123,7 +123,7 @@ namespace MachineLearning.Learning.Regression
                 return;
             if (this.mlSettings.bagging)
             {
-                throw new NotImplementedException("Recovering with bagging currently dosent work");
+                throw new NotImplementedException("Recovering with bagging currently doesn't work");
             }
             else
             {

@@ -12,7 +12,7 @@ namespace MachineLearning.Sampling.Heuristics
 
 
         /// <summary>
-        /// Generates a configuration for each pair of configuration options. Exceptions: parent-child-relationships, impliciation-relationships
+        /// Generates a configuration for each pair of configuration options. Exceptions: parent-child-relationships, implication-relationships
         /// </summary>
         /// <param name="vm">The variability model containing the binary options for which we want to generate the pair-wise configurations.</param>
         /// <returns>A list of configurations in which each configuration is represented by a list of SELECTED binary options</returns>
