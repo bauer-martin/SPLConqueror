@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MachineLearning.Sampling
 {
@@ -17,5 +18,24 @@ namespace MachineLearning.Sampling
             distanceMaxParameters = new List<Dictionary<string, string>>();
         }
 
+        public void updateSeeds()
+        {
+            updateSeeds(tWiseParameters);
+            updateSeeds(randomBinaryParameters);
+            updateSeeds(satParameters);
+            updateSeeds(distanceMaxParameters);
+        }
+
+        private static void updateSeeds(List<Dictionary<string, string>> binaryParameters)
+        {
+            foreach (Dictionary<string, string> parameters in binaryParameters)
+            {
+                if (parameters.ContainsKey("seed"))
+                {
+                    uint seed = UInt32.Parse(parameters["seed"]);
+                    parameters["seed"] = (seed + 1).ToString();
+                }
+            }
+        }
     }
 }

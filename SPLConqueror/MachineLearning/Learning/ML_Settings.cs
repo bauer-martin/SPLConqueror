@@ -104,6 +104,11 @@ namespace MachineLearning.Learning
         /// Defines the number of rounds the learning process have to be performed. 
         /// </summary>
         public int numberOfRounds = 70;
+        
+        /// <summary>
+        /// Defines the maximum number of active learning rounds.
+        /// </summary>
+        public int maxNumberOfActiveLearningRounds = 10;
 
         /// <summary>
         /// Defines the maximum increase of the error when removing a feature from the model
@@ -114,6 +119,11 @@ namespace MachineLearning.Learning
         /// Defines the minimum error in improved a round must reach before either the learnings is aborted or the hierarchy is increased for hierarchy learning
         /// </summary>
         public double minImprovementPerRound = 0.1;
+        
+        /// <summary>
+        /// Defines the minimum improvement an active learning round must achieve before the learning is aborted.
+        /// </summary>
+        public double minImprovementPerActiveLearningRound = 0.1;
 
         /// <summary>
         /// Defines whether we learn our model in hierarchical steps
