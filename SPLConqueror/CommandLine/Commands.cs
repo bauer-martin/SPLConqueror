@@ -1419,81 +1419,9 @@ namespace CommandLine
             {
                 throw new NotImplementedException("continue learning is not implemented in active learning");
             }
-
-            // initialization
             InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
-            List<Configuration> configurationsLearning;
-            List<Configuration> configurationsValidation;
-            if (!configurationsPreparedForLearning(learnAndValidation, out configurationsLearning, out configurationsValidation))
-                return;
-
-            // learn initial model
-            exp = new Learning(configurationsLearning, configurationsValidation)
-            {
-                metaModel = infMod,
-                mlSettings = this.mlSettings
-            };
-            exp.learn();
-
-            // set up abort criteria
-            if (exp.models.Count != 1)
-            {
-                GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
-                return;
-            }
-            int round = 1;
-            double relativeError = exp.models[0].finalError;
-            if (abortActiveLearning(round, relativeError)) return;
-
-            // continue learning
-            do
-            {
-                if (round == 1)
-                {
-                    // switch sampling strategy to select new configurations
-                    cleanLearning();
-                    performOneCommand(samplingTask);
-                }
-                else
-                {
-                    // keep sampling strategy but use different seed
-                    configBuilder.binaryParams.updateSeeds();
-                }
-                round++;
-                List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
-                configurationsLearning.AddRange(configsForNextRun);
-                exp = new Learning(configurationsLearning, configurationsValidation)
-                {
-                    metaModel = infMod,
-                    mlSettings = this.mlSettings
-                };
-                exp.learn();
-                relativeError = exp.models[0].finalError;
-            } while (!abortActiveLearning(round, relativeError));
-        }
-
-        private bool abortActiveLearning(int round, double relativeError)
-        {
-            if (round >= mlSettings.maxNumberOfActiveLearningRounds)
-            {
-                GlobalState.logInfo.logLine("Aborting active learning because maximum number of rounds reached");
-                return true;
-            }
-
-            if (relativeError < mlSettings.minImprovementPerActiveLearningRound)
-            {
-                GlobalState.logInfo.logLine("Aborting active learning because model did not achieve great improvement anymore");
-                return true;
-            }
-
-            if (relativeError < mlSettings.abortError)
-            {
-                GlobalState.logInfo.logLine("Aborting active learning because model is already good enough");
-                return true;
-            }
-
-            return false;
+            ActiveLearning activeLearning = new ActiveLearning(mlSettings, infMod, configBuilder);
+            activeLearning.learn(samplingTask);
         }
 
         private void predict(string task, Learning exp, List<Feature> model = null)
