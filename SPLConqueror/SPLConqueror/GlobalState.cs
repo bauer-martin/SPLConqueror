@@ -58,11 +58,6 @@ namespace SPLConqueror_Core
         public static string measurementSource;
 
         /// <summary>
-        /// The object that encapsulates the configurations that can be used to evaluate the learned predictor.
-        /// </summary>
-        public static ResultDB evalutionSet = new ResultDB();
-
-        /// <summary>
         /// If we require a configuration for learning, but haven't measured it, shall we use a similar one instead?
         /// </summary>
         public static bool takeSimilarConfig = true;
