@@ -3,6 +3,7 @@ using CommandLine;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using MachineLearning.Sampling;
 
 namespace MachineLearningTest
 {
@@ -70,9 +71,9 @@ namespace MachineLearningTest
         {
             cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " withHierarchy:true");
             cmd.performOneCommand(Commands.COMMAND_SET_NFP + " MainMemory");
-            cmd.performOneCommand(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_OPTIONWISE);
-            cmd.performOneCommand(Commands.COMMAND_NUMERIC_SAMPLING + " "
-                + Commands.COMMAND_EXPDESIGN_CENTRALCOMPOSITE);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " "
+                + ConfigurationBuilder.COMMAND_EXPDESIGN_CENTRALCOMPOSITE);
             cmd.performOneCommand(Commands.COMMAND_START_LEARNING_SPL_CONQUEROR);
         }
 
@@ -123,9 +124,9 @@ namespace MachineLearningTest
         private void cleanUp(Commands cmd, String mlSettings)
         {
             cmd.performOneCommand(Commands.COMMAND_CLEAR_LEARNING);
-            cmd.performOneCommand(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_OPTIONWISE);
-            cmd.performOneCommand(Commands.COMMAND_NUMERIC_SAMPLING + " "
-                + Commands.COMMAND_EXPDESIGN_CENTRALCOMPOSITE);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " "
+                + ConfigurationBuilder.COMMAND_EXPDESIGN_CENTRALCOMPOSITE);
             cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " bagging:false withHierarchy:true baggingNumbers:3");
         }
 

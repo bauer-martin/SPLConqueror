@@ -58,6 +58,10 @@
       <Project>{fe44070a-24e6-4a10-820f-854ff74c0dfb}</Project>
       <Name>CommandLine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
+      <Project>{aebdc4ea-60ad-4a95-8407-059b07150782}</Project>
+      <Name>MachineLearning</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

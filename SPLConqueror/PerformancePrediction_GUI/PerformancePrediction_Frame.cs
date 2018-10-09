@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Collections.Specialized;
 using MachineLearning.Learning.Regression;
 using System.IO;
+using MachineLearning.Sampling;
 
 namespace PerformancePrediction_GUI
 {
@@ -229,7 +230,7 @@ namespace PerformancePrediction_GUI
         {
             termToIndex = new Dictionary<string, int>();
 
-            perfInfGridView.ColumnCount = cmd.exp.info.mlSettings.numberOfRounds * 2;
+            perfInfGridView.ColumnCount = cmd.exp.mlSettings.numberOfRounds * 2;
             perfInfGridView.Columns[0].Name = "Round";
             perfInfGridView.Columns[1].Name = "Learning error";
             perfInfGridView.Columns[2].Name = "Global error";
@@ -237,7 +238,7 @@ namespace PerformancePrediction_GUI
 
         private void UpdateDataGridView(MachineLearning.Learning.Regression.LearningRound lastRound)
         {
-            string[] row = new string[cmd.exp.info.mlSettings.numberOfRounds * 2];
+            string[] row = new string[cmd.exp.mlSettings.numberOfRounds * 2];
             row[0] = lastRound.round.ToString();
             row[1] = lastRound.learningError.ToString();
             // TODO useEpsilonTube from Ml Settings
@@ -273,12 +274,12 @@ namespace PerformancePrediction_GUI
 
         private void performBinarySampling(Commands cmd, string param)
         {
-            cmd.performOneCommand(Commands.COMMAND_BINARY_SAMPLING + " " + param);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + param);
         }
 
         private void performNumericSampling(Commands cmd, string param)
         {
-            cmd.performOneCommand(Commands.COMMAND_NUMERIC_SAMPLING + " " + param);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + param);
         }
 
         private bool createSamplingCommands()
@@ -291,7 +292,7 @@ namespace PerformancePrediction_GUI
             if (this.OW.Checked)
             {
                 binarySelected = true;
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_OPTIONWISE + " " + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE + " " + validation);
             }
             if (this.twise.Checked)
             {
@@ -301,7 +302,7 @@ namespace PerformancePrediction_GUI
                 {
                     param = "t:" + twiseParam.Text + " ";
                 }
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_BINARY_TWISE + " " + param + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_BINARY_TWISE + " " + param + validation);
             }
             if (this.binRandom.Checked)
             {
@@ -315,22 +316,22 @@ namespace PerformancePrediction_GUI
                 {
                     param += "seed:" + binRandomSeed.Text;
                 }
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_BINARY_RANDOM + " " + param + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM + " " + param + validation);
             }
             if (this.PW.Checked)
             {
                 binarySelected = true;
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_PAIRWISE + " " + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE + " " + validation);
             }
             if (this.negOW.Checked)
             {
                 binarySelected = true;
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " " + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " " + validation);
             }
             if (this.binWholePop.Checked)
             {
                 binarySelected = true;
-                performBinarySampling(cmd, Commands.COMMAND_SAMPLE_ALLBINARY + " " + validation);
+                performBinarySampling(cmd, ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY + " " + validation);
             }
 
 
@@ -338,17 +339,17 @@ namespace PerformancePrediction_GUI
             if (num_BoxBehnken_check.Checked)
             {
                 numSelected = true;
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_BOXBEHNKEN + " " + validation);
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_BOXBEHNKEN + " " + validation);
             }
             if (num_CentralComposite_check.Checked)
             {
                 numSelected = true;
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_CENTRALCOMPOSITE + " " + validation);
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_CENTRALCOMPOSITE + " " + validation);
             }
             if (num_FullFactorial_check.Checked)
             {
                 numSelected = true;
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_FULLFACTORIAL + " " + validation);
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_FULLFACTORIAL + " " + validation);
             }
             if (num_hyperSampling_check.Checked)
             {
@@ -357,7 +358,7 @@ namespace PerformancePrediction_GUI
                     error();
                     return false;
                 }
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_HYPERSAMPLING + " "
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_HYPERSAMPLING + " "
                     + num_hyper_percent_text.Text + " " + validation);
                 numSelected = true;
             }
@@ -369,7 +370,7 @@ namespace PerformancePrediction_GUI
                     return false;
 
                 }
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_KEXCHANGE + " sampleSize:" +
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_KEXCHANGE + " sampleSize:" +
                     num_kEx_n_Box.Text.Trim() + " k:" + num_kEx_k_Box.Text.Trim());
                 numSelected = true;
             }
@@ -381,7 +382,7 @@ namespace PerformancePrediction_GUI
                     return false;
 
                 }
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_RANDOM + " sampleSize:"
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_RANDOM + " sampleSize:"
                     + num_random_n_Text.Text.Trim() + " seed:" + num_rand_seed_Text.Text.Trim());
                 numSelected = true;
             }
@@ -394,7 +395,7 @@ namespace PerformancePrediction_GUI
                     return false;
 
                 }
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_ONEFACTORATATIME + " distinctValuesPerOption:"
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_ONEFACTORATATIME + " distinctValuesPerOption:"
                     + num_oneFactorAtATime_num_Text.Text.Trim());
                 numSelected = true;
 
@@ -407,7 +408,7 @@ namespace PerformancePrediction_GUI
                     return false;
 
                 }
-                performNumericSampling(cmd, Commands.COMMAND_EXPDESIGN_PLACKETTBURMAN + " measurements:"
+                performNumericSampling(cmd, ConfigurationBuilder.COMMAND_EXPDESIGN_PLACKETTBURMAN + " measurements:"
                     + num_Plackett_n_Box.Text.Trim() + " level:" + num_Plackett_Level_Box.Text.Trim());
                 numSelected = true;
             }

@@ -57,12 +57,10 @@ namespace SamplingUnitTest
 
         private static List<Configuration> testBinary(SamplingStrategies strategy)
         {
-            List<SamplingStrategies> binaryStrat = new List<SamplingStrategies>();
-            binaryStrat.Add(strategy);
-            List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
-            numericStrat.Add(new CentralCompositeInscribedDesign());
-            List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+            configBuilder.binaryStrategies.Add(strategy);
+            configBuilder.numericStrategies.Add(new CentralCompositeInscribedDesign());
+            List<Configuration> result = configBuilder.buildConfigs(model);
 
             return result;
         }
@@ -77,12 +75,10 @@ namespace SamplingUnitTest
 
         private static List<Configuration> testNumeric(ExperimentalDesign design)
         {
-            List<SamplingStrategies> binaryStrat = new List<SamplingStrategies>();
-            binaryStrat.Add(SamplingStrategies.PAIRWISE);
-            List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
-            numericStrat.Add(design);
-            List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+            configBuilder.binaryStrategies.Add(SamplingStrategies.PAIRWISE);
+            configBuilder.numericStrategies.Add(design);
+            List<Configuration> result = configBuilder.buildConfigs(model);
             return result;
         }
 
@@ -160,34 +156,30 @@ namespace SamplingUnitTest
         public static bool TestTWise(string solver, int expected, int t)
         {
             string loc = resolvePath(solver, "TwiseSampling" + t + ".csv");
-            List<SamplingStrategies> binaryStrat = new List<SamplingStrategies>();
-            binaryStrat.Add(SamplingStrategies.T_WISE);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters.Add("t", t.ToString());
-            ConfigurationBuilder.binaryParams.tWiseParameters.Add(parameters);
-            List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
-            numericStrat.Add(new CentralCompositeInscribedDesign());
-            List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            ConfigurationBuilder.binaryParams.tWiseParameters.Add(parameters);
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+            configBuilder.binaryParams.tWiseParameters.Add(parameters);
+            configBuilder.binaryParams.tWiseParameters.Add(parameters);
+            configBuilder.binaryStrategies.Add(SamplingStrategies.T_WISE);
+            configBuilder.numericStrategies.Add(new CentralCompositeInscribedDesign());
+            List<Configuration> result = configBuilder.buildConfigs(model);
             List<Configuration> expectedSample = ConfigurationReader.readConfigurations_Header_CSV(loc, GlobalState.varModel);
-            ConfigurationBuilder.binaryParams.tWiseParameters.Clear();
+            configBuilder.binaryParams.tWiseParameters.Clear();
             return containsAllMeasurements(result, expectedSample) && result.Count == expected;
         }
 
         public static bool TestBinaryRandom(string solver, int expected, string numConfigs, int seed)
         {
             string loc = resolvePath(solver, "BinrandomSampling.csv");
-            List<SamplingStrategies> binaryStrat = new List<SamplingStrategies>();
-            binaryStrat.Add(SamplingStrategies.BINARY_RANDOM);
+            ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+            configBuilder.binaryStrategies.Add(SamplingStrategies.BINARY_RANDOM);
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters.Add("numConfigs", numConfigs);
             parameters.Add("seed", seed.ToString());
-            ConfigurationBuilder.binaryParams.randomBinaryParameters.Add(parameters);
-            List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
-            numericStrat.Add(new CentralCompositeInscribedDesign());
-            List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            configBuilder.binaryParams.randomBinaryParameters.Add(parameters);
+            configBuilder.numericStrategies.Add(new CentralCompositeInscribedDesign());
+            List<Configuration> result = configBuilder.buildConfigs(model);
             List<Configuration> expectedSample = ConfigurationReader.readConfigurations_Header_CSV(loc, GlobalState.varModel);
             return containsAllMeasurements(result, expectedSample) && result.Count == expected;
         }
@@ -233,11 +225,10 @@ namespace SamplingUnitTest
 
         private static List<Configuration> buildSampleSetHybrid(HybridStrategy design, Dictionary<string, string> parameters)
         {
-            List<HybridStrategy> hybridStrategies = new List<HybridStrategy>();
             design.SetSamplingParameters(parameters);
-            hybridStrategies.Add(design);
-            return ConfigurationBuilder.buildConfigs(model, new List<SamplingStrategies>(),
-                new List<ExperimentalDesign>(), hybridStrategies);
+            ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+            configBuilder.hybridStrategies.Add(design);
+            return configBuilder.buildConfigs(model);
         }
 
     }

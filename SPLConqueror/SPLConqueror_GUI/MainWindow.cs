@@ -4013,12 +4013,10 @@ namespace SPLConqueror_GUI
                     frequency.Add(feature, 0);
                 }
 
-                List<SamplingStrategies> binStrat = new List<SamplingStrategies>();
-                binStrat.Add(SamplingStrategies.ALLBINARY);
-                List<ExperimentalDesign> expDesigns = new List<ExperimentalDesign>();
-                expDesigns.Add(new FullFactorialDesign());
-                List<Configuration> configs = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binStrat, expDesigns,
-                    new List<MachineLearning.Sampling.Hybrid.HybridStrategy>());
+                ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+                configBuilder.binaryStrategies.Add(SamplingStrategies.ALLBINARY);
+                configBuilder.numericStrategies.Add(new FullFactorialDesign());
+                List<Configuration> configs = configBuilder.buildConfigs(GlobalState.varModel);
 
                 foreach (Configuration config in configs)
                 {

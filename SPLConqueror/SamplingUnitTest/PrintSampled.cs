@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using NUnit.Framework;
 using System.IO;
+using MachineLearning.Sampling;
 
 namespace SamplingUnitTest
 {
@@ -22,8 +23,8 @@ namespace SamplingUnitTest
 
             Commands cmd = new Commands();
             cmd.performOneCommand(Commands.COMMAND_VARIABILITYMODEL + " " + modelPath);
-            cmd.performOneCommand(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_FEATUREWISE);
-            cmd.performOneCommand(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_BOXBEHNKEN);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_FEATUREWISE);
+            cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_BOXBEHNKEN);
             cmd.performOneCommand(Commands.COMMAND_PRINT_CONFIGURATIONS + " "
                 + System.AppDomain.CurrentDomain.BaseDirectory + "testSampledConfigs.txt");
 

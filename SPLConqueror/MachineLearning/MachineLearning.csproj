@@ -95,7 +95,6 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Learning\LearningInfo.cs" />
     <Compile Include="Learning\ML_Settings.cs" />
     <Compile Include="Learning\ML_SettingsGenerator.cs" />
     <Compile Include="Learning\Regression\FeatureSubsetSelection.cs" />
@@ -179,7 +178,7 @@
   <PropertyGroup Condition=" '$(OS)' == 'OSX' ">
     <PreBuildEvent>cp "$(SolutionDir)packages\z3x64win.4.5.0.1\libz3.dll" "$(SolutionDir)packages\z3x64win.4.5.0.1\lib\"</PreBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

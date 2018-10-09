@@ -45,20 +45,7 @@ namespace CommandLine
         //save current SPLConqueror state to a file.
         public const string COMMAND_SAVE = "save";
 
-        public const string COMMAND_VALIDATION = "validation";
-
         public const string COMMAND_EVALUATION_SET = "evaluationset";
-
-        public const string COMMAND_BINARY_SAMPLING = "binary";
-        public const string COMMAND_SAMPLE_ALLBINARY = "allbinary";
-        public const string COMMAND_SAMPLE_FEATUREWISE = "featurewise";
-        public const string COMMAND_SAMPLE_OPTIONWISE = "optionwise";
-        public const string COMMAND_SAMPLE_PAIRWISE = "pairwise";
-        public const string COMMAND_SAMPLE_NEGATIVE_OPTIONWISE = "negfw";
-        public const string COMMAND_SAMPLE_BINARY_RANDOM = "random";
-        public const string COMMAND_SAMPLE_BINARY_TWISE = "twise";
-        public const string COMMAND_SAMPLE_BINARY_SAT = "satoutput";
-        public const string COMMAND_SAMPLE_BINARY_DISTANCE = "distance-based";
 
         #region splconqueror learn with all measurements
         // deprecated
@@ -108,77 +95,16 @@ namespace CommandLine
         public const string COMMAND_OPTIMIZE_PARAMETER = "optimize-parameter";
         #endregion
 
-        #region tag for numeric sampling
-        public const string COMMAND_NUMERIC_SAMPLING = "numeric";
-        // deprecated
-        public const string COMMAND_EXPERIMENTALDESIGN = "expdesign";
-        #endregion
-        public const string COMMAND_EXPDESIGN_BOXBEHNKEN = "boxbehnken";
-        public const string COMMAND_EXPDESIGN_CENTRALCOMPOSITE = "centralcomposite";
-        public const string COMMAND_EXPDESIGN_FULLFACTORIAL = "fullfactorial";
-        public const string COMMAND_EXPDESIGN_FACTORIAL = "factorial";
-        public const string COMMAND_EXPDESIGN_HYPERSAMPLING = "hypersampling";
-        public const string COMMAND_EXPDESIGN_ONEFACTORATATIME = "onefactoratatime";
-        public const string COMMAND_EXPDESIGN_KEXCHANGE = "kexchange";
-        public const string COMMAND_EXPDESIGN_PLACKETTBURMAN = "plackettburman";
-        public const string COMMAND_EXPDESIGN_RANDOM = "random";
-
-        public const string COMMAND_HYBRID = "hybrid";
-        public const string COMMAND_HYBRID_DISTRIBUTION_AWARE = "distribution-aware";
-        public const string COMMAND_HYBRID_DISTRIBUTION_PRESERVING = "distribution-preserving";
-
         public const string COMMAND_SUBSCRIPT = "script";
 
         public const string DEFINE_PYTHON_PATH = "define-python-path";
         public const string COMMAND_PYTHON_LEARN = "learn-python";
         public const string COMMAND_PYTHON_LEARN_OPT = "learn-python-opt";
 
-        List<SamplingStrategies> binaryToSample = new List<SamplingStrategies>();
-
         #region Intern commands
         // shouldn't be used by user.
         public const string ROLLBACK_FLAG = "rollback";
         #endregion
-
-        public List<SamplingStrategies> BinaryToSample
-        {
-            get { return binaryToSample; }
-        }
-
-        List<SamplingStrategies> binaryToSampleValidation = new List<SamplingStrategies>();
-
-        public List<SamplingStrategies> BinaryToSampleValidation
-        {
-            get { return binaryToSampleValidation; }
-        }
-
-        List<HybridStrategy> hybridToSample = new List<HybridStrategy>();
-
-        public List<HybridStrategy> HybridToSample
-        {
-            get { return hybridToSample; }
-        }
-
-        List<HybridStrategy> hybridToSampleValidation = new List<HybridStrategy>();
-
-        public List<HybridStrategy> HybridToSampleValidation
-        {
-            get { return hybridToSampleValidation; }
-        }
-
-        List<ExperimentalDesign> numericToSample = new List<ExperimentalDesign>();
-
-        public List<ExperimentalDesign> NumericToSample
-        {
-            get { return numericToSample; }
-        }
-
-        List<ExperimentalDesign> numericToSampleValidation = new List<ExperimentalDesign>();
-
-        public List<ExperimentalDesign> NumericToSampleValidation
-        {
-            get { return numericToSampleValidation; }
-        }
 
         private bool allMeasurementsSelected = false;
 
@@ -188,6 +114,7 @@ namespace CommandLine
         private CommandHistory currentHistory = new CommandHistory();
         private bool hasLearnData = false;
 
+        public ConfigurationBuilder configBuilder = new ConfigurationBuilder();
         public Learning exp = new MachineLearning.Learning.Regression.Learning();
 
         public static string targetPath = "";
@@ -266,8 +193,8 @@ namespace CommandLine
                         else
                         {
                             this.mlSettings = recoveredData.Item1;
-                            this.binaryToSample = recoveredData.Item2;
-                            this.binaryToSampleValidation = recoveredData.Item3;
+                            this.configBuilder.binaryStrategies = recoveredData.Item2;
+                            this.configBuilder.binaryStrategiesValidation = recoveredData.Item3;
 
                             FileInfo fi = new FileInfo(taskAsParameter[1]);
                             StreamReader reader = null;
@@ -282,8 +209,8 @@ namespace CommandLine
                                 hasLearnData = true;
                             }
                             co.exp = this.exp;
-                            co.binaryToSample = this.binaryToSample;
-                            co.binaryToSampleValidation = this.binaryToSampleValidation;
+                            co.configBuilder.binaryStrategies = this.configBuilder.binaryStrategies;
+                            co.configBuilder.binaryStrategiesValidation = this.configBuilder.binaryStrategiesValidation;
                             co.mlSettings = this.mlSettings;
                             GlobalState.rollback = true;
 
@@ -298,8 +225,8 @@ namespace CommandLine
                     }
                 case COMMAND_SAVE:
                     {
-                        CommandPersistence.dump(taskAsParameter, this.mlSettings, this.binaryToSample,
-                            this.binaryToSampleValidation, this.exp, this.currentHistory);
+                        CommandPersistence.dump(taskAsParameter, this.mlSettings, this.configBuilder.binaryStrategies,
+                            this.configBuilder.binaryStrategiesValidation, this.exp, this.currentHistory);
                         break;
                     }
                 case ROLLBACK_FLAG:
@@ -353,8 +280,7 @@ namespace CommandLine
                             co.hasLearnData = true;
                         }
                         co.exp = this.exp;
-                        co.binaryToSample = this.binaryToSample;
-                        co.binaryToSampleValidation = this.binaryToSampleValidation;
+                        co.configBuilder = this.configBuilder;
                         co.mlSettings = this.mlSettings;
                         GlobalState.rollback = true;
 
@@ -486,8 +412,7 @@ namespace CommandLine
                             co.currentHistory = this.currentHistory;
                             if (GlobalState.rollback)
                             {
-                                co.binaryToSample = this.binaryToSample;
-                                co.binaryToSampleValidation = this.binaryToSampleValidation;
+                                co.configBuilder = this.configBuilder;
                                 co.mlSettings = this.mlSettings;
                             }
 
@@ -715,15 +640,6 @@ namespace CommandLine
 
                         break;
                     }
-                case COMMAND_NUMERIC_SAMPLING:
-                    performOneCommand_ExpDesign(task);
-                    break;
-                case COMMAND_HYBRID:
-                    performOneCommand_Hybrid(task);
-                    break;
-                case COMMAND_BINARY_SAMPLING:
-                    performOneCommand_Binary(task);
-                    break;
                 case COMMAND_SAMPLING_OPTIONORDER:
                     parseOptionOrder(task);
                     break;
@@ -780,8 +696,8 @@ namespace CommandLine
                         {
                             ConfigurationPrinter printer = null;
 
-                            ConfigurationBuilder.setBlacklisted(this.mlSettings.blacklisted);
-                            List<Configuration> configs = ConfigurationBuilder.buildConfigs(GlobalState.varModel, this.binaryToSample, this.numericToSample, this.hybridToSample);
+                            configBuilder.blacklisted = mlSettings.blacklisted;
+                            List<Configuration> configs = configBuilder.buildConfigs(GlobalState.varModel);
 
                             // Clear the content of the file
                             File.WriteAllText(para[0], string.Empty);
@@ -841,7 +757,7 @@ namespace CommandLine
 
                 case COMMAND_PYTHON_LEARN:
                     {
-                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
                         List<Configuration> configurationsLearning;
                         List<Configuration> configurationsValidation;
                         if (allMeasurementsSelected)
@@ -874,7 +790,7 @@ namespace CommandLine
                 case COMMAND_PYTHON_LEARN_OPT:
                     {
                         InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
                         List<Configuration> configurationsLearning;
                         List<Configuration> configurationsValidation;
                         if (allMeasurementsSelected)
@@ -923,7 +839,7 @@ namespace CommandLine
                 case COMMAND_OPTIMIZE_PARAMETER_SPLCONQUEROR:
                     {
                         InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
                         List<Configuration> configurationsLearning;
                         List<Configuration> configurationsValidation;
                         if (!configurationsPreparedForLearning(learnAndValidation,
@@ -996,9 +912,17 @@ namespace CommandLine
                     }
 
                 default:
-                    // Try to perform it as deprecated command.
-                    performOneCommand_Depr(line);
-                    return command;
+                    bool didPerformCommand = configBuilder.performOneCommand(line);
+                    if (didPerformCommand)
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        // Try to perform it as deprecated command.
+                        performOneCommand_Depr(line);
+                        return command;
+                    }
             }
             return "";
         }
@@ -1041,40 +965,6 @@ namespace CommandLine
                     this.mlSettings = ML_Settings.readSettingsFromFile(task);
                     break;
 
-                case COMMAND_SAMPLE_PAIRWISE:
-                    addBinSamplingNoParams(SamplingStrategies.PAIRWISE,
-                        "PW", taskAsParameter.Contains(COMMAND_VALIDATION));
-                    break;
-
-                case COMMAND_SAMPLE_BINARY_TWISE:
-                    {
-                        string[] para = task.Split(new char[] { ' ' });
-
-                        Dictionary<String, String> parameters = new Dictionary<string, string>();
-                        //parseParametersToLinearAndQuadraticBinarySampling(para);
-
-                        for (int i = 0; i < para.Length; i++)
-                        {
-                            if (para[i].Contains(":"))
-                            {
-                                parameters.Add(para[i].Split(':')[0], para[i].Split(':')[1]);
-                            }
-                        }
-                        addBinSamplingParams(SamplingStrategies.T_WISE, "TW", parameters,
-                            para.Contains(Commands.COMMAND_VALIDATION));
-                    }
-                    break;
-
-                case COMMAND_EXPERIMENTALDESIGN:
-                    performOneCommand_ExpDesign(task);
-                    break;
-
-                case COMMAND_SAMPLE_FEATUREWISE:
-                case COMMAND_SAMPLE_OPTIONWISE:
-                    addBinSamplingNoParams(SamplingStrategies.OPTIONWISE,
-                        "OW", taskAsParameter.Contains(COMMAND_VALIDATION));
-                    break;
-
                 case COMMAND_PREDICT_CONFIGURATIONS:
                     {
                         FeatureSubsetSelection learnedModel = exp.models[exp.models.Count - 1];
@@ -1097,11 +987,6 @@ namespace CommandLine
                     printPredictedConfigurations(task, this.exp);
                     break;
 
-                case COMMAND_SAMPLE_ALLBINARY:
-                    addBinSamplingNoParams(SamplingStrategies.ALLBINARY, "ALLB",
-                        taskAsParameter.Contains(COMMAND_VALIDATION));
-                    break;
-
                 case COMMAND_START_ALLMEASUREMENTS:
                     learnWithAllMeasurements();
                     break;
@@ -1120,7 +1005,7 @@ namespace CommandLine
                 case COMMAND_OPTIMIZE_PARAMETER:
                     {
                         InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+                        Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
                         List<Configuration> configurationsLearning;
                         List<Configuration> configurationsValidation;
                         if (!configurationsPreparedForLearning(learnAndValidation,
@@ -1162,28 +1047,6 @@ namespace CommandLine
 
                         break;
                     }
-
-                case COMMAND_SAMPLE_BINARY_RANDOM:
-                    {
-                        Dictionary<String, String> parameter = new Dictionary<String, String>();
-                        string[] para = task.Split(new char[] { ' ' });
-                        for (int i = 0; i < para.Length; i++)
-                        {
-                            String key = para[i].Split(':')[0];
-                            String value = para[i].Split(':')[1];
-                            parameter.Add(key, value);
-                        }
-                        addBinSamplingParams(SamplingStrategies.BINARY_RANDOM, "RANDB",
-                            parameter, taskAsParameter.Contains(COMMAND_VALIDATION));
-
-                        break;
-                    }
-
-                case COMMAND_SAMPLE_NEGATIVE_OPTIONWISE:
-                    // TODO there are two different variants in generating NegFW configurations.
-                    addBinSamplingNoParams(SamplingStrategies.NEGATIVE_OPTIONWISE,
-                        "NEGOW", taskAsParameter.Contains(COMMAND_VALIDATION));
-                    break;
 
                 default:
                     GlobalState.logInfo.logLine("Invalid deprecated command: " + command);
@@ -1231,8 +1094,6 @@ namespace CommandLine
         private void cleanGlobal()
         {
             SPLConqueror_Core.GlobalState.clear();
-            binaryToSample.Clear();
-            binaryToSampleValidation.Clear();
             cleanSampling();
         }
 
@@ -1240,45 +1101,30 @@ namespace CommandLine
         {
             this.allMeasurementsSelected = false;
             exp.clearSampling();
-            binaryToSample.Clear();
-            binaryToSampleValidation.Clear();
-            numericToSample.Clear();
-            numericToSampleValidation.Clear();
-            hybridToSample.Clear();
-            hybridToSampleValidation.Clear();
-            ConfigurationBuilder.clear();
+            configBuilder.clear();
             cleanLearning();
         }
 
         private void cleanLearning()
         {
             exp.clear();
-            binaryToSample.Clear();
-            binaryToSampleValidation.Clear();
         }
 
         private string createSamplingIdentifier()
         {
             StringBuilder sb = new StringBuilder();
             // add binary sampling strategy to the identifier
-            sb.Append(this.exp.info.binarySamplings_Learning + "_");
+            foreach (SamplingStrategies sampling in configBuilder.binaryStrategies)
+            {
+                sb.Append(sampling.ToString().ToLower() + "_");
+            }
 
             // add numeric sampling strategy to the identifier
-            foreach (ExperimentalDesign sampling in numericToSample)
+            foreach (ExperimentalDesign sampling in configBuilder.numericStrategies)
             {
                 sb.Append("_" + sampling.getTag() + "--" + sampling.parameterIdentifier());
             }
             return sb.ToString();
-        }
-
-        private bool isAllMeasurementsToSample()
-        {
-            return this.binaryToSample.Contains(SamplingStrategies.ALLBINARY) && this.binaryToSample.Contains(SamplingStrategies.FULLFACTORIAL);
-        }
-
-        private bool isAllMeasurementsValidation()
-        {
-            return this.binaryToSampleValidation.Contains(SamplingStrategies.ALLBINARY) && this.binaryToSample.Contains(SamplingStrategies.FULLFACTORIAL);
         }
 
         private bool allMeasurementsValid()
@@ -1289,27 +1135,6 @@ namespace CommandLine
                     return false;
             }
             return true;
-        }
-
-        private List<Configuration> buildSet(List<SamplingStrategies> binaryStrats, List<ExperimentalDesign> numericStrats, List<HybridStrategy> hybridStrats)
-        {
-            ConfigurationBuilder.setBlacklisted(mlSettings.blacklisted);
-            List<Configuration> configurationsTest = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binaryStrats, numericStrats, hybridStrats);
-            //Construct configurations and compute the synthetic value if we have a given function that simulates the options' influences
-            if (trueModel != null)
-            {
-                foreach (Configuration conf in configurationsTest)
-                {
-                    conf.setMeasuredValue(GlobalState.currentNFP, trueModel.eval(conf));
-                    GlobalState.addConfiguration(conf);
-                }
-            }
-            else
-            {
-                configurationsTest = GlobalState.getMeasuredConfigs(configurationsTest);
-            }
-
-            return configurationsTest;
         }
 
         private void printNFPsToFile(List<Configuration> conf, string file)
@@ -1402,33 +1227,6 @@ namespace CommandLine
         }
 
 
-        private Tuple<List<Configuration>, List<Configuration>> buildSetsEfficient()
-        {
-            bool measurementsValid = false;
-            List<Configuration> configurationsLearning = new List<Configuration>();
-            List<Configuration> configurationsValidation = new List<Configuration>();
-
-            if (isAllMeasurementsToSample() && allMeasurementsValid() && (mlSettings.blacklisted == null || mlSettings.blacklisted.Count == 0))
-            {
-                measurementsValid = true;
-                configurationsLearning = GlobalState.allMeasurements.Configurations;
-            }
-            else
-            {
-                configurationsLearning = buildSet(this.binaryToSample, this.numericToSample, this.hybridToSample);
-            }
-
-            if (isAllMeasurementsValidation() && (measurementsValid || allMeasurementsValid()) && (mlSettings.blacklisted == null || mlSettings.blacklisted.Count == 0))
-            {
-                configurationsValidation = GlobalState.allMeasurements.Configurations;
-            }
-            else
-            {
-                configurationsValidation = buildSet(this.binaryToSampleValidation, this.numericToSampleValidation, this.hybridToSampleValidation);
-            }
-            return Tuple.Create(configurationsLearning, configurationsValidation);
-        }
-
         private void parseOptionOrder(string task)
         {
             String[] optionNames = task.Split(' ');
@@ -1495,152 +1293,6 @@ namespace CommandLine
             }
         }
 
-        /// <summary>
-        /// This method sets the according variables to perform the hybrid sampling strategy.
-        /// Note: A hybrid sampling strategy might have parameters and also consider only a specific set of numeric options.
-        ///         [option1,option3,...,optionN] param1:value param2:value
-        /// </summary>
-        /// <param name="task">the task containing the name of the sampling strategy and the parameters</param>
-        /// <returns>the name of the sampling strategy if it is not found; empty string otherwise</returns>
-        private string performOneCommand_Hybrid(string task)
-        {
-            // splits the task in design and parameters of the design
-            string[] designAndParams = task.Split(new Char[] { ' ' }, 2);
-            string designName = designAndParams[0];
-
-            // parsing of the parameters
-            List<ConfigurationOption> optionsToConsider;
-            Dictionary<string, string> parameter;
-            List<ConfigurationOption> temp = new List<ConfigurationOption>();
-            getParametersAndSamplingDomain(task, out parameter, out optionsToConsider);
-
-
-            if (optionsToConsider.Count == 0)
-            {
-                optionsToConsider.AddRange(GlobalState.varModel.NumericOptions);
-                optionsToConsider.AddRange(GlobalState.varModel.BinaryOptions);
-            }
-
-            HybridStrategy hybridDesign = null;
-
-            switch (designName.ToLower())
-            {
-                case COMMAND_HYBRID_DISTRIBUTION_AWARE:
-                    parameter.Remove(designName);
-                    hybridDesign = new DistributionAware();
-                    hybridDesign.SetSamplingDomain(optionsToConsider);
-                    break;
-                case COMMAND_HYBRID_DISTRIBUTION_PRESERVING:
-                    parameter.Remove(designName);
-                    hybridDesign = new DistributionPreserving();
-                    hybridDesign.SetSamplingDomain(optionsToConsider);
-                    break;
-                default:
-                    return task;
-            }
-
-            addHybridDesign(hybridDesign, parameter.ContainsKey("validation"), parameter);
-
-            return "";
-        }
-
-        private void getParametersAndSamplingDomain(string taskLine, out Dictionary<string, string> parameters,
-            out List<ConfigurationOption> samplingDomain)
-        {
-            parameters = new Dictionary<string, string>();
-            samplingDomain = new List<ConfigurationOption>();
-
-            string[] args = taskLine.Split(new string[] { " " }, StringSplitOptions.None);
-
-            if (args.Length > 1)
-            {
-                foreach (string param in args)
-                {
-                    if (param.Contains("["))
-                    {
-                        string[] options = param.Substring(1, param.Length - 2).Split(',');
-                        foreach (string option in options)
-                        {
-                            samplingDomain.Add(GlobalState.varModel.getOption(option));
-                        }
-                    }
-                    else if (param.Contains(":"))
-                    {
-                        string[] keyAndValue = param.Split(new string[] { ":" }, StringSplitOptions.None);
-                        parameters.Add(keyAndValue[0], keyAndValue[1]);
-                    }
-                }
-            }
-        }
-
-        private void performOneCommand_Binary(string task)
-        {
-            string strategyName = task.Split(new string[] { " " }, StringSplitOptions.None)[0];
-            Dictionary<string, string> parameterKeyAndValue;
-            List<BinaryOption> optionsToConsider;
-            List<ConfigurationOption> temp = new List<ConfigurationOption>();
-            getParametersAndSamplingDomain(task, out parameterKeyAndValue, out temp);
-            optionsToConsider = temp.OfType<BinaryOption>().ToList();
-            bool isValidation = task.Contains(COMMAND_VALIDATION);
-
-            switch (strategyName.ToLower())
-            {
-                case COMMAND_SAMPLE_ALLBINARY:
-                    addBinarySamplingDomain(SamplingStrategies.ALLBINARY, optionsToConsider);
-                    addBinSamplingNoParams(SamplingStrategies.ALLBINARY, "ALLB", isValidation);
-                    break;
-                case COMMAND_SAMPLE_FEATUREWISE:
-                case COMMAND_SAMPLE_OPTIONWISE:
-                    addBinarySamplingDomain(SamplingStrategies.OPTIONWISE, optionsToConsider);
-                    addBinSamplingNoParams(SamplingStrategies.OPTIONWISE, "OW", isValidation);
-                    break;
-                case COMMAND_SAMPLE_PAIRWISE:
-                    addBinarySamplingDomain(SamplingStrategies.PAIRWISE, optionsToConsider);
-                    addBinSamplingNoParams(SamplingStrategies.PAIRWISE, "PW", isValidation);
-                    break;
-                case COMMAND_SAMPLE_NEGATIVE_OPTIONWISE:
-                    addBinarySamplingDomain(SamplingStrategies.NEGATIVE_OPTIONWISE, optionsToConsider);
-                    addBinSamplingNoParams(SamplingStrategies.NEGATIVE_OPTIONWISE, "NEGOW", isValidation);
-                    break;
-                case COMMAND_SAMPLE_BINARY_RANDOM:
-                    addBinarySamplingDomain(SamplingStrategies.BINARY_RANDOM, optionsToConsider);
-                    addBinSamplingParams(SamplingStrategies.BINARY_RANDOM, "RANDB", parameterKeyAndValue,
-                        isValidation);
-                    break;
-                case COMMAND_SAMPLE_BINARY_TWISE:
-                    addBinarySamplingDomain(SamplingStrategies.T_WISE, optionsToConsider);
-                    addBinSamplingParams(SamplingStrategies.T_WISE, "TW", parameterKeyAndValue, isValidation);
-                    break;
-                case COMMAND_SAMPLE_BINARY_SAT:
-                    addBinarySamplingDomain(SamplingStrategies.SAT, optionsToConsider);
-                    addBinSamplingParams(SamplingStrategies.SAT, "SAT", parameterKeyAndValue, isValidation);
-                    break;
-                case COMMAND_SAMPLE_BINARY_DISTANCE:
-                    addBinarySamplingDomain(SamplingStrategies.DISTANCE_BASED, optionsToConsider);
-                    addBinSamplingParams(SamplingStrategies.DISTANCE_BASED, "DIST_BASE", parameterKeyAndValue, isValidation);
-                    break;
-                //TODO:hybrid as bin/num
-                //case COMMAND_HYBRID_DISTRIBUTION_AWARE:
-                //    addHybridAsBin(new DistributionAware(), task.Contains(COMMAND_VALIDATION), parameterKeyAndValue);
-                //    break;
-                //case COMMAND_HYBRID_DISTRIBUTION_PRESERVING:
-                //    addHybridDesign(new DistributionPreserving(), task.Contains(COMMAND_VALIDATION),
-                //        parameterKeyAndValue);
-                //    break;
-                default:
-                    GlobalState.logError.logLine("Invalid binary strategy: " + strategyName);
-                    break;
-            }
-        }
-
-        private void addBinarySamplingDomain(SamplingStrategies strat, List<BinaryOption> optionsToConsider)
-        {
-            if (optionsToConsider.Count > 0)
-            {
-                ConfigurationBuilder.optionsToConsider.Add(strat, optionsToConsider);
-            }
-        }
-
         //TODO:hybrid as bin/num
         //private void addHybridAsBin(HybridStrategy hybrid, bool isValidation, Dictionary<string, string> parameters)
         //{
@@ -1670,183 +1322,6 @@ namespace CommandLine
         //        parameters[notAllowed] = "false";
         //    }
         //}
-
-        private void addHybridDesign(HybridStrategy hybrid, bool isValidation, Dictionary<string, string> parameters)
-        {
-            hybrid.SetSamplingParameters(parameters);
-            if (isValidation)
-            {
-                this.hybridToSampleValidation.Add(hybrid);
-                this.exp.info.numericSamplings_Validation = hybrid.getTag();
-            }
-            else
-            {
-                this.hybridToSample.Add(hybrid);
-                this.exp.info.numericSamplings_Learning = hybrid.getTag();
-            }
-
-        }
-
-        private void addBinSamplingNoParams(SamplingStrategies strategy, string name, bool isValidation)
-        {
-            if (isValidation)
-            {
-                this.binaryToSampleValidation.Add(strategy);
-                this.exp.info.binarySamplings_Validation = name;
-            }
-            else
-            {
-                this.binaryToSample.Add(strategy);
-                this.exp.info.binarySamplings_Learning = name;
-            }
-        }
-
-        private void addBinSamplingParams(SamplingStrategies strategy, string name,
-            Dictionary<string, string> parameter, bool isValidation)
-        {
-            addBinSamplingNoParams(strategy, name, isValidation);
-            switch (strategy)
-            {
-                case SamplingStrategies.BINARY_RANDOM:
-                    ConfigurationBuilder.binaryParams.randomBinaryParameters.Add(parameter);
-                    break;
-                case SamplingStrategies.T_WISE:
-                    ConfigurationBuilder.binaryParams.tWiseParameters.Add(parameter);
-                    break;
-                case SamplingStrategies.SAT:
-                    ConfigurationBuilder.binaryParams.satParameters.Add(parameter);
-                    break;
-                case SamplingStrategies.DISTANCE_BASED:
-                    ConfigurationBuilder.binaryParams.distanceMaxParameters.Add(parameter);
-                    break;
-            }
-
-            string parameterIdentifier = "";
-            foreach (KeyValuePair<string, string> kv in parameter)
-            {
-                parameterIdentifier += "_" + kv.Key + "-" + kv.Value;
-            }
-            if (isValidation)
-            {
-                this.exp.info.binarySamplings_Validation += parameterIdentifier;
-            }
-            else
-            {
-                this.exp.info.binarySamplings_Learning += parameterIdentifier;
-            }
-        }
-
-
-        /// <summary>
-        ///
-        /// Note: An experimental design might have parameters and also consider only a specific set of numeric options.
-        ///         [option1,option3,...,optionN] param1:value param2:value
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        private string performOneCommand_ExpDesign(string task)
-        {
-            // splits the task in design and parameters of the design
-            string[] designAndParams = task.Split(new Char[] { ' ' }, 2);
-            string designName = designAndParams[0]; ;
-
-
-
-            // parsing of the parameters
-            List<NumericOption> optionsToConsider;
-            Dictionary<string, string> parameter = new Dictionary<string, string>();
-            List<ConfigurationOption> temp = new List<ConfigurationOption>();
-            getParametersAndSamplingDomain(task, out parameter, out temp);
-            optionsToConsider = temp.OfType<NumericOption>().ToList();
-
-            if (optionsToConsider.Count == 0)
-                optionsToConsider = GlobalState.varModel.NumericOptions;
-
-            ExperimentalDesign expDesign = null;
-
-            switch (designName.ToLower())
-            {
-                case COMMAND_EXPDESIGN_BOXBEHNKEN:
-                    expDesign = new BoxBehnkenDesign();
-                    break;
-                case COMMAND_EXPDESIGN_CENTRALCOMPOSITE:
-                    expDesign = new CentralCompositeInscribedDesign();
-                    break;
-                case COMMAND_EXPDESIGN_FULLFACTORIAL:
-                    expDesign = new FullFactorialDesign();
-                    break;
-
-                case COMMAND_EXPDESIGN_FACTORIAL:
-                    expDesign = new FactorialDesign();
-                    break;
-
-                case COMMAND_EXPDESIGN_HYPERSAMPLING:
-                    expDesign = new HyperSampling();
-                    break;
-
-                case COMMAND_EXPDESIGN_ONEFACTORATATIME:
-                    expDesign = new OneFactorAtATime();
-                    break;
-
-                case COMMAND_EXPDESIGN_KEXCHANGE:
-                    expDesign = new KExchangeAlgorithm();
-                    break;
-
-                case COMMAND_EXPDESIGN_PLACKETTBURMAN:
-                    expDesign = new PlackettBurmanDesign();
-                    break;
-
-                case COMMAND_EXPDESIGN_RANDOM:
-                    expDesign = new RandomSampling();
-                    break;
-
-                //TODO:hybrids as bin/num
-                //case COMMAND_HYBRID_DISTRIBUTION_AWARE:
-                //    addHybridAsNumeric(new DistributionAware(), parameter.ContainsKey("validation"), parameter);
-                //    return "";
-
-                //case COMMAND_HYBRID_DISTRIBUTION_PRESERVING:
-                //    addHybridAsNumeric(new DistributionPreserving(), parameter.ContainsKey("validation"), parameter);
-                //    return "";
-
-                default:
-                    return task;
-            }
-
-            if (optionsToConsider.Count > 0)
-            {
-                expDesign.setSamplingDomain(optionsToConsider);
-            }
-
-            if ((expDesign is KExchangeAlgorithm || expDesign is RandomSampling)
-                && parameter.ContainsKey("sampleSize") && GlobalState.varModel != null)
-            {
-                int maximumNumberNumVariants = computeNumberOfPossibleNumericVariants(GlobalState.varModel);
-                String numberOfSamples;
-                parameter.TryGetValue("sampleSize", out numberOfSamples);
-                if (Double.Parse(numberOfSamples) > maximumNumberNumVariants)
-                {
-                    GlobalState.logInfo.logLine("The number of stated numeric variants exceeds the maximum number "
-                        + "of possible variants. Only " + maximumNumberNumVariants
-                        + " variants are possible. Switching to fullfactorial design.");
-                    expDesign = new FullFactorialDesign();
-                }
-            }
-
-            expDesign.setSamplingParameters(parameter);
-            if (parameter.ContainsKey("validation"))
-            {
-                this.numericToSampleValidation.Add(expDesign);
-                this.exp.info.numericSamplings_Validation = expDesign.getName();
-            }
-            else
-            {
-                this.numericToSample.Add(expDesign);
-                this.exp.info.numericSamplings_Learning = expDesign.getName();
-            }
-
-            return "";
-        }
 
         private void learnWithAllMeasurements()
         {
@@ -1888,7 +1363,7 @@ namespace CommandLine
         private void learnWithSampling()
         {
             InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
             List<Configuration> configurationsLearning;
             List<Configuration> configurationsValidation;
             if (!configurationsPreparedForLearning(learnAndValidation,
@@ -1947,7 +1422,7 @@ namespace CommandLine
 
             // initialization
             InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
-            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = buildSetsEfficient();
+            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
             List<Configuration> configurationsLearning;
             List<Configuration> configurationsValidation;
             if (!configurationsPreparedForLearning(learnAndValidation, out configurationsLearning, out configurationsValidation))
@@ -1983,10 +1458,10 @@ namespace CommandLine
                 else
                 {
                     // keep sampling strategy but use different seed
-                    ConfigurationBuilder.binaryParams.updateSeeds();
+                    configBuilder.binaryParams.updateSeeds();
                 }
                 round++;
-                List<Configuration> configsForNextRun = buildSet(this.binaryToSample, this.numericToSample, this.hybridToSample);
+                List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 configurationsLearning.AddRange(configsForNextRun);
                 exp = new Learning(configurationsLearning, configurationsValidation)
                 {
@@ -2059,35 +1534,6 @@ namespace CommandLine
             // Use the ConfigurationPrinter to print the file.
             ConfigurationPrinter configurationPrinter = new ConfigurationPrinter(task, GlobalState.optionOrder, "", "");
             configurationPrinter.print(GlobalState.allMeasurements.Configurations, nfpPropertiesToPrint);
-        }
-
-        /// <summary>
-        /// Calculate the number of possible configurations for numeric options in a vm.
-        /// </summary>
-        /// <param name="vm">The variability model used.</param>
-        /// <returns>Number of possible configurations.</returns>
-        private static int computeNumberOfPossibleNumericVariants(VariabilityModel vm)
-        {
-            List<int> numberOfSteps = new List<int>();
-
-            foreach (NumericOption numOpt in vm.NumericOptions)
-            {
-                if (numOpt.Values != null)
-                    numberOfSteps.Add(numOpt.Values.Count());
-                else
-                    numberOfSteps.Add((int)numOpt.getNumberOfSteps());
-            }
-
-            if (numberOfSteps.Count == 0)
-            {
-                return numberOfSteps.Count;
-            }
-            else
-            {
-                int numberOfNumVariants = 1;
-                numberOfSteps.ForEach(x => numberOfNumVariants *= x);
-                return numberOfNumVariants;
-            }
         }
 
         private bool configurationsPreparedForLearning(Tuple<List<Configuration>, List<Configuration>> learnAndValidation,

@@ -13,6 +13,7 @@ using SPLConqueror_Core;
 using MachineLearning;
 using MachineLearning.Learning;
 using CommandLine;
+using MachineLearning.Sampling;
 
 namespace ScriptGenerator
 {
@@ -214,22 +215,22 @@ namespace ScriptGenerator
 
             if (bsamp_FW_box.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_OPTIONWISE + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE + " " + validation);
                 keyInfo += "FW ";
             }
             if (bsamp_PW_box.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_PAIRWISE + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE + " " + validation);
                 keyInfo += "PW ";
             }
             if (bsamp_negFW_box.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " " + validation);
                 keyInfo += "negFW ";
             }
             if (bsamp_all_box.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_ALLBINARY + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY + " " + validation);
                 keyInfo += "all ";
             }
             if (bsamp_random_box.Checked)
@@ -244,7 +245,7 @@ namespace ScriptGenerator
                 {
                     param += "seed:" + randomSeedTextBox.Text;
                 }
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_BINARY_RANDOM
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM
                     + " " + param + " " + validation);
                 keyInfo += "random " + numConfigsTextBox.Text + randomSeedTextBox.Text;
             }
@@ -255,7 +256,7 @@ namespace ScriptGenerator
                 {
                     param += "t:" + tTextBox.Text + " ";
                 }
-                samplingNames.Add(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_BINARY_TWISE + " "
+                samplingNames.Add(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_BINARY_TWISE + " "
                     + param + validation);
             }
             Container cont = new Container(containerKey, samplingNames);
@@ -276,23 +277,23 @@ namespace ScriptGenerator
 
             if (num_forValidationCheckBox.Checked)
             {
-                validation = CommandLine.Commands.COMMAND_VALIDATION;
-                containerKey.Append(CommandLine.Commands.COMMAND_VALIDATION);
+                validation = ConfigurationBuilder.COMMAND_VALIDATION;
+                containerKey.Append(ConfigurationBuilder.COMMAND_VALIDATION);
             }
 
             if (num_BoxBehnken_check.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_BOXBEHNKEN + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_BOXBEHNKEN + " " + validation);
                 keyInfo += "BoxBehnken ";
             }
             if (num_CentralComposite_check.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_CENTRALCOMPOSITE + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_CENTRALCOMPOSITE + " " + validation);
                 keyInfo += "CentralComposite ";
             }
             if (num_FullFactorial_check.Checked)
             {
-                samplingNames.Add(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_FULLFACTORIAL + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_FULLFACTORIAL + " " + validation);
                 keyInfo += "FullFactorial ";
             }
             if (num_hyperSampling_check.Checked)
@@ -302,7 +303,7 @@ namespace ScriptGenerator
                     informatioLabel.Text = PARAMETER_NOT_SPECIFIED;
                     return;
                 }
-                samplingNames.Add(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_HYPERSAMPLING + " " + num_hyper_percent_text.Text + " " + validation);
+                samplingNames.Add(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_HYPERSAMPLING + " " + num_hyper_percent_text.Text + " " + validation);
                 keyInfo += "HyperSampling " + num_hyper_percent_text.Text + " ";
             }
             if (num_kEx_check.Checked)
@@ -312,7 +313,7 @@ namespace ScriptGenerator
                     informatioLabel.Text = PARAMETER_NOT_SPECIFIED;
                     return;
                 }
-                string str = Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_KEXCHANGE + " sampleSize:" + num_kEx_n_Box.Text.Trim() + " k:" + num_kEx_k_Box.Text.Trim();
+                string str = ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_KEXCHANGE + " sampleSize:" + num_kEx_n_Box.Text.Trim() + " k:" + num_kEx_k_Box.Text.Trim();
                 samplingNames.Add(str + " " + validation);
                 keyInfo += str + " ";
             }
@@ -323,7 +324,7 @@ namespace ScriptGenerator
                     informatioLabel.Text = PARAMETER_NOT_SPECIFIED;
                     return;
                 }
-                string str = Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_RANDOM + " sampleSize:" + num_random_n_Text.Text.Trim() + " seed:" + num_rand_seed_Text.Text.Trim();
+                string str = ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_RANDOM + " sampleSize:" + num_random_n_Text.Text.Trim() + " seed:" + num_rand_seed_Text.Text.Trim();
                 samplingNames.Add(str + " " + validation);
                 keyInfo += str + " ";
             }
@@ -335,7 +336,7 @@ namespace ScriptGenerator
                     informatioLabel.Text = PARAMETER_NOT_SPECIFIED;
                     return;
                 }
-                string str = Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_ONEFACTORATATIME + " distinctValuesPerOption:" + num_oneFactorAtATime_num_Text.Text.Trim();
+                string str = ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_ONEFACTORATATIME + " distinctValuesPerOption:" + num_oneFactorAtATime_num_Text.Text.Trim();
                 samplingNames.Add(str + " " + validation);
                 keyInfo += str + " ";
 
@@ -347,7 +348,7 @@ namespace ScriptGenerator
                     informatioLabel.Text = PARAMETER_NOT_SPECIFIED;
                     return;
                 }
-                string str = Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_PLACKETTBURMAN + " measurements:" + num_Plackett_n_Box.Text.Trim() + " level:" + num_Plackett_Level_Box.Text.Trim();
+                string str = ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " " + ConfigurationBuilder.COMMAND_EXPDESIGN_PLACKETTBURMAN + " measurements:" + num_Plackett_n_Box.Text.Trim() + " level:" + num_Plackett_Level_Box.Text.Trim();
                 samplingNames.Add(str + " " + validation);
                 keyInfo += str + " ";
             }
@@ -977,8 +978,8 @@ namespace ScriptGenerator
                 return false;
             }
 
-            if (samplingNamesBinary.Contains(Commands.COMMAND_SAMPLE_ALLBINARY)
-                && samplingNamesNumeric.Contains(Commands.COMMAND_EXPDESIGN_FULLFACTORIAL))
+            if (samplingNamesBinary.Contains(ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY)
+                && samplingNamesNumeric.Contains(ConfigurationBuilder.COMMAND_EXPDESIGN_FULLFACTORIAL))
             {
                 return true;
             }
@@ -989,8 +990,7 @@ namespace ScriptGenerator
                 cmd.performOneCommand(samplingNamesBinary.First());
             if (samplingNamesNumeric != null)
                 cmd.performOneCommand(samplingNamesNumeric.First());
-            var sampled = MachineLearning.Sampling.ConfigurationBuilder.buildConfigs(GlobalState.varModel, cmd.BinaryToSample
-                , cmd.NumericToSample, new List<MachineLearning.Sampling.Hybrid.HybridStrategy>());
+            var sampled = new MachineLearning.Sampling.ConfigurationBuilder().buildConfigs(GlobalState.varModel);
             var existing = ConfigurationReader.readConfigurations(measurement, GlobalState.varModel);
             return ((sampled.Intersect(existing)).Count() > 0);
         }
@@ -1023,10 +1023,10 @@ namespace ScriptGenerator
 
         private void updateScript(string source, string target)
         {
-            string[] binarySampling = new string[] { Commands.COMMAND_SAMPLE_ALLBINARY,
-                    Commands.COMMAND_SAMPLE_BINARY_RANDOM, Commands.COMMAND_SAMPLE_BINARY_TWISE,
-                    Commands.COMMAND_SAMPLE_FEATUREWISE, Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE,
-                    Commands.COMMAND_SAMPLE_OPTIONWISE, Commands.COMMAND_SAMPLE_PAIRWISE,
+            string[] binarySampling = new string[] { ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY,
+                    ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM, ConfigurationBuilder.COMMAND_SAMPLE_BINARY_TWISE,
+                    ConfigurationBuilder.COMMAND_SAMPLE_FEATUREWISE, ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE,
+                    ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE, ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE,
                     Commands.COMMAND_SAMPLING_OPTIONORDER };
             StreamReader sr = new StreamReader(source);
             StreamWriter sw = new StreamWriter(target);
@@ -1035,17 +1035,17 @@ namespace ScriptGenerator
             {
                 line = sr.ReadLine();
                 if (binarySampling.Any(sampling => line.Contains(sampling))
-                    && !line.StartsWith(Commands.COMMAND_BINARY_SAMPLING))
+                    && !line.StartsWith(ConfigurationBuilder.COMMAND_BINARY_SAMPLING))
                 {
-                    line = Commands.COMMAND_BINARY_SAMPLING + " " + line;
+                    line = ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + line;
                 }
                 else if (line.Contains(Commands.COMMAND_LOAD_MLSETTINGS))
                 {
                     line = line.Replace(Commands.COMMAND_LOAD_MLSETTINGS, Commands.COMMAND_LOAD_MLSETTINGS_UNIFORM);
                 }
-                else if (line.Contains(Commands.COMMAND_EXPERIMENTALDESIGN))
+                else if (line.Contains(ConfigurationBuilder.COMMAND_EXPERIMENTALDESIGN))
                 {
-                    line = line.Replace(Commands.COMMAND_EXPERIMENTALDESIGN, Commands.COMMAND_NUMERIC_SAMPLING);
+                    line = line.Replace(ConfigurationBuilder.COMMAND_EXPERIMENTALDESIGN, ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING);
                 }
                 else if (line.Contains(Commands.COMMAND_PREDICT_CONFIGURATIONS))
                 {

@@ -255,11 +255,11 @@ namespace CommandLine
                         }
                         break;
 
-                    case Commands.COMMAND_SAMPLE_OPTIONWISE:
-                    case Commands.COMMAND_SAMPLE_BINARY_RANDOM:
-                    case Commands.COMMAND_SAMPLE_PAIRWISE:
-                    case Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE:
-                    case Commands.COMMAND_SAMPLE_ALLBINARY:
+                    case ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE:
+                    case ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM:
+                    case ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE:
+                    case ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE:
+                    case ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY:
                         wasPerformed = reconstructBinarySampling(logReader, relevantCommands, task, command, line);
                         if (!wasPerformed)
                         {
@@ -272,8 +272,8 @@ namespace CommandLine
                         }
                         break;
 
-                    case Commands.COMMAND_EXPERIMENTALDESIGN:
-                    case Commands.COMMAND_NUMERIC_SAMPLING:
+                    case ConfigurationBuilder.COMMAND_EXPERIMENTALDESIGN:
+                    case ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING:
                         wasPerformed = reconstructNumericSampling(logReader, relevantCommands, task, command, line);
                         if (!wasPerformed)
                         {
@@ -510,18 +510,18 @@ namespace CommandLine
             string lineInLog = Commands.COMMAND + commandLine;
             if (lineInLog.Equals(logReader.ReadLine()))
             {
-                relevantCommands.Remove(Commands.COMMAND_EXPERIMENTALDESIGN);
-                relevantCommands.Remove(Commands.COMMAND_EXPERIMENTALDESIGN + " validation");
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_OPTIONWISE);
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_BINARY_RANDOM);
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_PAIRWISE);
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE);
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_ALLBINARY);
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_OPTIONWISE + " validation");
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_BINARY_RANDOM + " validation");
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_PAIRWISE + " validation");
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " validation");
-                relevantCommands.Remove(Commands.COMMAND_SAMPLE_ALLBINARY + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_EXPERIMENTALDESIGN);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_EXPERIMENTALDESIGN + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY);
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_BINARY_RANDOM + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_PAIRWISE + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_NEGATIVE_OPTIONWISE + " validation");
+                relevantCommands.Remove(ConfigurationBuilder.COMMAND_SAMPLE_ALLBINARY + " validation");
                 return true;
             }
             else

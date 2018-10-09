@@ -21,7 +21,6 @@ namespace MachineLearning.Learning.Regression
         int nbBaggings = 0;
         public ObservableCollection<FeatureSubsetSelection> models = new ObservableCollection<FeatureSubsetSelection>();
         public InfluenceModel metaModel = null;
-        public LearningInfo info = new LearningInfo();
 
         // The event to know that all threads are done
         ManualResetEvent eventX = new ManualResetEvent(false);
@@ -296,14 +295,6 @@ namespace MachineLearning.Learning.Regression
                 this.testSet = new List<Configuration>();
             if (this.validationSet != null)
                 this.validationSet = new List<Configuration>();
-
-            this.info.binarySamplings_Learning = "";
-            this.info.binarySamplings_Validation = "";
-
-            this.info.numericSamplings_Learning = "";
-            this.info.numericSamplings_Validation = "";
-
-            ConfigurationBuilder.binaryParams = new BinaryParameters();
         }
 
         public void clear()
