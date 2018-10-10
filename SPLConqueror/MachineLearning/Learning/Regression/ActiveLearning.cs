@@ -12,6 +12,9 @@ namespace MachineLearning.Learning.Regression
         private InfluenceModel influenceModel;
         private ConfigurationBuilder configBuilder;
 
+        private int round = -1;
+        private double lastRelativeError = -1;
+
         public ActiveLearning(ML_Settings mlSettings, InfluenceModel influenceModel, ConfigurationBuilder configBuilder)
         {
             this.mlSettings = mlSettings;
@@ -42,6 +45,7 @@ namespace MachineLearning.Learning.Regression
                 + " NumberOfConfigurationsValidation:" + configurationsValidation.Count);
 
             // learn initial model
+            round = 1;
             Learning exp = new Learning(configurationsLearning, configurationsValidation)
             {
                 metaModel = this.influenceModel,
@@ -49,15 +53,13 @@ namespace MachineLearning.Learning.Regression
             };
             exp.learn();
 
-            // set up abort criteria
             if (exp.models.Count != 1)
             {
                 GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
                 return;
             }
-            int round = 1;
-            double relativeError = exp.models[0].finalError;
-            if (abortActiveLearning(round, relativeError)) return;
+            lastRelativeError = exp.models[0].finalError;
+            if (abortActiveLearning()) return;
 
             // continue learning
             do
@@ -82,11 +84,16 @@ namespace MachineLearning.Learning.Regression
                     mlSettings = this.mlSettings
                 };
                 exp.learn();
-                relativeError = exp.models[0].finalError;
-            } while (!abortActiveLearning(round, relativeError));
+                if (exp.models.Count != 1)
+                {
+                    GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
+                    return;
+                }
+                lastRelativeError = exp.models[0].finalError;
+            } while (!abortActiveLearning());
         }
 
-        private bool abortActiveLearning(int round, double relativeError)
+        private bool abortActiveLearning()
         {
             if (round >= mlSettings.maxNumberOfActiveLearningRounds)
             {
@@ -94,13 +101,13 @@ namespace MachineLearning.Learning.Regression
                 return true;
             }
 
-            if (relativeError < mlSettings.minImprovementPerActiveLearningRound)
+            if (lastRelativeError < mlSettings.minImprovementPerActiveLearningRound)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model did not achieve great improvement anymore");
                 return true;
             }
 
-            if (relativeError < mlSettings.abortError)
+            if (lastRelativeError < mlSettings.abortError)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model is already good enough");
                 return true;
