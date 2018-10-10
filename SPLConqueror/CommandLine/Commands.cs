@@ -732,6 +732,9 @@ namespace CommandLine
                     }
 
                 case DEFINE_PYTHON_PATH:
+                {
+                    FileAttributes attributes = File.GetAttributes(taskAsParameter[0]);
+                    if (attributes.HasFlag(FileAttributes.Directory))
                     {
                         // Append a slash if it is not included
                         if (!taskAsParameter[0].EndsWith("/") && !taskAsParameter[0].EndsWith("\\"))
@@ -751,8 +754,13 @@ namespace CommandLine
                         {
                             PythonWrapper.PYTHON_PATH += "python";
                         }
-                        break;
                     }
+                    else
+                    {
+                        PythonWrapper.PYTHON_PATH = taskAsParameter[0];
+                    }
+                    break;
+                }
 
 
                 case COMMAND_PYTHON_LEARN:

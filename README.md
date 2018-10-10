@@ -690,9 +690,10 @@ An example would be as follows:
 
 #### Defining the path to the python interpreter
 
-```define-python-path <path-to-folder>```
+```define-python-path <path>```
 
-To set which python interpreter is used, use the ```define-python-path``` command.
+Use the `define-python-path` command to set which python interpreter should be used.
+If `<path>` is a directory, then SPLConqueror uses `python.exe` on Windows and `python` on all other operating systems.
 
 #### Learning with scikit-learn
 
