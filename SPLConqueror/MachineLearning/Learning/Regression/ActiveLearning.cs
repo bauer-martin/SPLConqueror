@@ -12,7 +12,13 @@ namespace MachineLearning.Learning.Regression
         private InfluenceModel influenceModel;
         private ConfigurationBuilder configBuilder;
 
+        /// <summary>
+        /// The number of active learning rounds.
+        /// </summary>
         private int round = -1;
+        /// <summary>
+        /// The relative error of the last active learning round.
+        /// </summary>
         private double lastRelativeError = -1;
 
         public ActiveLearning(ML_Settings mlSettings, InfluenceModel influenceModel, ConfigurationBuilder configBuilder)
@@ -22,6 +28,10 @@ namespace MachineLearning.Learning.Regression
             this.configBuilder = configBuilder;
         }
 
+        /// <summary>
+        /// Learns a model using multiple rounds of <see cref="Learning"/>.
+        /// </summary>
+        /// <param name="samplingTask">The parameter string for the 'active-learn-splconqueror' command</param>
         public void learn(string samplingTask)
         {
             Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
@@ -97,7 +107,7 @@ namespace MachineLearning.Learning.Regression
         {
             if (round >= mlSettings.maxNumberOfActiveLearningRounds)
             {
-                GlobalState.logInfo.logLine("Aborting active learning because maximum number of rounds reached");
+                GlobalState.logInfo.logLine("Aborting active learning because maximum number of rounds has been reached");
                 return true;
             }
 
