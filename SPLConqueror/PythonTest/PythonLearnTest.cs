@@ -43,7 +43,7 @@ namespace PythonTest
         private int getNumberPredictions()
         {
             int numberPredictions = -1;
-            StreamReader sr = new StreamReader(Path.GetTempPath() + "PreVal_SVR_BerkeleyDbC__.csv");
+            StreamReader sr = new StreamReader(Path.GetTempPath() + "PreVal_SVR_BerkeleyDbC_.csv");
             while (sr.ReadLine() != "" && !sr.EndOfStream)
             {
                 numberPredictions += 1;
@@ -56,7 +56,7 @@ namespace PythonTest
         {
             Commands cmd = setupCommandLine();
             cmd.performOneCommand(Commands.COMMAND_PYTHON_LEARN + " SVR");
-            Assert.True(File.Exists(Path.GetTempPath() + "PreVal_SVR_BerkeleyDbC__.csv"));
+            Assert.True(File.Exists(Path.GetTempPath() + "PreVal_SVR_BerkeleyDbC_.csv"));
             Assert.AreEqual(2559, getNumberPredictions());
         }
 
