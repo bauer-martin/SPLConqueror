@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using MachineLearning.Sampling;
 using SPLConqueror_Core;
@@ -9,6 +8,8 @@ namespace MachineLearning.Learning.Regression
 {
     public class ActiveLearning
     {
+        private const string SAMPLE_COMMAND = "sample";
+
         private ML_Settings mlSettings = null;
         private InfluenceModel influenceModel;
         private ConfigurationBuilder configBuilder;
@@ -17,10 +18,16 @@ namespace MachineLearning.Learning.Regression
         /// The number of active learning rounds.
         /// </summary>
         private int round = -1;
+
         /// <summary>
         /// The relative error of the last active learning round.
         /// </summary>
         private double lastRelativeError = -1;
+
+        /// <summary>
+        /// The sampling task for switching the sampling strategy to find new configurations.
+        /// </summary>
+        private string samplingTask;
 
         public ActiveLearning(ML_Settings mlSettings, InfluenceModel influenceModel, ConfigurationBuilder configBuilder)
         {
@@ -29,12 +36,44 @@ namespace MachineLearning.Learning.Regression
             this.configBuilder = configBuilder;
         }
 
+        private void parseActiveLearningParameters(string[] parameters)
+        {
+            foreach (string parameter in parameters)
+            {
+                string[] tokens = parameter.Split(' ');
+                if (tokens.Length < 1 || tokens[0].Length < 1) continue;
+                string task = tokens[0];
+                string[] taskParameters = tokens.Skip(1).ToArray();
+                switch (task)
+                {
+                    case SAMPLE_COMMAND:
+                        samplingTask = string.Join(" ", taskParameters);
+                        break;
+                    default:
+                        GlobalState.logError.logLine("Invalid parameter for active learning: " + parameter);
+                        break;
+                }
+            }
+        }
+
+        private bool allInformationAvailable()
+        {
+            if (samplingTask == null)
+            {
+                GlobalState.logError.logLine("You need to specify a sampling strategy for active learning.");
+                return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Learns a model using multiple rounds of <see cref="Learning"/>.
         /// </summary>
-        /// <param name="samplingTask">The parameter string for the 'active-learn-splconqueror' command</param>
-        public void learn(string samplingTask)
+        /// <param name="parameters">The parameters for the 'active-learn-splconqueror' command</param>
+        public void learn(string[] parameters)
         {
+            parseActiveLearningParameters(parameters);
+            if (!allInformationAvailable()) return;
             Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
             List<Configuration> configurationsLearning = learnAndValidation.Item1;
             List<Configuration> configurationsValidation = learnAndValidation.Item2;

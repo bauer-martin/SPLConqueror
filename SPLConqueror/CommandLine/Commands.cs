@@ -834,14 +834,12 @@ namespace CommandLine
                     break;
 
                 case COMMAND_START_ACTIVE_LEARNING_SPL_CONQUEROR:
-                    if (taskAsParameter.Length > 1)
+                    string[] activeLearningParameters = task.Split(',');
+                    for (int i = 0; i < activeLearningParameters.Length; i++)
                     {
-                        activeLearnWithSampling(string.Join(" ", taskAsParameter));
+                        activeLearningParameters[i] = activeLearningParameters[i].Trim();
                     }
-                    else
-                    {
-                        GlobalState.logInfo.logLine("No sampling strategy for active learning defined! Aborting.");
-                    }
+                    activeLearnWithSampling(activeLearningParameters);
                     break;
 
                 case COMMAND_OPTIMIZE_PARAMETER_SPLCONQUEROR:
@@ -1421,7 +1419,7 @@ namespace CommandLine
 
         }
 
-        private void activeLearnWithSampling(string samplingTask)
+        private void activeLearnWithSampling(string[] parameters)
         {
             if (hasLearnData)
             {
@@ -1429,7 +1427,7 @@ namespace CommandLine
             }
             InfluenceModel infMod = new InfluenceModel(GlobalState.varModel, GlobalState.currentNFP);
             ActiveLearning activeLearning = new ActiveLearning(mlSettings, infMod, configBuilder);
-            activeLearning.learn(samplingTask);
+            activeLearning.learn(parameters);
         }
 
         private void predict(string task, Learning exp, List<Feature> model = null)
