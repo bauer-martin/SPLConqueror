@@ -59,6 +59,7 @@ namespace MachineLearning.Sampling
         public static IVariantGenerator vg = new VariantGenerator();
 
         public List<String> blacklisted;
+        public List<Configuration> existingConfigurations = new List<Configuration>();
 
         public void clear()
         {
@@ -70,6 +71,7 @@ namespace MachineLearning.Sampling
             hybridStrategiesValidation.Clear();
             optionsToConsider = new Dictionary<SamplingStrategies, List<BinaryOption>>();
             binaryParams = new BinaryParameters();
+            existingConfigurations.Clear();
         }
 
         public bool performOneCommand(string line)
@@ -907,11 +909,12 @@ namespace MachineLearning.Sampling
             return measured.Concat(notMeasured).ToList();
         }
 
-        private static List<Configuration> ExecuteHybridStrategy(List<HybridStrategy> hybridStrategies, VariabilityModel vm)
+        private List<Configuration> ExecuteHybridStrategy(List<HybridStrategy> hybridStrategies, VariabilityModel vm)
         {
             List<Configuration> allSampledConfigurations = new List<Configuration>();
             foreach (HybridStrategy hybrid in hybridStrategies)
             {
+                hybrid.SetExistingConfigurations(existingConfigurations);
                 hybrid.ComputeSamplingStrategy();
                 allSampledConfigurations.AddRange(hybrid.selectedConfigurations);
             }

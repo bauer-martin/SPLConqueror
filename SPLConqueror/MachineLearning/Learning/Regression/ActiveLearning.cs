@@ -86,6 +86,7 @@ namespace MachineLearning.Learning.Regression
                     configBuilder.binaryParams.updateSeeds();
                 }
                 round++;
+                configBuilder.existingConfigurations = configurationsLearning;
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 configurationsLearning.AddRange(configsForNextRun);
                 exp = new Learning(configurationsLearning, configurationsValidation)

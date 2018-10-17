@@ -146,11 +146,11 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
                     Int32.TryParse(this.strategyParameter[SEED], out seed);
                     ((RandomSelection)selection).setSeed(seed);
                 }
-                else if (this.selection is SolverSelection)
+                else if (this.selection is SolverSelection solverSelection)
                 {
                     int seed = 0;
                     Int32.TryParse(this.strategyParameter[SEED], out seed);
-                    ((SolverSelection)selection).setSeed(seed);
+                    solverSelection.setSeed(seed);
                     Tuple<int, int> numberFeatureRange = new Tuple<int, int>(1, 1);
                     if (this.strategyParameter[OPTIONS_FOR_WEIGHTOPTIMIZATION].Contains("-"))
                     {
@@ -172,7 +172,8 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
                         Int32.TryParse(this.strategyParameter[OPTIONS_FOR_WEIGHTOPTIMIZATION], out numberFeatures);
                         numberFeatureRange = new Tuple<int, int>(numberFeatures, numberFeatures);
                     }
-                  ((SolverSelection)selection).setNumberFeatures(numberFeatureRange);
+                    solverSelection.setNumberFeatures(numberFeatureRange);
+                    solverSelection.setExistingConfigurations(existingConfigurations);
                 }
             }
             else

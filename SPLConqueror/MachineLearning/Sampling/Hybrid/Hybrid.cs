@@ -22,6 +22,11 @@ namespace MachineLearning.Sampling.Hybrid
         protected List<ConfigurationOption> optionsToConsider = null;
 
         /// <summary>
+        /// The list of configurations that have been sampled previously.
+        /// </summary>
+        protected List<Configuration> existingConfigurations = new List<Configuration>();
+
+        /// <summary>
         /// This list contains the configurations that were selected by the sampling strategy.
         /// </summary>
         public List<Configuration> selectedConfigurations = new List<Configuration>();
@@ -41,6 +46,15 @@ namespace MachineLearning.Sampling.Hybrid
         public void SetSamplingDomain(List<ConfigurationOption> samplingDomain)
         {
             this.optionsToConsider = samplingDomain;
+        }
+
+        /// <summary>
+        /// Sets the configurations that have been sampled previously.
+        /// </summary>
+        /// <param name="existingConfigurations">The list of configurations</param>
+        public void SetExistingConfigurations(List<Configuration> existingConfigurations)
+        {
+            this.existingConfigurations = existingConfigurations;
         }
 
         /// <summary>

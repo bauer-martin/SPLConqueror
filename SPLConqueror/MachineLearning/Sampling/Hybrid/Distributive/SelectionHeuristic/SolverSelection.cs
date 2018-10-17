@@ -20,6 +20,9 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         // number of features considered for weight optimization
         private Tuple<int, int> featureRange = new Tuple<int, int>(1, 1);
 
+        // configurations that have been sampled previously
+        private List<Configuration> existingConfigurations = new List<Configuration>();
+
         /// <summary>
         /// Initializes a new instance of the
         /// <see cref="MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic.SolverSelection"/> class.
@@ -44,6 +47,15 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         public void setNumberFeatures(Tuple<int, int> featureRange)
         {
             this.featureRange = featureRange;
+        }
+
+        /// <summary>
+        /// Sets the configurations that have been sampled previously.
+        /// </summary>
+        /// <param name="configurations">The list of configurations</param>
+        public void setExistingConfigurations(List<Configuration> configurations)
+        {
+            this.existingConfigurations = configurations;
         }
 
         /// <summary>
@@ -77,6 +89,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 {
                     featureWeight.Add(0, new Dictionary<List<BinaryOption>, int>());
                 }
+                existingConfigurations.ForEach(config => UpdateWeights(GlobalState.varModel, featureWeight[0], config));
             }
             else if (optimization == Optimization.LOCAL)
             {
@@ -90,6 +103,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                     {
                         featureWeight.Add(i, new Dictionary<List<BinaryOption>, int>());
                     }
+                    existingConfigurations.ForEach(config => UpdateWeights(GlobalState.varModel, featureWeight[i], config));
                 }
             }
 
