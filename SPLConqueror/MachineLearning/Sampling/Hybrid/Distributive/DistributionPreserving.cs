@@ -13,7 +13,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
     public class DistributionPreserving : DistributionSensitive
     {
         /// <summary>
-        /// This method multiplies two distributions, namely the distribution provided by the user and the 
+        /// This method multiplies two distributions, namely the distribution provided by the user and the
         /// original distribution of the subject system.
         /// </summary>
         /// <param name="wholeDistribution">the distribution of all configurations</param>

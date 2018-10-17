@@ -180,7 +180,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         }
 
         /// <summary>
-        /// This method initializes the weight function. 
+        /// This method initializes the weight function.
         /// </summary>
         /// <returns>A new dictionary with initialized values.</returns>
         /// <param name="vm">The variability model.</param>
@@ -348,4 +348,3 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
     }
 }
-

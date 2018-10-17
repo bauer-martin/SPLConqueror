@@ -12,8 +12,8 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
 {
     /// <summary>
     /// This class summarizes the methods of distribution-aware and distribution-preserving sampling and is realized by using
-    /// the strategy pattern. 
-    /// In these sampling strategies, the configurations are divided in buckets and the sampled configurations are selected 
+    /// the strategy pattern.
+    /// In these sampling strategies, the configurations are divided in buckets and the sampled configurations are selected
     /// from this buckets according to a given distribution (e.g., uniform, normal distribution).
     /// </summary>
     public abstract class DistributionSensitive : HybridStrategy
