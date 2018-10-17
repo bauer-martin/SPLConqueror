@@ -72,6 +72,7 @@ namespace MachineLearning.Sampling
             optionsToConsider = new Dictionary<SamplingStrategies, List<BinaryOption>>();
             binaryParams = new BinaryParameters();
             existingConfigurations.Clear();
+            vg.ClearCache();
         }
 
         public bool performOneCommand(string line)
