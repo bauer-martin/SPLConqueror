@@ -1,14 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MachineLearning.Learning.Regression.ExchangeStrategies;
 using MachineLearning.Sampling;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression
 {
+    public enum ConfigurationExchangeStrategies
+    {
+        NONE
+    }
+
     public class ActiveLearning
     {
         private const string SAMPLE_COMMAND = "sample";
+        private const string EXCHANGE_COMMAND = "exchange";
 
         private ML_Settings mlSettings = null;
         private InfluenceModel influenceModel;
@@ -29,6 +36,11 @@ namespace MachineLearning.Learning.Regression
         /// </summary>
         private string samplingTask;
 
+        /// <summary>
+        /// The strategy to exchange configurations after an active learning round.
+        /// </summary>
+        private ConfigurationExchangeStrategy exchangeStrategy = new NoOpExchangeStrategy();
+
         public ActiveLearning(ML_Settings mlSettings, InfluenceModel influenceModel, ConfigurationBuilder configBuilder)
         {
             this.mlSettings = mlSettings;
@@ -36,7 +48,7 @@ namespace MachineLearning.Learning.Regression
             this.configBuilder = configBuilder;
         }
 
-        private void parseActiveLearningParameters(string[] parameters)
+        private bool parseActiveLearningParameters(string[] parameters)
         {
             foreach (string parameter in parameters)
             {
@@ -49,11 +61,32 @@ namespace MachineLearning.Learning.Regression
                     case SAMPLE_COMMAND:
                         samplingTask = string.Join(" ", taskParameters);
                         break;
+                    case EXCHANGE_COMMAND:
+                        ConfigurationExchangeStrategies strategyType;
+                        if (Enum.TryParse(taskParameters[0].ToUpper(), out strategyType))
+                        {
+                            switch (strategyType)
+                            {
+                                case ConfigurationExchangeStrategies.NONE:
+                                    exchangeStrategy = new NoOpExchangeStrategy();
+                                    break;
+                                default:
+                                    return false;
+                            }
+                        }
+                        else
+                        {
+                            GlobalState.logError.logLine("Invalid exchange strategy: " + tokens[1]
+                                + " Using none instead.");
+                            return false;
+                        }
+                        break;
                     default:
                         GlobalState.logError.logLine("Invalid parameter for active learning: " + parameter);
-                        break;
+                        return false;
                 }
             }
+            return true;
         }
 
         private bool allInformationAvailable()
@@ -72,31 +105,30 @@ namespace MachineLearning.Learning.Regression
         /// <param name="parameters">The parameters for the 'active-learn-splconqueror' command</param>
         public void learn(string[] parameters)
         {
-            parseActiveLearningParameters(parameters);
-            if (!allInformationAvailable()) return;
+            bool shouldProceed = parseActiveLearningParameters(parameters);
+            if (!shouldProceed || !allInformationAvailable()) return;
             Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
-            List<Configuration> configurationsLearning = learnAndValidation.Item1;
-            List<Configuration> configurationsValidation = learnAndValidation.Item2;
-            if (configurationsLearning.Count == 0 && configurationsValidation.Count == 0)
+            List<Configuration> learningSet = learnAndValidation.Item1;
+            List<Configuration> validationSet = learnAndValidation.Item2;
+            if (learningSet.Count == 0 && validationSet.Count == 0)
             {
                 GlobalState.logInfo.logLine("The learning set is empty! Cannot start learning!");
                 return;
             }
-            if (configurationsLearning.Count == 0)
+            if (learningSet.Count == 0)
             {
-                configurationsLearning = configurationsValidation;
+                learningSet = validationSet;
             }
-            else if (configurationsValidation.Count == 0)
+            else if (validationSet.Count == 0)
             {
-                configurationsValidation = configurationsLearning;
+                validationSet = learningSet;
             }
 
-            GlobalState.logInfo.logLine("Learning: NumberOfConfigurationsLearning:" + configurationsLearning.Count 
-                + " NumberOfConfigurationsValidation:" + configurationsValidation.Count);
+            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:" + validationSet.Count);
 
             // learn initial model
             round = 1;
-            Learning exp = new Learning(configurationsLearning, configurationsValidation)
+            Learning exp = new Learning(learningSet, validationSet)
             {
                 metaModel = this.influenceModel,
                 mlSettings = this.mlSettings
@@ -132,10 +164,10 @@ namespace MachineLearning.Learning.Regression
                     configBuilder.binaryParams.updateSeeds();
                 }
                 round++;
-                configBuilder.existingConfigurations = configurationsLearning;
+                configBuilder.existingConfigurations = learningSet;
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
-                configurationsLearning.AddRange(configsForNextRun);
-                exp = new Learning(configurationsLearning, configurationsValidation)
+                learningSet.AddRange(configsForNextRun);
+                exp = new Learning(learningSet, validationSet)
                 {
                     metaModel = influenceModel,
                     mlSettings = this.mlSettings
@@ -148,6 +180,7 @@ namespace MachineLearning.Learning.Regression
                 }
                 lastRelativeError = exp.models[0].finalError;
                 featureSet = exp.models[0].LearningHistory.Last().FeatureSet;
+                exchangeStrategy.exchangeConfigurations(learningSet, validationSet);
             } while (!abortActiveLearning());
         }
 
@@ -174,5 +207,5 @@ namespace MachineLearning.Learning.Regression
             return false;
         }
     }
-    
+
 }
