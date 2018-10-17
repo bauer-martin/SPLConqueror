@@ -55,7 +55,7 @@ namespace MachineLearning.Learning.Regression
             this.validationSet = validationSet;
         }
 
-        public void learn()
+        public void learn(List<Feature> featureSet = null)
         {
             if (!hasNecessaryData())
                 return;
@@ -105,7 +105,7 @@ namespace MachineLearning.Learning.Regression
                 sel.setValidationSet(this.validationSet);
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                sel.learn();
+                sel.learn(featureSet);
                 sw.Stop();
                 Console.WriteLine("Elapsed={0}", sw.Elapsed);
             }

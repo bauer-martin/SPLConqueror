@@ -174,14 +174,18 @@ namespace MachineLearning.Learning.Regression
         /// Learning is done in rounds, in which each round adds an additional feature (i.e., configuration option or interaction) to the current model containing all influences.
         /// Abort criteria is derived from ML_Settings class, such as number of rounds, minimum error, etc.
         /// </summary>
-        public void learn()
+        public void learn(List<Feature> featureSet = null)
         {
             if (!allInformationAvailable())
                 return;
             this.startTime = System.DateTime.Now;
-            LearningRound current = new LearningRound();
+            if (featureSet == null)
+            {
+                featureSet = new List<Feature>();
+            }
+            LearningRound current = new LearningRound(featureSet);
 
-            if (this.strictlyMandatoryFeatures.Count > 0)
+            if (this.strictlyMandatoryFeatures.Count > 0 && featureSet.Count < 1)
                 current.FeatureSet.Add(this.strictlyMandatoryFeatures[0]);
             LearningRound previous;
             do
@@ -190,8 +194,7 @@ namespace MachineLearning.Learning.Regression
                 current = performForwardStep(previous);
                 if (current == null)
                 {
-                    updateInfluenceModel();
-                    return;
+                    break;
                 }
                 learningHistory.Add(current);
                 GlobalState.logInfo.logLine(current.ToString());

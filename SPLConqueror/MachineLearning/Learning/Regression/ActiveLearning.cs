@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Linq;
 using MachineLearning.Sampling;
 using SPLConqueror_Core;
 
@@ -70,6 +71,12 @@ namespace MachineLearning.Learning.Regression
             }
             lastRelativeError = exp.models[0].finalError;
             if (abortActiveLearning()) return;
+            if (exp.models[0].LearningHistory.Count < 1)
+            {
+                GlobalState.logError.logLine("There should be at least one learning round! Aborting active learning!");
+                return;
+            }
+            List<Feature> featureSet = exp.models[0].LearningHistory.Last().FeatureSet;
 
             // continue learning
             do
@@ -94,13 +101,14 @@ namespace MachineLearning.Learning.Regression
                     metaModel = influenceModel,
                     mlSettings = this.mlSettings
                 };
-                exp.learn();
+                exp.learn(featureSet);
                 if (exp.models.Count != 1)
                 {
                     GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
                     return;
                 }
                 lastRelativeError = exp.models[0].finalError;
+                featureSet = exp.models[0].LearningHistory.Last().FeatureSet;
             } while (!abortActiveLearning());
         }
 

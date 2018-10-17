@@ -118,6 +118,8 @@ namespace MachineLearning.Learning.Regression
             this.round = round;
         }
 
+        internal LearningRound(List<Feature> featureSet) { this.featureSet = featureSet; }
+
         internal LearningRound() { }
 
     }
