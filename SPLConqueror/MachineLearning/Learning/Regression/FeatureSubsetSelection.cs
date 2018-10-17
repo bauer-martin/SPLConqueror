@@ -429,8 +429,9 @@ namespace MachineLearning.Learning.Regression
             else
             {
                 bestModel = copyCombination(bestModel);
-                LearningRound newRound = new LearningRound(bestModel, minimalRoundError, computeValidationError(bestModel), previousRound.round + 1);
-                newRound.learningError_relative = minimalRoundError;
+                double learningError = computeLearningError(bestModel);
+                LearningRound newRound = new LearningRound(bestModel, learningError, computeValidationError(bestModel), previousRound.round + 1);
+                newRound.learningError_relative = learningError;
                 newRound.validationError_relative = newRound.validationError;
                 newRound.elapsedTime = DateTime.Now - startTime;
                 newRound.bestCandidate = bestCandidate;
