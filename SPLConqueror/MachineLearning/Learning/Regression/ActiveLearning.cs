@@ -24,12 +24,12 @@ namespace MachineLearning.Learning.Regression
         /// <summary>
         /// The number of active learning rounds.
         /// </summary>
-        private int round = -1;
+        private int currentRound = -1;
 
         /// <summary>
-        /// The relative error of the last active learning round.
+        /// The relative error of the current active learning round.
         /// </summary>
-        private double lastRelativeError = -1;
+        private double currentRelativeError = Double.MaxValue;
 
         /// <summary>
         /// The sampling task for switching the sampling strategy to find new configurations.
@@ -127,32 +127,31 @@ namespace MachineLearning.Learning.Regression
             GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:" + validationSet.Count);
 
             // learn initial model
-            round = 1;
+            currentRound = 1;
             Learning exp = new Learning(learningSet, validationSet)
             {
                 metaModel = this.influenceModel,
                 mlSettings = this.mlSettings
             };
             exp.learn();
-
             if (exp.models.Count != 1)
             {
                 GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
                 return;
             }
-            lastRelativeError = exp.models[0].finalError;
-            if (abortActiveLearning()) return;
+            currentRelativeError = exp.models[0].finalError;
             if (exp.models[0].LearningHistory.Count < 1)
             {
                 GlobalState.logError.logLine("There should be at least one learning round! Aborting active learning!");
                 return;
             }
-            List<Feature> featureSet = exp.models[0].LearningHistory.Last().FeatureSet;
+            List<Feature> currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
 
-            // continue learning
-            do
+            while (!abortActiveLearning())
             {
-                if (round == 1)
+                // prepare next active learning round
+                currentRound++;
+                if (currentRound == 2)
                 {
                     // switch sampling strategy to select new configurations
                     configBuilder.clear();
@@ -163,42 +162,45 @@ namespace MachineLearning.Learning.Regression
                     // keep sampling strategy but use different seed
                     configBuilder.binaryParams.updateSeeds();
                 }
-                round++;
                 configBuilder.existingConfigurations = learningSet;
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 learningSet.AddRange(configsForNextRun);
+
+                // learn a new model
                 exp = new Learning(learningSet, validationSet)
                 {
                     metaModel = influenceModel,
                     mlSettings = this.mlSettings
                 };
-                exp.learn(featureSet);
+                exp.learn(currentModel);
                 if (exp.models.Count != 1)
                 {
                     GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
                     return;
                 }
-                lastRelativeError = exp.models[0].finalError;
-                featureSet = exp.models[0].LearningHistory.Last().FeatureSet;
+                currentRelativeError = exp.models[0].finalError;
+                currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
+
+                // exchange configurations
                 exchangeStrategy.exchangeConfigurations(learningSet, validationSet);
-            } while (!abortActiveLearning());
+            }
         }
 
         private bool abortActiveLearning()
         {
-            if (round >= mlSettings.maxNumberOfActiveLearningRounds)
+            if (currentRound >= mlSettings.maxNumberOfActiveLearningRounds)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because maximum number of rounds has been reached");
                 return true;
             }
 
-            if (lastRelativeError < mlSettings.minImprovementPerActiveLearningRound)
+            if (currentRelativeError < mlSettings.minImprovementPerActiveLearningRound)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model did not achieve great improvement anymore");
                 return true;
             }
 
-            if (lastRelativeError < mlSettings.abortError)
+            if (currentRelativeError < mlSettings.abortError)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model is already good enough");
                 return true;
