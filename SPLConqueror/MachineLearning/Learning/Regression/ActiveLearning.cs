@@ -27,6 +27,11 @@ namespace MachineLearning.Learning.Regression
         private int currentRound = -1;
 
         /// <summary>
+        /// The relative error of the previous active learning round.
+        /// </summary>
+        private double previousRelativeError = Double.MaxValue;
+
+        /// <summary>
         /// The relative error of the current active learning round.
         /// </summary>
         private double currentRelativeError = Double.MaxValue;
@@ -162,6 +167,7 @@ namespace MachineLearning.Learning.Regression
                     // keep sampling strategy but use different seed
                     configBuilder.binaryParams.updateSeeds();
                 }
+                previousRelativeError = currentRelativeError;
                 configBuilder.existingConfigurations = learningSet;
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 learningSet.AddRange(configsForNextRun);
@@ -194,7 +200,8 @@ namespace MachineLearning.Learning.Regression
                 return true;
             }
 
-            if (currentRelativeError < mlSettings.minImprovementPerActiveLearningRound)
+            double improvement = previousRelativeError - currentRelativeError;
+            if (improvement > 0 && improvement < mlSettings.minImprovementPerActiveLearningRound)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model did not achieve great improvement anymore");
                 return true;
