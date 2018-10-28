@@ -8,6 +8,6 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
     /// </summary>
     public interface ConfigurationExchangeStrategy
     {
-        void exchangeConfigurations(List<Configuration> learningSet, List<Configuration> validationSet);
+        void exchangeConfigurations(List<Configuration> learningSet, List<Configuration> validationSet, List<Feature> model);
     }
 }

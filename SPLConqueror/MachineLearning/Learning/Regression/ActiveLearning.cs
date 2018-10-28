@@ -188,7 +188,7 @@ namespace MachineLearning.Learning.Regression
                 currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
 
                 // exchange configurations
-                exchangeStrategy.exchangeConfigurations(learningSet, validationSet);
+                exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
             }
         }
 

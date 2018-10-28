@@ -9,6 +9,6 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
     /// </summary>
     public class NoOpExchangeStrategy : ConfigurationExchangeStrategy
     {
-        public void exchangeConfigurations(List<Configuration> learningSet, List<Configuration> validationSet) { }
+        public void exchangeConfigurations(List<Configuration> learningSet, List<Configuration> validationSet, List<Feature> model) { }
     }
 }
