@@ -9,7 +9,8 @@ namespace MachineLearning.Learning.Regression
 {
     public enum ConfigurationExchangeStrategies
     {
-        NONE
+        NONE,
+        PERFORMANCE
     }
 
     public class ActiveLearning
@@ -74,6 +75,9 @@ namespace MachineLearning.Learning.Regression
                             {
                                 case ConfigurationExchangeStrategies.NONE:
                                     exchangeStrategy = new NoOpExchangeStrategy();
+                                    break;
+                                case ConfigurationExchangeStrategies.PERFORMANCE:
+                                    exchangeStrategy = new PerformanceValueExchangeStrategy(mlSettings);
                                     break;
                                 default:
                                     return false;

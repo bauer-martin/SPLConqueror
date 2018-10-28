@@ -106,6 +106,7 @@
     <Compile Include="Learning\Regression\ActiveLearning.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\ConfigurationExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\NoOpExchangeStrategy.cs" />
+    <Compile Include="Learning\Regression\ExchangeStrategies\PerformanceValueExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\FeatureSubsetSelection.cs" />
     <Compile Include="Learning\Regression\KFoldCrossValidation.cs" />
     <Compile Include="Learning\Regression\Learning.cs" />
