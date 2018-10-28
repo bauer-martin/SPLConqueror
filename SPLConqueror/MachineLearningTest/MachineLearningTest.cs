@@ -3,6 +3,7 @@ using CommandLine;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using MachineLearning.Sampling;
 
 namespace MachineLearningTest
@@ -29,6 +30,26 @@ namespace MachineLearningTest
                   + "Files/BerkeleyDBMeasurements.xml";
 
         private bool isCIEnvironment;
+
+        /* Not needed currently
+        public static bool IsMono()
+        {
+            return Type.GetType("Mono.Runtime") != null;
+        }
+
+        public static string monoVers()
+        {
+            Type type = Type.GetType("Mono.Runtime");
+            MethodInfo dispalayName = type.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+            return dispalayName.Invoke(null, null).ToString();
+        }
+
+        public static bool isHigherThanV16()
+        {
+            string version = monoVers();
+            string[] numbers = version.Split(new char[] { '.' });
+            return (int.Parse(numbers[0]) > 5) || (int.Parse(numbers[0]) == 5 && int.Parse(numbers[1]) >= 16);
+        } */
 
         [OneTimeSetUp]
         public void init()
@@ -69,7 +90,6 @@ namespace MachineLearningTest
 
         private void performSimpleLearning(Commands cmd)
         {
-            cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " withHierarchy:true");
             cmd.performOneCommand(Commands.COMMAND_SET_NFP + " MainMemory");
             cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE);
             cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " "
@@ -107,7 +127,7 @@ namespace MachineLearningTest
         public void testBagging()
         {
             cleanUp(cmd, "");
-            cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " withHierarchy:true bagging:true baggingNumbers:3");
+            cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " bagging:true baggingNumbers:3");
             cmd.performOneCommand(Commands.COMMAND_START_LEARNING_SPL_CONQUEROR);
 
             string averageModel = consoleOutput.ToString()
@@ -115,10 +135,9 @@ namespace MachineLearningTest
             string[] polynoms = averageModel.Replace("\n", "").Trim()
                 .Split(new string[] { "+" }, StringSplitOptions.RemoveEmptyEntries);
             Console.Error.Write(consoleOutput.ToString());
-            Assert.AreEqual(3, polynoms.Length);
-            Assert.AreEqual("1585.8 * PAGESIZE", polynoms[0].Trim());
-            Assert.AreEqual("-12.3111111111108 * CS32MB", polynoms[1].Trim());
-            Assert.AreEqual("510.111111111112 * PS32K", polynoms[2].Trim());
+            Assert.AreEqual(2, polynoms.Length);
+            Assert.AreEqual("1585.8 * PAGESIZE", polynoms[0].Trim().Replace(",","."));
+            Assert.AreEqual("507.033333333333 * PS32K", polynoms[1].Trim().Replace(",","."));
         }
 
         private void cleanUp(Commands cmd, String mlSettings)
@@ -127,7 +146,7 @@ namespace MachineLearningTest
             cmd.performOneCommand(ConfigurationBuilder.COMMAND_BINARY_SAMPLING + " " + ConfigurationBuilder.COMMAND_SAMPLE_OPTIONWISE);
             cmd.performOneCommand(ConfigurationBuilder.COMMAND_NUMERIC_SAMPLING + " "
                 + ConfigurationBuilder.COMMAND_EXPDESIGN_CENTRALCOMPOSITE);
-            cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " bagging:false withHierarchy:true baggingNumbers:3");
+            cmd.performOneCommand(Commands.COMMAND_SET_MLSETTING + " bagging:false baggingNumbers:3");
         }
 
         [Test, Order(3)]
@@ -175,12 +194,11 @@ namespace MachineLearningTest
                 variables.Add(coefficientAndVariable[1].Trim());
                 coefficients.Add(Double.Parse(coefficientAndVariable[0].Trim()));
             }
-
             isExpected &= variables.Count == 2;
             isExpected &= variables[0].Equals("PAGESIZE");
-            isExpected &= variables[1].Equals("CS16MB");
-            isExpected &= Math.Round(coefficients[0], 2) == 1955.51;
-            isExpected &= Math.Round(coefficients[1], 2) == 125.69;
+            isExpected &= variables[1].Equals("PS32K");
+            isExpected &= Math.Round(coefficients[0], 2) == 1600.2;
+            isExpected &= Math.Round(coefficients[1], 2) == 495.95;
             return isExpected;
         }
 

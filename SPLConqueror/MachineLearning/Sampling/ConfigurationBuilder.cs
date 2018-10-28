@@ -529,13 +529,13 @@ namespace MachineLearning.Sampling
 
         private bool isAllMeasurementsToSample()
         {
-            return binaryStrategies.Contains(SamplingStrategies.ALLBINARY) 
+            return binaryStrategies.Contains(SamplingStrategies.ALLBINARY)
                 && numericStrategies.Any(strategy => strategy is FullFactorialDesign);
         }
 
         private bool isAllMeasurementsValidation()
         {
-            return binaryStrategiesValidation.Contains(SamplingStrategies.ALLBINARY) 
+            return binaryStrategiesValidation.Contains(SamplingStrategies.ALLBINARY)
                 && numericStrategiesValidation.Any(strategy => strategy is FullFactorialDesign);
         }
 
