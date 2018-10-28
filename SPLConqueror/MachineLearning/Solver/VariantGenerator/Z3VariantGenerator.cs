@@ -589,8 +589,7 @@ namespace MachineLearning.Solver
             List<KeyValuePair<List<BinaryOption>, int>> featureRanking;
             if (featureWeight != null)
             {
-                featureRanking = featureWeight.ToList();
-                featureRanking.Sort((first, second) => first.Value.CompareTo(second.Value));
+                featureRanking = featureWeight.OrderBy(pair => pair.Value).ToList();
             }
             else
             {
