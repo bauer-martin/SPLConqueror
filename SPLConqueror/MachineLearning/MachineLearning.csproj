@@ -104,6 +104,7 @@
     <Compile Include="Learning\ML_Settings.cs" />
     <Compile Include="Learning\ML_SettingsGenerator.cs" />
     <Compile Include="Learning\Regression\ActiveLearning.cs" />
+    <Compile Include="Learning\Regression\ExchangeStrategies\LargestValidationErrorExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\ConfigurationExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\NoOpExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\PerformanceValueExchangeStrategy.cs" />
