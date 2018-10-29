@@ -10,7 +10,8 @@ namespace MachineLearning.Learning.Regression
     public enum ConfigurationExchangeStrategies
     {
         NONE,
-        PERFORMANCE
+        PERFORMANCE,
+        PAIRWISEDISTANCE
     }
 
     public class ActiveLearning
@@ -78,6 +79,9 @@ namespace MachineLearning.Learning.Regression
                                     break;
                                 case ConfigurationExchangeStrategies.PERFORMANCE:
                                     exchangeStrategy = new PerformanceValueExchangeStrategy(mlSettings);
+                                    break;
+                                case ConfigurationExchangeStrategies.PAIRWISEDISTANCE:
+                                    exchangeStrategy = new PairwiseDistanceExchangeStrategy(mlSettings);
                                     break;
                                 default:
                                     return false;

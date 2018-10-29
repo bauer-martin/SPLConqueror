@@ -345,6 +345,19 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
+        /// Compares this configuration option with the object given as parameter.
+        /// </summary>
+        /// <param name="obj">The object to compare to.</param>
+        /// <returns>True if both the option and the object are the same.</returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ConfigurationOption) obj);
+        }
+
+        /// <summary>
         /// Compares this configuration option with the option given as parameter.
         /// </summary>
         /// <param name="other">The configuration option to compare to.</param>
@@ -352,6 +365,16 @@ namespace SPLConqueror_Core
         public bool Equals(ConfigurationOption other)
         {
             return this.name.Equals(other.name);
+        }
+
+        /// <summary>
+        /// Returns a hash code of this option.
+        /// The code is computed based on the name of the option.
+        /// </summary>
+        /// <returns>The hash code of this option.</returns>
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
         }
 
         /// <summary>

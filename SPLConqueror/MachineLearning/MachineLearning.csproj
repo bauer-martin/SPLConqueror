@@ -107,6 +107,7 @@
     <Compile Include="Learning\Regression\ExchangeStrategies\LargestValidationErrorExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\ConfigurationExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\NoOpExchangeStrategy.cs" />
+    <Compile Include="Learning\Regression\ExchangeStrategies\PairwiseDistanceExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\PerformanceValueExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\FeatureSubsetSelection.cs" />
     <Compile Include="Learning\Regression\KFoldCrossValidation.cs" />

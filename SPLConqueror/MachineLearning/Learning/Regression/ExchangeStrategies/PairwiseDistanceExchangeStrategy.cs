@@ -1,0 +1,112 @@
+using System.Collections.Generic;
+using System.Linq;
+using SPLConqueror_Core;
+
+namespace MachineLearning.Learning.Regression.ExchangeStrategies
+{
+    public class PairwiseDistanceExchangeStrategy : LargestValidationErrorExchangeStrategy
+    {
+        private struct Triple<T1, T2, T3>
+        {
+            internal T1 first;
+            internal T2 second;
+            internal T3 third;
+
+            public Triple(T1 first, T2 second, T3 third)
+            {
+                this.first = first;
+                this.second = second;
+                this.third = third;
+            }
+        }
+
+        public PairwiseDistanceExchangeStrategy(ML_Settings mlSettings) : base(mlSettings, 0.1) { }
+
+        protected override IEnumerable<Configuration> SelectConfigsFromLearningSet(List<Configuration> learningSet,
+            int count)
+        {
+            Dictionary<Configuration, Dictionary<Configuration, double>> pairs =
+                new Dictionary<Configuration, Dictionary<Configuration, double>>();
+            foreach (Configuration config1 in learningSet)
+            {
+                Dictionary<Configuration, double> row;
+                if (pairs.ContainsKey(config1))
+                {
+                    row = pairs[config1];
+                }
+                else
+                {
+                    row = new Dictionary<Configuration, double>();
+                    pairs[config1] = row;
+                }
+                foreach (Configuration config2 in learningSet)
+                {
+                    if (config1.Equals(config2)) continue;
+                    if (pairs.ContainsKey(config2)) continue;
+                    double distance = ComputeDistance(config1, config2);
+                    row[config2] = distance;
+                }
+            }
+            IEnumerable<Triple<Configuration,Configuration,double>> sortedByMinDistance = SortedByMinDistance(pairs);
+            return sortedByMinDistance.Select(triple => triple.first).Take(count);
+        }
+
+        private static double ComputeDistance(Configuration config1, Configuration config2)
+        {
+            Dictionary<BinaryOption, int> participatingOptions = new Dictionary<BinaryOption, int>();
+            foreach (KeyValuePair<BinaryOption, BinaryOption.BinaryValue> keyValuePair in config1.BinaryOptions)
+            {
+                if (keyValuePair.Value == BinaryOption.BinaryValue.Deselected) continue;
+                participatingOptions[keyValuePair.Key] = 1;
+            }
+            foreach (KeyValuePair<BinaryOption, BinaryOption.BinaryValue> keyValuePair in config2.BinaryOptions)
+            {
+                if (keyValuePair.Value == BinaryOption.BinaryValue.Deselected) continue;
+                if (participatingOptions.ContainsKey(keyValuePair.Key))
+                {
+                    participatingOptions[keyValuePair.Key] += 1;
+                }
+                else
+                {
+                    participatingOptions[keyValuePair.Key] = 1;
+                }
+            }
+            int distance = 0;
+            foreach (KeyValuePair<BinaryOption, int> keyValuePair in participatingOptions)
+            {
+                if (keyValuePair.Value % 2 != 0)
+                {
+                    distance++;
+                }
+            }
+            return distance;
+        }
+
+        private static IEnumerable<Triple<Configuration, Configuration, double>> SortedByMinDistance(
+            Dictionary<Configuration, Dictionary<Configuration, double>> pairs)
+        {
+            return pairs
+                .Aggregate(new List<Triple<Configuration, Configuration, double>>(), ToTriple)
+                .OrderBy(triple => triple.third);
+        }
+
+        private static List<Triple<Configuration, Configuration, double>> ToTriple(
+            List<Triple<Configuration, Configuration, double>> acc,
+            KeyValuePair<Configuration, Dictionary<Configuration, double>> outerKeyValuePair)
+        {
+            Configuration config1 = outerKeyValuePair.Key;
+            Dictionary<Configuration, double> row = outerKeyValuePair.Value;
+            List<Triple<Configuration, Configuration, double>> aggregatedRow = row.Aggregate(
+                new List<Triple<Configuration, Configuration, double>>(),
+                (innerAcc, innerKeyValuePair) =>
+                {
+                    Configuration config2 = innerKeyValuePair.Key;
+                    double distance = innerKeyValuePair.Value;
+                    innerAcc.Add(new Triple<Configuration, Configuration, double>(config1, config2, distance));
+                    return innerAcc;
+                });
+            acc.AddRange(aggregatedRow);
+            return acc;
+        }
+    }
+}
