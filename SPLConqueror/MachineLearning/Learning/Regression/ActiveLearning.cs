@@ -190,6 +190,8 @@ namespace MachineLearning.Learning.Regression
                 }
                 currentRelativeError = exp.models[0].finalError;
                 currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
+                double globalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+                GlobalState.logInfo.logLine("globalError = " + globalError);
 
                 // exchange configurations
                 exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
