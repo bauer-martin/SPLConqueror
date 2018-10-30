@@ -6,7 +6,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
     public class PairwiseDistanceExchangeStrategy : LargestValidationErrorExchangeStrategy
     {
-        private struct Triple<T1, T2, T3>
+        public struct Triple<T1, T2, T3>
         {
             internal T1 first;
             internal T2 second;
@@ -24,6 +24,11 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
 
         protected override IEnumerable<Configuration> SelectConfigsFromLearningSet(List<Configuration> learningSet,
             int count)
+        {
+            return SortedByMinDistance(learningSet).Select(triple => triple.first).Take(count);
+        }
+
+        private static Dictionary<Configuration, Dictionary<Configuration, double>> DistanceMatrix(List<Configuration> learningSet)
         {
             Dictionary<Configuration, Dictionary<Configuration, double>> pairs =
                 new Dictionary<Configuration, Dictionary<Configuration, double>>();
@@ -47,8 +52,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
                     row[config2] = distance;
                 }
             }
-            IEnumerable<Triple<Configuration,Configuration,double>> sortedByMinDistance = SortedByMinDistance(pairs);
-            return sortedByMinDistance.Select(triple => triple.first).Take(count);
+            return pairs;
         }
 
         private static double ComputeDistance(Configuration config1, Configuration config2)
@@ -82,10 +86,10 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
             return distance;
         }
 
-        private static IEnumerable<Triple<Configuration, Configuration, double>> SortedByMinDistance(
-            Dictionary<Configuration, Dictionary<Configuration, double>> pairs)
+        public static IEnumerable<Triple<Configuration, Configuration, double>> SortedByMinDistance(
+            List<Configuration> learningSet)
         {
-            return pairs
+            return DistanceMatrix(learningSet)
                 .Aggregate(new List<Triple<Configuration, Configuration, double>>(), ToTriple)
                 .OrderBy(triple => triple.third);
         }

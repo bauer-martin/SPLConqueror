@@ -7,7 +7,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
     public class PerformanceValueExchangeStrategy : LargestValidationErrorExchangeStrategy
     {
-        private class Distribution
+        public class Distribution
         {
             private readonly List<Bucket> buckets;
             private readonly double bucketSize;
@@ -116,14 +116,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
             List<Configuration> selectedConfigs = new List<Configuration>();
             do
             {
-                Distribution layer1 = Distribution.CreateDefault(mutableConfigsList);
-                Distribution layer2 = Distribution.CreateShifted(mutableConfigsList);
-                ICollection<Distribution.Bucket> maximalBucketsLayer1 = layer1.GetMaximalBuckets();
-                ICollection<Distribution.Bucket> maximalBucketsLayer2 = layer2.GetMaximalBuckets();
-                ICollection<Distribution.Bucket> maximalBuckets =
-                    maximalBucketsLayer1.First().configCount >= maximalBucketsLayer2.First().configCount
-                        ? maximalBucketsLayer1
-                        : maximalBucketsLayer2;
+                ICollection<Distribution.Bucket> maximalBuckets = FindMaximalBuckets(mutableConfigsList);
                 foreach (Distribution.Bucket bucket in maximalBuckets)
                 {
                     Configuration configuration = bucket.configs.First();
@@ -132,6 +125,17 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
                 }
             } while (selectedConfigs.Count < count && mutableConfigsList.Count > 0);
             return selectedConfigs.Take(count).ToList();
+        }
+
+        public static ICollection<Distribution.Bucket> FindMaximalBuckets(List<Configuration> configs)
+        {
+            Distribution layer1 = Distribution.CreateDefault(configs);
+            Distribution layer2 = Distribution.CreateShifted(configs);
+            ICollection<Distribution.Bucket> maximalBucketsLayer1 = layer1.GetMaximalBuckets();
+            ICollection<Distribution.Bucket> maximalBucketsLayer2 = layer2.GetMaximalBuckets();
+            return maximalBucketsLayer1.First().configCount >= maximalBucketsLayer2.First().configCount
+                    ? maximalBucketsLayer1
+                    : maximalBucketsLayer2;
         }
     }
 }

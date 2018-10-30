@@ -11,7 +11,8 @@ namespace MachineLearning.Learning.Regression
     {
         NONE,
         PERFORMANCE,
-        PAIRWISEDISTANCE
+        PAIRWISEDISTANCE,
+        MOSTSIMILARPERFORMANCE
     }
 
     public class ActiveLearning
@@ -82,6 +83,9 @@ namespace MachineLearning.Learning.Regression
                                     break;
                                 case ConfigurationExchangeStrategies.PAIRWISEDISTANCE:
                                     exchangeStrategy = new PairwiseDistanceExchangeStrategy(mlSettings);
+                                    break;
+                                case ConfigurationExchangeStrategies.MOSTSIMILARPERFORMANCE:
+                                    exchangeStrategy = new MostSimilarPerformanceExchangeStrategy(mlSettings);
                                     break;
                                 default:
                                     return false;
