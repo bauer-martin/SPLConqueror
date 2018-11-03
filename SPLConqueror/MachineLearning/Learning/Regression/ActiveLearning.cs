@@ -17,8 +17,8 @@ namespace MachineLearning.Learning.Regression
 
     public class ActiveLearning
     {
-        private const string SAMPLE_COMMAND = "sample";
-        private const string EXCHANGE_COMMAND = "exchange";
+        private const string ADD_NEW_CONFIGS_COMMAND = "addNewConfigs";
+        private const string EXCHANGE_CONFIGS_COMMAND = "exchangeConfigs";
 
         private static readonly Dictionary<string, ConfigurationExchangeStrategies> strategiesByName =
             new Dictionary<string, ConfigurationExchangeStrategies>
@@ -56,7 +56,7 @@ namespace MachineLearning.Learning.Regression
         /// <summary>
         /// The sampling task for switching the sampling strategy to find new configurations.
         /// </summary>
-        private string samplingTask;
+        private string addNewConfigsSamplingTask;
 
         /// <summary>
         /// If set to true, new configurations are added at the beginning of every active learning round.
@@ -91,11 +91,11 @@ namespace MachineLearning.Learning.Regression
                 string[] taskParameters = tokens.Skip(1).ToArray();
                 switch (task)
                 {
-                    case SAMPLE_COMMAND:
-                        samplingTask = string.Join(" ", taskParameters);
+                    case ADD_NEW_CONFIGS_COMMAND:
+                        addNewConfigsSamplingTask = string.Join(" ", taskParameters);
                         shouldAddNewConfigurations = true;
                         break;
-                    case EXCHANGE_COMMAND:
+                    case EXCHANGE_CONFIGS_COMMAND:
                         string strategyName = taskParameters[0];
                         if (strategiesByName.ContainsKey(strategyName))
                         {
@@ -157,7 +157,7 @@ namespace MachineLearning.Learning.Regression
                     if (currentRound == 2)
                     {
                         configBuilder.clear();
-                        configBuilder.performOneCommand(samplingTask);
+                        configBuilder.performOneCommand(addNewConfigsSamplingTask);
                     }
                     else
                     {
