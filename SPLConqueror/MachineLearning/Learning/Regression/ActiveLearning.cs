@@ -152,7 +152,9 @@ namespace MachineLearning.Learning.Regression
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 learningSet.AddRange(configsForNextRun);
                 LearnNewModel(learningSet, validationSet, ref currentModel);
+                if (abortActiveLearning()) break;
                 exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
+                LearnNewModel(learningSet, validationSet, ref currentModel);
             }
         }
 
