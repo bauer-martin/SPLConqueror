@@ -11,14 +11,23 @@ namespace MachineLearning.Learning.Regression
     {
         NONE,
         PERFORMANCE,
-        PAIRWISEDISTANCE,
-        MOSTSIMILARPERFORMANCE
+        PAIRWISE_DISTANCE,
+        MOST_SIMILAR_PERFORMANCE
     }
 
     public class ActiveLearning
     {
         private const string SAMPLE_COMMAND = "sample";
         private const string EXCHANGE_COMMAND = "exchange";
+
+        private static readonly Dictionary<string, ConfigurationExchangeStrategies> strategiesByName =
+            new Dictionary<string, ConfigurationExchangeStrategies>
+            {
+                {"none", ConfigurationExchangeStrategies.NONE},
+                {"performance", ConfigurationExchangeStrategies.PERFORMANCE},
+                {"pairwiseDistance", ConfigurationExchangeStrategies.PAIRWISE_DISTANCE},
+                {"mostSimilarPerformance", ConfigurationExchangeStrategies.MOST_SIMILAR_PERFORMANCE}
+            };
 
         private ML_Settings mlSettings = null;
         private InfluenceModel influenceModel;
@@ -75,10 +84,10 @@ namespace MachineLearning.Learning.Regression
                         samplingTask = string.Join(" ", taskParameters);
                         break;
                     case EXCHANGE_COMMAND:
-                        ConfigurationExchangeStrategies strategyType;
-                        if (Enum.TryParse(taskParameters[0].ToUpper(), out strategyType))
+                        string strategyName = taskParameters[0];
+                        if (strategiesByName.ContainsKey(strategyName))
                         {
-                            switch (strategyType)
+                            switch (strategiesByName[strategyName])
                             {
                                 case ConfigurationExchangeStrategies.NONE:
                                     exchangeStrategy = new NoOpExchangeStrategy();
@@ -86,10 +95,10 @@ namespace MachineLearning.Learning.Regression
                                 case ConfigurationExchangeStrategies.PERFORMANCE:
                                     exchangeStrategy = new PerformanceValueExchangeStrategy(mlSettings);
                                     break;
-                                case ConfigurationExchangeStrategies.PAIRWISEDISTANCE:
+                                case ConfigurationExchangeStrategies.PAIRWISE_DISTANCE:
                                     exchangeStrategy = new PairwiseDistanceExchangeStrategy(mlSettings);
                                     break;
-                                case ConfigurationExchangeStrategies.MOSTSIMILARPERFORMANCE:
+                                case ConfigurationExchangeStrategies.MOST_SIMILAR_PERFORMANCE:
                                     exchangeStrategy = new MostSimilarPerformanceExchangeStrategy(mlSettings);
                                     break;
                                 default:
