@@ -40,6 +40,11 @@ namespace MachineLearning.Learning.Regression
         private double currentRelativeError = Double.MaxValue;
 
         /// <summary>
+        /// The global error of the current active learning round.
+        /// </summary>
+        private double currentGlobalError = Double.MaxValue;
+
+        /// <summary>
         /// The sampling task for switching the sampling strategy to find new configurations.
         /// </summary>
         private string samplingTask;
@@ -163,6 +168,8 @@ namespace MachineLearning.Learning.Regression
                 return;
             }
             List<Feature> currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
+            currentGlobalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+            GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
 
             while (!abortActiveLearning())
             {
@@ -198,8 +205,8 @@ namespace MachineLearning.Learning.Regression
                 }
                 currentRelativeError = exp.models[0].finalError;
                 currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
-                double globalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
-                GlobalState.logInfo.logLine("globalError = " + globalError);
+                currentGlobalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+                GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
 
                 // exchange configurations
                 exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
