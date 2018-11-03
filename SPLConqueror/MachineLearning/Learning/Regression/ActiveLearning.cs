@@ -59,6 +59,17 @@ namespace MachineLearning.Learning.Regression
         private string samplingTask;
 
         /// <summary>
+        /// If set to true, new configurations are added at the beginning of every active learning round.
+        /// </summary>
+        private bool shouldAddNewConfigurations = false;
+
+        /// <summary>
+        /// If set to true, configurations are exchanged between the learning set and the validation set.
+        /// Also performs one additional learning in an active learning round.
+        /// </summary>
+        private bool shouldExchangeConfigurations = false;
+
+        /// <summary>
         /// The strategy to exchange configurations after an active learning round.
         /// </summary>
         private ConfigurationExchangeStrategy exchangeStrategy = new NoOpExchangeStrategy();
@@ -82,6 +93,7 @@ namespace MachineLearning.Learning.Regression
                 {
                     case SAMPLE_COMMAND:
                         samplingTask = string.Join(" ", taskParameters);
+                        shouldAddNewConfigurations = true;
                         break;
                     case EXCHANGE_COMMAND:
                         string strategyName = taskParameters[0];
@@ -104,11 +116,11 @@ namespace MachineLearning.Learning.Regression
                                 default:
                                     return false;
                             }
+                            shouldExchangeConfigurations = true;
                         }
                         else
                         {
-                            GlobalState.logError.logLine("Invalid exchange strategy: " + tokens[1]
-                                + " Using none instead.");
+                            GlobalState.logError.logLine("Invalid exchange strategy: " + tokens[1]);
                             return false;
                         }
                         break;
@@ -116,16 +128,6 @@ namespace MachineLearning.Learning.Regression
                         GlobalState.logError.logLine("Invalid parameter for active learning: " + parameter);
                         return false;
                 }
-            }
-            return true;
-        }
-
-        private bool allInformationAvailable()
-        {
-            if (samplingTask == null)
-            {
-                GlobalState.logError.logLine("You need to specify a sampling strategy for active learning.");
-                return false;
             }
             return true;
         }
@@ -149,22 +151,31 @@ namespace MachineLearning.Learning.Regression
             while (!shouldAbortActiveLearning())
             {
                 currentRound++;
-                if (currentRound == 2)
-                {
-                    configBuilder.clear();
-                    configBuilder.performOneCommand(samplingTask);
-                }
-                else
-                {
-                    configBuilder.binaryParams.updateSeeds();
-                }
                 previousRelativeError = currentRelativeError;
-                configBuilder.existingConfigurations = learningSet;
-                List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
-                learningSet.AddRange(configsForNextRun);
-                LearnNewModel(learningSet, validationSet, ref currentModel);
-                if (shouldAbortActiveLearning()) break;
-                exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
+                if (shouldAddNewConfigurations)
+                {
+                    if (currentRound == 2)
+                    {
+                        configBuilder.clear();
+                        configBuilder.performOneCommand(samplingTask);
+                    }
+                    else
+                    {
+                        configBuilder.binaryParams.updateSeeds();
+                    }
+                    configBuilder.existingConfigurations = learningSet;
+                    List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
+                    learningSet.AddRange(configsForNextRun);
+                }
+                if (shouldAddNewConfigurations && shouldExchangeConfigurations)
+                {
+                    LearnNewModel(learningSet, validationSet, ref currentModel);
+                    if (shouldAbortActiveLearning()) break;
+                }
+                if (shouldExchangeConfigurations)
+                {
+                    exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
+                }
                 LearnNewModel(learningSet, validationSet, ref currentModel);
             }
         }
@@ -173,7 +184,7 @@ namespace MachineLearning.Learning.Regression
             out List<Configuration> validationSet)
         {
             bool shouldProceed = parseActiveLearningParameters(parameters);
-            if (!shouldProceed || !allInformationAvailable())
+            if (!shouldProceed)
             {
                 learningSet = null;
                 validationSet = null;
