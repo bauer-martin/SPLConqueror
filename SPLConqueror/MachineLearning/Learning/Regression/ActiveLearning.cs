@@ -127,15 +127,52 @@ namespace MachineLearning.Learning.Regression
         /// <param name="parameters">The parameters for the 'active-learn-splconqueror' command</param>
         public void learn(string[] parameters)
         {
+            if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet, out List<Configuration> validationSet)) return;
+            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:" + validationSet.Count);
+
+            // learn initial model
+            currentRound = 1;
+            List<Feature> currentModel = null;
+            LearnNewModel(learningSet, validationSet, ref currentModel);
+
+            while (!abortActiveLearning())
+            {
+                currentRound++;
+                if (currentRound == 2)
+                {
+                    configBuilder.clear();
+                    configBuilder.performOneCommand(samplingTask);
+                }
+                else
+                {
+                    configBuilder.binaryParams.updateSeeds();
+                }
+                previousRelativeError = currentRelativeError;
+                configBuilder.existingConfigurations = learningSet;
+                List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
+                learningSet.AddRange(configsForNextRun);
+                LearnNewModel(learningSet, validationSet, ref currentModel);
+                exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
+            }
+        }
+
+        private bool PrepareActiveLearning(string[] parameters, out List<Configuration> learningSet, out List<Configuration> validationSet)
+        {
             bool shouldProceed = parseActiveLearningParameters(parameters);
-            if (!shouldProceed || !allInformationAvailable()) return;
-            Tuple<List<Configuration>, List<Configuration>> learnAndValidation = configBuilder.buildSetsEfficient(mlSettings);
-            List<Configuration> learningSet = learnAndValidation.Item1;
-            List<Configuration> validationSet = learnAndValidation.Item2;
+            if (!shouldProceed || !allInformationAvailable())
+            {
+                learningSet = null;
+                validationSet = null;
+                return false;
+            }
+            Tuple<List<Configuration>, List<Configuration>> learnAndValidation =
+                configBuilder.buildSetsEfficient(mlSettings);
+            learningSet = learnAndValidation.Item1;
+            validationSet = learnAndValidation.Item2;
             if (learningSet.Count == 0 && validationSet.Count == 0)
             {
                 GlobalState.logInfo.logLine("The learning set is empty! Cannot start learning!");
-                return;
+                return false;
             }
             if (learningSet.Count == 0)
             {
@@ -145,72 +182,27 @@ namespace MachineLearning.Learning.Regression
             {
                 validationSet = learningSet;
             }
+            return true;
+        }
 
-            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:" + validationSet.Count);
-
-            // learn initial model
-            currentRound = 1;
+        private void LearnNewModel(List<Configuration> learningSet, List<Configuration> validationSet, ref List<Feature> currentModel)
+        {
             Learning exp = new Learning(learningSet, validationSet)
             {
-                metaModel = this.influenceModel,
+                metaModel = influenceModel,
                 mlSettings = this.mlSettings
             };
-            exp.learn();
+            exp.learn(currentModel);
             if (exp.models.Count != 1)
             {
                 GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
-                return;
+                Environment.Exit(0);
             }
-            currentRelativeError = exp.models[0].finalError;
-            if (exp.models[0].LearningHistory.Count < 1)
-            {
-                GlobalState.logError.logLine("There should be at least one learning round! Aborting active learning!");
-                return;
-            }
-            List<Feature> currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
-            currentGlobalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+            FeatureSubsetSelection model = exp.models[0];
+            currentModel = model.LearningHistory.Last().FeatureSet;
+            currentRelativeError = model.finalError;
+            currentGlobalError = model.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
-
-            while (!abortActiveLearning())
-            {
-                // prepare next active learning round
-                currentRound++;
-                if (currentRound == 2)
-                {
-                    // switch sampling strategy to select new configurations
-                    configBuilder.clear();
-                    configBuilder.performOneCommand(samplingTask);
-                }
-                else
-                {
-                    // keep sampling strategy but use different seed
-                    configBuilder.binaryParams.updateSeeds();
-                }
-                previousRelativeError = currentRelativeError;
-                configBuilder.existingConfigurations = learningSet;
-                List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
-                learningSet.AddRange(configsForNextRun);
-
-                // learn a new model
-                exp = new Learning(learningSet, validationSet)
-                {
-                    metaModel = influenceModel,
-                    mlSettings = this.mlSettings
-                };
-                exp.learn(currentModel);
-                if (exp.models.Count != 1)
-                {
-                    GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
-                    return;
-                }
-                currentRelativeError = exp.models[0].finalError;
-                currentModel = exp.models[0].LearningHistory.Last().FeatureSet;
-                currentGlobalError = exp.models[0].computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
-                GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
-
-                // exchange configurations
-                exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
-            }
         }
 
         private bool abortActiveLearning()
