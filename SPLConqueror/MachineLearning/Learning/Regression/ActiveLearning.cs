@@ -29,9 +29,9 @@ namespace MachineLearning.Learning.Regression
                 {"mostSimilarPerformance", ConfigurationExchangeStrategies.MOST_SIMILAR_PERFORMANCE}
             };
 
-        private ML_Settings mlSettings = null;
-        private InfluenceModel influenceModel;
-        private ConfigurationBuilder configBuilder;
+        private readonly ML_Settings mlSettings = null;
+        private readonly InfluenceModel influenceModel;
+        private readonly ConfigurationBuilder configBuilder;
 
         /// <summary>
         /// The number of active learning rounds.
@@ -136,15 +136,17 @@ namespace MachineLearning.Learning.Regression
         /// <param name="parameters">The parameters for the 'active-learn-splconqueror' command</param>
         public void learn(string[] parameters)
         {
-            if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet, out List<Configuration> validationSet)) return;
-            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:" + validationSet.Count);
+            if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet,
+                out List<Configuration> validationSet)) return;
+            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:"
+                + validationSet.Count);
 
             // learn initial model
             currentRound = 1;
             List<Feature> currentModel = null;
             LearnNewModel(learningSet, validationSet, ref currentModel);
 
-            while (!abortActiveLearning())
+            while (!shouldAbortActiveLearning())
             {
                 currentRound++;
                 if (currentRound == 2)
@@ -161,13 +163,14 @@ namespace MachineLearning.Learning.Regression
                 List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                 learningSet.AddRange(configsForNextRun);
                 LearnNewModel(learningSet, validationSet, ref currentModel);
-                if (abortActiveLearning()) break;
+                if (shouldAbortActiveLearning()) break;
                 exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
                 LearnNewModel(learningSet, validationSet, ref currentModel);
             }
         }
 
-        private bool PrepareActiveLearning(string[] parameters, out List<Configuration> learningSet, out List<Configuration> validationSet)
+        private bool PrepareActiveLearning(string[] parameters, out List<Configuration> learningSet,
+            out List<Configuration> validationSet)
         {
             bool shouldProceed = parseActiveLearningParameters(parameters);
             if (!shouldProceed || !allInformationAvailable())
@@ -196,7 +199,8 @@ namespace MachineLearning.Learning.Regression
             return true;
         }
 
-        private void LearnNewModel(List<Configuration> learningSet, List<Configuration> validationSet, ref List<Feature> currentModel)
+        private void LearnNewModel(List<Configuration> learningSet, List<Configuration> validationSet,
+            ref List<Feature> currentModel)
         {
             Learning exp = new Learning(learningSet, validationSet)
             {
@@ -216,18 +220,20 @@ namespace MachineLearning.Learning.Regression
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
         }
 
-        private bool abortActiveLearning()
+        private bool shouldAbortActiveLearning()
         {
             if (currentRound >= mlSettings.maxNumberOfActiveLearningRounds)
             {
-                GlobalState.logInfo.logLine("Aborting active learning because maximum number of rounds has been reached");
+                GlobalState.logInfo.logLine(
+                    "Aborting active learning because maximum number of rounds has been reached");
                 return true;
             }
 
             double improvement = previousRelativeError - currentRelativeError;
             if (improvement > 0 && improvement < mlSettings.minImprovementPerActiveLearningRound)
             {
-                GlobalState.logInfo.logLine("Aborting active learning because model did not achieve great improvement anymore");
+                GlobalState.logInfo.logLine(
+                    "Aborting active learning because model did not achieve great improvement anymore");
                 return true;
             }
 
@@ -240,5 +246,4 @@ namespace MachineLearning.Learning.Regression
             return false;
         }
     }
-
 }
