@@ -25,7 +25,17 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
         protected override IEnumerable<Configuration> SelectConfigsFromLearningSet(List<Configuration> learningSet,
             int count)
         {
-            return SortedByMinDistance(learningSet).Select(triple => triple.first).Take(count);
+            List<Triple<Configuration, Configuration, double>> triples = SortedByMinDistance(learningSet).ToList();
+            List<Configuration> result = new List<Configuration>();
+            int index = 0;
+            while (result.Count < count && triples.Count > 0)
+            {
+                Triple<Configuration, Configuration, double> triple = triples[index];
+                if (!result.Contains(triple.first)) result.Add(triple.first);
+                if (!result.Contains(triple.second)) result.Add(triple.second);
+                index++;
+            }
+            return result.Take(count);
         }
 
         private static Dictionary<Configuration, Dictionary<Configuration, double>> DistanceMatrix(List<Configuration> learningSet)
