@@ -163,7 +163,9 @@ namespace MachineLearning.Learning.Regression
                     {
                         configBuilder.binaryParams.updateSeeds();
                     }
-                    configBuilder.existingConfigurations = learningSet;
+                    List<Configuration> existingConfigurations = new List<Configuration>(learningSet);
+                    existingConfigurations.AddRange(validationSet);
+                    configBuilder.existingConfigurations = existingConfigurations;
                     List<Configuration> configsForNextRun = configBuilder.buildSet(mlSettings);
                     learningSet.AddRange(configsForNextRun);
                 }

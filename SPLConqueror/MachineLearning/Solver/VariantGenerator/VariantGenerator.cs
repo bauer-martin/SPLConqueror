@@ -208,8 +208,7 @@ namespace MachineLearning.Solver
         /// <param name="vm">The variability model.</param>
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of the features to minimize.</param>
-        /// <param name="sampledConfigurations">The sampled configurations until now.</param>
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, Configuration lastSampledConfiguration)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight)
         {
             if (this._constraintSystemCache == null)
             {
@@ -217,45 +216,20 @@ namespace MachineLearning.Solver
             }
 
             List<CspTerm> variables;
-            Dictionary<BinaryOption, CspTerm> elemToTerm;
             Dictionary<CspTerm, BinaryOption> termToElem;
             ConstraintSystem S;
 
-            if (this._constraintSystemCache.Keys.Contains(numberSelectedFeatures))
+            if (!this._constraintSystemCache.Keys.Contains(numberSelectedFeatures))
             {
-                variables = _constraintSystemCache[numberSelectedFeatures].GetVariables();
-                elemToTerm = _constraintSystemCache[numberSelectedFeatures].GetElemToTermMapping();
-                termToElem = _constraintSystemCache[numberSelectedFeatures].GetTermToElemMapping();
-                S = _constraintSystemCache[numberSelectedFeatures].GetConstraintSystem();
-
-                S.ResetSolver();
-                S.RemoveAllMinimizationGoals();
-
-                // Add the missing configurations
-                AddBinaryConfigurationsToConstraintSystem(vm, S, lastSampledConfiguration, elemToTerm);
-
+                InitializeCache(vm, numberSelectedFeatures);
             }
-            else
-            {
-                variables = new List<CspTerm>();
-                elemToTerm = new Dictionary<BinaryOption, CspTerm>();
-                termToElem = new Dictionary<CspTerm, BinaryOption>();
 
-                // Build the constraint system
-                S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+            variables = _constraintSystemCache[numberSelectedFeatures].GetVariables();
+            termToElem = _constraintSystemCache[numberSelectedFeatures].GetTermToElemMapping();
+            S = _constraintSystemCache[numberSelectedFeatures].GetConstraintSystem();
 
-                // The first goal of this method is, to have an exact number of features selected
-                S.AddConstraints(S.ExactlyMofN(numberSelectedFeatures, variables.ToArray()));
-
-                if (lastSampledConfiguration != null)
-                {
-                    // Add the previous configurations as constraints
-                    AddBinaryConfigurationsToConstraintSystem(vm, S, lastSampledConfiguration, elemToTerm);
-                }
-
-                this._constraintSystemCache.Add(numberSelectedFeatures, new ConstraintSystemCache(S, variables, elemToTerm, termToElem));
-
-            }
+            S.ResetSolver();
+            S.RemoveAllMinimizationGoals();
 
             // Next, solve the constraint system
             ConstraintSolverSolution soln = S.Solve();
@@ -278,6 +252,44 @@ namespace MachineLearning.Solver
             }
 
             return tempConfig;
+        }
+
+        private void InitializeCache(VariabilityModel vm, int numberSelectedFeatures)
+        {
+            List<CspTerm> variables;
+            Dictionary<CspTerm, BinaryOption> termToElem;
+            ConstraintSystem S;
+            Dictionary<BinaryOption, CspTerm> elemToTerm;
+            // Build the constraint system
+            S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+
+            // The first goal of this method is, to have an exact number of features selected
+            S.AddConstraints(S.ExactlyMofN(numberSelectedFeatures, variables.ToArray()));
+
+            this._constraintSystemCache.Add(numberSelectedFeatures,
+                new ConstraintSystemCache(S, variables, elemToTerm, termToElem));
+        }
+
+        public void AddConstraint(VariabilityModel vm, Configuration configToExclude, int numberSelectedFeatures)
+        {
+            if (this._constraintSystemCache == null)
+            {
+                this._constraintSystemCache = new Dictionary<int, ConstraintSystemCache>();
+            }
+            Dictionary<BinaryOption, CspTerm> elemToTerm;
+            ConstraintSystem S;
+
+            if (!this._constraintSystemCache.Keys.Contains(numberSelectedFeatures))
+            {
+                InitializeCache(vm, numberSelectedFeatures);
+            }
+            elemToTerm = _constraintSystemCache[numberSelectedFeatures].GetElemToTermMapping();
+            S = _constraintSystemCache[numberSelectedFeatures].GetConstraintSystem();
+
+            S.ResetSolver();
+            S.RemoveAllMinimizationGoals();
+            // Add the missing configurations
+            AddBinaryConfigurationsToConstraintSystem(vm, S, configToExclude, elemToTerm);
         }
 
         /// <summary>

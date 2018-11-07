@@ -579,7 +579,7 @@ namespace MachineLearning.Solver
         }
 
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, Configuration lastSampledConfiguration)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight)
         {
             if (_z3Cache == null)
             {
@@ -598,67 +598,17 @@ namespace MachineLearning.Solver
 
             List<BoolExpr> variables = null;
             Dictionary<BoolExpr, BinaryOption> termToOption = null;
-            Dictionary<BinaryOption, BoolExpr> optionToTerm = null;
-            Tuple<Context, BoolExpr> z3Tuple;
-            Context z3Context;
             Microsoft.Z3.Solver solver;
 
-            // Reuse the solver if it is already in the cache
-            if (this._z3Cache.Keys.Contains(numberSelectedFeatures))
+            if (!this._z3Cache.Keys.Contains(numberSelectedFeatures))
             {
-                Z3Cache cache = this._z3Cache[numberSelectedFeatures];
-                z3Context = cache.GetContext();
-                solver = cache.GetSolver();
-                variables = cache.GetVariables();
-                termToOption = cache.GetTermToOptionMapping();
-                optionToTerm = cache.GetOptionToTermMapping();
-
-                if (lastSampledConfiguration != null)
-                {
-                    // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration.getBinaryOptions(BinaryOption.BinaryValue.Selected), optionToTerm, vm)));
-
-                    // Create a new backtracking point for the next run
-                    solver.Push();
-                }
-
+                InitializeZ3Cache(vm, numberSelectedFeatures);
             }
-            else
-            {
-                z3Tuple = Z3Solver.GetInitializedBooleanSolverSystem(out variables, out optionToTerm, out termToOption, vm, this.henard);
-                z3Context = z3Tuple.Item1;
-                BoolExpr z3Constraints = z3Tuple.Item2;
-                solver = z3Context.MkSolver();
 
-                // TODO: The following line works for z3Solver version >= 4.6.0
-                //solver.Set (RANDOM_SEED, z3RandomSeed);
-                Params solverParameter = z3Context.MkParams();
-                solverParameter.Add(RANDOM_SEED, z3RandomSeed);
-                solver.Parameters = solverParameter;
-
-                solver.Assert(z3Constraints);
-
-                if (lastSampledConfiguration != null)
-                {
-                    // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration.getBinaryOptions(BinaryOption.BinaryValue.Selected), optionToTerm, vm)));
-                }
-
-                // The goal of this method is, to have an exact number of features selected
-
-                // Therefore, initialize an integer array with the value '1' for the pseudo-boolean equal function
-                int[] neutralWeights = new int[variables.Count];
-                for (int i = 0; i < variables.Count; i++)
-                {
-                    neutralWeights[i] = 1;
-                }
-                solver.Assert(z3Context.MkPBEq(neutralWeights, variables.ToArray(), numberSelectedFeatures));
-
-                // Create a backtracking point before adding the optimization goal
-                solver.Push();
-
-                this._z3Cache[numberSelectedFeatures] = new Z3Cache(z3Context, solver, variables, optionToTerm, termToOption);
-            }
+            Z3Cache cache = this._z3Cache[numberSelectedFeatures];
+            solver = cache.GetSolver();
+            variables = cache.GetVariables();
+            termToOption = cache.GetTermToOptionMapping();
 
             // Check if there is still a solution available by finding the first satisfiable configuration
             if (solver.Check() == Status.SATISFIABLE)
@@ -689,6 +639,76 @@ namespace MachineLearning.Solver
             {
                 return null;
             }
+        }
+
+        private void InitializeZ3Cache(VariabilityModel vm, int numberSelectedFeatures)
+        {
+            Dictionary<BoolExpr, BinaryOption> termToOption;
+            Microsoft.Z3.Solver solver;
+            Tuple<Context, BoolExpr> z3Tuple;
+            List<BoolExpr> variables;
+            Dictionary<BinaryOption, BoolExpr> optionToTerm;
+            Context z3Context;
+            z3Tuple = Z3Solver.GetInitializedBooleanSolverSystem(out variables, out optionToTerm, out termToOption, vm,
+                this.henard);
+            z3Context = z3Tuple.Item1;
+            BoolExpr z3Constraints = z3Tuple.Item2;
+            solver = z3Context.MkSolver();
+
+            // TODO: The following line works for z3Solver version >= 4.6.0
+            //solver.Set (RANDOM_SEED, z3RandomSeed);
+            Params solverParameter = z3Context.MkParams();
+            solverParameter.Add(RANDOM_SEED, z3RandomSeed);
+            solver.Parameters = solverParameter;
+
+            solver.Assert(z3Constraints);
+
+            // The goal of this method is, to have an exact number of features selected
+
+            // Therefore, initialize an integer array with the value '1' for the pseudo-boolean equal function
+            int[] neutralWeights = new int[variables.Count];
+            for (int i = 0; i < variables.Count; i++)
+            {
+                neutralWeights[i] = 1;
+            }
+            solver.Assert(z3Context.MkPBEq(neutralWeights, variables.ToArray(), numberSelectedFeatures));
+
+            // Create a backtracking point before adding the optimization goal
+            solver.Push();
+
+            this._z3Cache[numberSelectedFeatures] = new Z3Cache(z3Context, solver, variables, optionToTerm, termToOption);
+        }
+
+        /// <summary>
+        /// Adds the given configuration as a constraint to the solver.
+        /// </summary>
+        /// <param name="vm">The variability model</param>
+        /// <param name="configToExclude">The configuration to exclude</param>
+        /// <param name="numberSelectedFeatures">The number of features to be selected</param>
+        public void AddConstraint(VariabilityModel vm, Configuration configToExclude, int numberSelectedFeatures)
+        {
+            if (_z3Cache == null)
+            {
+                _z3Cache = new Dictionary<int, Z3Cache>();
+            }
+            Dictionary<BinaryOption, BoolExpr> optionToTerm;
+            Context z3Context;
+            Microsoft.Z3.Solver solver;
+            if (!this._z3Cache.Keys.Contains(numberSelectedFeatures))
+            {
+                InitializeZ3Cache(vm, numberSelectedFeatures);
+            }
+            Z3Cache cache = this._z3Cache[numberSelectedFeatures];
+            z3Context = cache.GetContext();
+            solver = cache.GetSolver();
+            optionToTerm = cache.GetOptionToTermMapping();
+            // Add the previous configurations as constraints
+            solver.Assert(Z3Solver.NegateExpr(z3Context,
+                Z3Solver.ConvertConfiguration(z3Context,
+                    configToExclude.getBinaryOptions(BinaryOption.BinaryValue.Selected), optionToTerm, vm)));
+
+            // Create a new backtracking point for the next run
+            solver.Push();
         }
 
         /// <summary>

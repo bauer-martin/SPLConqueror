@@ -89,7 +89,11 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 {
                     featureWeight.Add(0, new Dictionary<List<BinaryOption>, int>());
                 }
-                existingConfigurations.ForEach(config => UpdateWeights(GlobalState.varModel, featureWeight[0], config));
+                existingConfigurations.ForEach(config =>
+                {
+                    ConfigurationBuilder.vg.AddConstraint(GlobalState.varModel, config, config.getBinaryOptions(BinaryOption.BinaryValue.Selected).Count);
+                    UpdateWeights(GlobalState.varModel, featureWeight[0], config);
+                });
             }
             else if (optimization == Optimization.LOCAL)
             {
@@ -103,7 +107,11 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                     {
                         featureWeight.Add(i, new Dictionary<List<BinaryOption>, int>());
                     }
-                    existingConfigurations.ForEach(config => UpdateWeights(GlobalState.varModel, featureWeight[i], config));
+                    existingConfigurations.ForEach(config =>
+                    {
+                        ConfigurationBuilder.vg.AddConstraint(GlobalState.varModel, config, config.getBinaryOptions(BinaryOption.BinaryValue.Selected).Count);
+                        UpdateWeights(GlobalState.varModel, featureWeight[0], config);
+                    });
                 }
             }
 
@@ -143,18 +151,18 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 if (optimization == Optimization.NONE)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, null, selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, null);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0], selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, featureWeight[0]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket], selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, featureWeight[currentBucket]);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
@@ -171,6 +179,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
                 Configuration currentSelectedConfiguration = new Configuration(solution);
 
+                ConfigurationBuilder.vg.AddConstraint(GlobalState.varModel, currentSelectedConfiguration, distanceOfBucket);
                 selectedConfigurations.Add(currentSelectedConfiguration);
                 selectedConfigurationsFromBucket[currentBucket] = currentSelectedConfiguration;
                 if (optimization == Optimization.GLOBAL)

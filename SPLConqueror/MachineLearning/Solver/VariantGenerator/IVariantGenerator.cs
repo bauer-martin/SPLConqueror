@@ -81,9 +81,16 @@ namespace MachineLearning.Solver
         /// <param name="vm">The variability model containing all options and their constraints.</param>
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of certain feature combinations.</param>
-        /// <param name="lastSampledConfiguration">The last included sampled configuration.</param>
         /// <returns>A list of <see cref="BinaryOption"/>, which should be selected.</returns>
-        List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, Configuration lastSampledConfiguration);
+        List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight);
+
+        /// <summary>
+        /// Adds the given configuration as a constraint to the solver.
+        /// </summary>
+        /// <param name="vm">The variability model</param>
+        /// <param name="configToExclude">The configuration to exclude</param>
+        /// <param name="numberSelectedFeatures">The number of features to be selected</param>
+        void AddConstraint(VariabilityModel vm, Configuration configToExclude, int numberSelectedFeatures);
 
         /// <summary>
         /// This method clears the cache if caches are used.
