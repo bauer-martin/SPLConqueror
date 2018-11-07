@@ -140,7 +140,7 @@ namespace MachineLearning.Learning.Regression
         {
             if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet,
                 out List<Configuration> validationSet)) return;
-            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + " Validation set:"
+            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + ", Validation set: "
                 + validationSet.Count);
 
             // learn initial model
@@ -229,6 +229,8 @@ namespace MachineLearning.Learning.Regression
             currentRelativeError = model.finalError;
             currentGlobalError = model.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
+            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + ", Validation set: "
+                + validationSet.Count);
         }
 
         private bool shouldAbortActiveLearning()
