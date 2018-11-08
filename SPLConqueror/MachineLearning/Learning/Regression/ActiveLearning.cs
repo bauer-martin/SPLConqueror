@@ -151,7 +151,6 @@ namespace MachineLearning.Learning.Regression
             while (!shouldAbortActiveLearning())
             {
                 currentRound++;
-                previousRelativeError = currentRelativeError;
                 if (shouldAddNewConfigurations)
                 {
                     if (currentRound == 2)
@@ -228,6 +227,7 @@ namespace MachineLearning.Learning.Regression
             }
             FeatureSubsetSelection model = exp.models[0];
             currentModel = model.LearningHistory.Last().FeatureSet;
+            previousRelativeError = currentRelativeError;
             currentRelativeError = model.finalError;
             currentGlobalError = model.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
