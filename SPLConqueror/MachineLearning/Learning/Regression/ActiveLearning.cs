@@ -243,7 +243,7 @@ namespace MachineLearning.Learning.Regression
             }
 
             double improvement = previousRelativeError - currentRelativeError;
-            if (improvement > 0 && improvement < mlSettings.minImprovementPerActiveLearningRound)
+            if (improvement < mlSettings.minImprovementPerActiveLearningRound)
             {
                 GlobalState.logInfo.logLine(
                     "Aborting active learning because model did not achieve great improvement anymore");
