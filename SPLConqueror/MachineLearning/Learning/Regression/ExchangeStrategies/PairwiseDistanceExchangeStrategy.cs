@@ -28,7 +28,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
             List<Triple<Configuration, Configuration, double>> triples = SortedByMinDistance(learningSet).ToList();
             List<Configuration> result = new List<Configuration>();
             int index = 0;
-            while (result.Count < count && triples.Count > 0)
+            while (result.Count < count && index < triples.Count)
             {
                 Triple<Configuration, Configuration, double> triple = triples[index];
                 if (!result.Contains(triple.first)) result.Add(triple.first);
