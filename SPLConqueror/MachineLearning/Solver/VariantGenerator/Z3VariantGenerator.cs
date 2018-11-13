@@ -409,8 +409,6 @@ namespace MachineLearning.Solver
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
         public List<List<BinaryOption>> MaximizeConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions)
         {
-            List<List<BinaryOption>> optimalConfigurations = new List<List<BinaryOption>>();
-
             List<BoolExpr> variables;
             Dictionary<BoolExpr, BinaryOption> termToOption;
             Dictionary<BinaryOption, BoolExpr> optionToTerm;
@@ -438,47 +436,22 @@ namespace MachineLearning.Solver
                 BinaryOption currOption = termToOption[variables[r]];
                 ArithExpr numericVariable = z3Context.MkIntConst(currOption.Name);
 
-                int weight;
-                if (minimize)
-                {
-                    weight = 1;
-                }
-                else
-                {
-                    weight = -1;
-                }
-
-                if (unwantedOptions != null && (unwantedOptions.Contains(termToOption[variables[r]]) && !config.Contains(termToOption[variables[r]])))
-                {
-                    weight = 10000;
-                }
-
-                constraints.Add(z3Context.MkEq(numericVariable, z3Context.MkITE(variables[r], z3Context.MkInt(weight), z3Context.MkInt(0))));
+                constraints.Add(z3Context.MkEq(numericVariable, z3Context.MkITE(variables[r], z3Context.MkInt(1), z3Context.MkInt(0))));
 
                 optimizationGoals[r] = numericVariable;
             }
 
             Optimize optimizer = z3Context.MkOptimize();
             optimizer.Assert(constraints.ToArray());
-            optimizer.MkMinimize(z3Context.MkAdd(optimizationGoals));
-            int bestSize = 0;
-            int currentSize = 0;
-            while (optimizer.Check() == Status.SATISFIABLE && currentSize >= bestSize)
-            {
-                Model model = optimizer.Model;
-                List<BinaryOption> solution = RetrieveConfiguration(variables, model, termToOption);
-                currentSize = solution.Count;
-                if (currentSize >= bestSize)
-                {
-                    optimalConfigurations.Add(solution);
-                }
-                if (bestSize == 0)
-                    bestSize = solution.Count;
-                currentSize = solution.Count;
-                optimizer.Assert(z3Context.MkNot(Z3Solver.ConvertConfiguration(z3Context, solution, optionToTerm, vm)));
-            }
+            optimizer.MkMaximize(z3Context.MkAdd(optimizationGoals));
 
-            return optimalConfigurations;
+            if (optimizer.Check() != Status.SATISFIABLE)
+                return null;
+            List<BinaryOption> solution = RetrieveConfiguration(variables, optimizer.Model, termToOption);
+            return new List<List<BinaryOption>>
+            {
+                solution
+            };
         }
 
 
