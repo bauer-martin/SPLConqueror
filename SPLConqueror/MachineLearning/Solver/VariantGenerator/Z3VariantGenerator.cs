@@ -553,7 +553,7 @@ namespace MachineLearning.Solver
         }
 
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> whiteList, List<BinaryOption> blackList)
         {
             if (_z3Cache == null)
             {
@@ -584,6 +584,24 @@ namespace MachineLearning.Solver
             variables = cache.GetVariables();
             termToOption = cache.GetTermToOptionMapping();
 
+            Dictionary<BinaryOption, BoolExpr> optionToTerm = cache.GetOptionToTermMapping();
+            Context z3Context = cache.GetContext();
+            solver.Push();
+            if (whiteList != null)
+            {
+                foreach (BinaryOption binaryOption in whiteList)
+                {
+                    solver.Add(optionToTerm[binaryOption]);
+                }
+            }
+            if (blackList != null)
+            {
+                foreach (BinaryOption binaryOption in blackList)
+                {
+                    solver.Add(z3Context.MkNot(optionToTerm[binaryOption]));
+                }
+            }
+
             // Check if there is still a solution available by finding the first satisfiable configuration
             if (solver.Check() == Status.SATISFIABLE)
             {
@@ -599,6 +617,7 @@ namespace MachineLearning.Solver
                     .getSmallWeightConfig(featureRanking, this._z3Cache[numberSelectedFeatures], vm);
                 }
 
+                solver.Pop();
                 if (approximateOptimal == null)
                 {
                     return possibleSolution;
@@ -611,6 +630,7 @@ namespace MachineLearning.Solver
             }
             else
             {
+                solver.Pop();
                 return null;
             }
         }

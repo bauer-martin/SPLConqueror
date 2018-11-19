@@ -82,11 +82,27 @@ namespace MachineLearning.Sampling.Hybrid
             }
         }
 
+        public virtual String GetSamplingParameters(String parameterName)
+        {
+            if (strategyParameter == null)
+            {
+                throw new NotImplementedException("No strategy parameters are implemented for the strategy "
+                    + this.GetType() + ".");
+            }
+            if (this.strategyParameter.ContainsKey(parameterName))
+            {
+                return strategyParameter[parameterName];
+            }
+            // Instead of throwing an argument exception, an error could be printed.
+            throw new ArgumentException("The parameter " + parameterName + " is not supported in the strategy "
+                + this.GetType() + ".");
+        }
+
         /// <summary>
         /// Computes the sampling set using the provided parameters. 
         /// </summary>
         /// <returns><code>True</code> if the computation was successful.</returns>
-        public abstract bool ComputeSamplingStrategy();
+        public abstract bool ComputeSamplingStrategy(List<BinaryOption> whiteList, List<BinaryOption> blackList);
 
         /// <summary>
         /// Create a string representing the selected parameters.

@@ -66,8 +66,9 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         /// <param name="allBuckets">The buckets containing at least one configuration.</param>
         /// <param name="count">The number of configurations to select.</param>
         /// <param name="optimization">The optimization to use</param>
-        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, Optimization optimization = Optimization.NONE)
+        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, List<BinaryOption> blackList, Optimization optimization = Optimization.NONE)
         {
+            wantedDistribution = new Dictionary<double, double>(wantedDistribution);
             Random rand = new Random(seed);
             List<Configuration> selectedConfigurations = new List<Configuration>();
             Dictionary<int, Configuration> selectedConfigurationsFromBucket = new Dictionary<int, Configuration>();
@@ -151,25 +152,28 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 if (optimization == Optimization.NONE)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, null);
+                        distanceOfBucket, null, whiteList, blackList);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0]);
+                        distanceOfBucket, featureWeight[0], whiteList, blackList);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket]);
+                        distanceOfBucket, featureWeight[currentBucket], whiteList, blackList);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
                 if (solution == null)
                 {
-                    noSamples[currentBucket] = true;
-
+                    if (whiteList.Count == 0 && blackList.Count == 0)
+                    {
+                        // TODO maybe optimize performance: additionally sample configuration from bucket to check if there are any more configurations in the bucket
+                        noSamples[currentBucket] = true;
+                    }
                     // As a consequence, the probability to pick this bucket is set to 0 and the whole
                     // distribution is readjusted so that the sum of all probabilities is equal to 1 (i.e., 100%).
                     wantedDistribution[wantedDistribution.ElementAt(currentBucket).Key] = 0d;

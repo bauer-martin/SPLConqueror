@@ -67,7 +67,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
         /// Computes a distribution-aware sample set.
         /// </summary>
         /// <returns><code>True</code> iff the process was successful;<code>False</code> otherwise</returns>
-        public override bool ComputeSamplingStrategy()
+        public override bool ComputeSamplingStrategy(List<BinaryOption> whiteList, List<BinaryOption> blackList)
         {
             // Check configuration and set the according variables
             CheckConfiguration();
@@ -91,7 +91,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
             }
 
             // Then, sample from all buckets according to the given distribution
-            SampleFromDistribution(wholeDistribution, allBuckets, numberConfigs);
+            SampleFromDistribution(wholeDistribution, allBuckets, numberConfigs, whiteList, blackList);
 
             return true;
         }
@@ -242,7 +242,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
         /// <param name="wholeDistribution">the distribution of all configurations</param>
         /// <param name="allBuckets">all buckets of the distribution</param>
         /// <param name="count">the number of configurations to sample</param>
-        public void SampleFromDistribution(Dictionary<double, List<Configuration>> wholeDistribution, List<double> allBuckets, int count)
+        public void SampleFromDistribution(Dictionary<double, List<Configuration>> wholeDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, List<BinaryOption> blackList)
         {
             Dictionary<double, double> wantedDistribution = CreateDistribution(wholeDistribution, allBuckets);
 
@@ -252,7 +252,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
             }
 
             this.selectedConfigurations = selection
-                .SampleFromDistribution(wantedDistribution, allBuckets, count, GetOptimization());
+                .SampleFromDistribution(wantedDistribution, allBuckets, count, whiteList, blackList, GetOptimization());
         }
 
         /// <summary>

@@ -604,6 +604,61 @@ namespace MachineLearning.Sampling
             return buildConfigs(vm, binaryStrategiesValidation, numericStrategiesValidation, hybridStrategiesValidation);
         }
 
+        public List<Configuration> buildConfigs(VariabilityModel vm, List<BinaryOption> whiteList,
+            List<BinaryOption> blackList)
+        {
+            if (hybridStrategies.Count == 0)
+            {
+                throw new Exception("There must be at least one hybrid strategy!");
+            }
+            List<Configuration> configurations = new List<Configuration>();
+            foreach (HybridStrategy hybrid in hybridStrategies)
+            {
+                hybrid.SetExistingConfigurations(existingConfigurations);
+                string previousValue = hybrid.GetSamplingParameters(DistributionSensitive.NUM_CONFIGS);
+                Dictionary<string, string> parameterValue = new Dictionary<string, string>
+                {
+                    {DistributionSensitive.NUM_CONFIGS, "1"}
+                };
+                hybrid.SetSamplingParameters(parameterValue);
+                hybrid.SetExistingConfigurations(existingConfigurations);
+                hybrid.ComputeSamplingStrategy(whiteList, blackList);
+                if (hybrid.selectedConfigurations.Any(config => existingConfigurations.Contains(config)))
+                {
+                    throw new Exception("configuration already exists");
+                }
+                configurations.AddRange(hybrid.selectedConfigurations);
+                parameterValue = new Dictionary<string, string>
+                {
+                    {DistributionSensitive.NUM_CONFIGS, previousValue}
+                };
+                hybrid.SetSamplingParameters(parameterValue);
+            }
+
+            if (vm.MixedConstraints.Count == 0)
+            {
+                return replaceReference(configurations.Distinct().ToList());
+            }
+            List<Configuration> unfilteredList = configurations.Distinct().ToList();
+            List<Configuration> filteredConfiguration = new List<Configuration>();
+            foreach (Configuration toTest in unfilteredList)
+            {
+                bool isValid = true;
+                foreach (MixedConstraint constr in vm.MixedConstraints)
+                {
+                    if (!constr.requirementsFulfilled(toTest))
+                    {
+                        isValid = false;
+                    }
+                }
+                if (isValid)
+                {
+                    filteredConfiguration.Add(toTest);
+                }
+            }
+            return replaceReference(filteredConfiguration);
+        }
+
         private List<Configuration> buildConfigs(VariabilityModel vm, List<SamplingStrategies> binaryStrats, List<ExperimentalDesign> numericStrats, List<HybridStrategy> hybridStrats)
         {
             List<Configuration> result = new List<Configuration>();
@@ -916,7 +971,7 @@ namespace MachineLearning.Sampling
             foreach (HybridStrategy hybrid in hybridStrategies)
             {
                 hybrid.SetExistingConfigurations(existingConfigurations);
-                hybrid.ComputeSamplingStrategy();
+                hybrid.ComputeSamplingStrategy(null, null);
                 allSampledConfigurations.AddRange(hybrid.selectedConfigurations);
             }
             return allSampledConfigurations;

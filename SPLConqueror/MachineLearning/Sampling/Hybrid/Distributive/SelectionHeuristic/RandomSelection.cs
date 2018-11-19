@@ -43,7 +43,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         /// <param name="count">the number of configurations to sample</param>
         /// <param name="optimization">The optimization to use. Currently, this option is ignored in this class.</param>
         /// <returns>The configurations that were selected.</returns>
-        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, Optimization optimization)
+        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, List<BinaryOption> blackList, Optimization optimization)
         {
             if (wholeDistribution == null)
             {
