@@ -14,6 +14,7 @@ namespace MachineLearning.Solver
     public class Z3VariantGenerator : IVariantGenerator
     {
         private Dictionary<int, Z3Cache> _z3Cache;
+        private Dictionary<int, HashSet<Configuration>> constraintsCache = new Dictionary<int, HashSet<Configuration>>();
 
         private uint z3RandomSeed = 1;
         private const string RANDOM_SEED = ":random-seed";
@@ -660,6 +661,15 @@ namespace MachineLearning.Solver
         /// <param name="numberSelectedFeatures">The number of features to be selected</param>
         public void AddConstraint(VariabilityModel vm, Configuration configToExclude, int numberSelectedFeatures)
         {
+            if (!constraintsCache.ContainsKey(numberSelectedFeatures))
+            {
+                constraintsCache[numberSelectedFeatures] = new HashSet<Configuration>();
+            }
+            if (constraintsCache[numberSelectedFeatures].Contains(configToExclude))
+            {
+                return;
+            }
+            constraintsCache[numberSelectedFeatures].Add(configToExclude);
             if (_z3Cache == null)
             {
                 _z3Cache = new Dictionary<int, Z3Cache>();
@@ -690,6 +700,7 @@ namespace MachineLearning.Solver
         public void ClearCache()
         {
             this._z3Cache = null;
+            constraintsCache = new Dictionary<int, HashSet<Configuration>>();
         }
     }
 }
