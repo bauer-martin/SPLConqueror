@@ -56,7 +56,7 @@ namespace MachineLearning.Learning.Regression.ExchangeStrategies
                 switch (mlSettings.lossFunction)
                 {
                     case ML_Settings.LossFunction.RELATIVE:
-                        error = Math.Abs((estimatedValue - realValue) / realValue) * 100;
+                        error = Math.Abs((estimatedValue - realValue) / realValue);
                         break;
                     case ML_Settings.LossFunction.LEASTSQUARES:
                         error = Math.Pow(realValue - estimatedValue, 2);
