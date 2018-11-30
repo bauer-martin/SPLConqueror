@@ -169,7 +169,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
                 if (solution == null)
                 {
-                    if (whiteList.Count == 0 && blackList.Count == 0)
+                    if ((whiteList == null || whiteList.Count == 0) && (blackList == null || blackList.Count == 0))
                     {
                         // TODO maybe optimize performance: additionally sample configuration from bucket to check if there are any more configurations in the bucket
                         noSamples[currentBucket] = true;

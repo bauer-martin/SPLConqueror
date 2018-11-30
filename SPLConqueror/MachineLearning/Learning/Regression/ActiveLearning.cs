@@ -1,12 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MachineLearning.Learning.Regression.AdditionStrategies;
 using MachineLearning.Learning.Regression.ExchangeStrategies;
 using MachineLearning.Sampling;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression
 {
+    public enum ConfigurationAdditionStrategies
+    {
+        NONE,
+        SIMPLE,
+        MATRIX
+    }
+
     public enum ConfigurationExchangeStrategies
     {
         NONE,
@@ -20,7 +28,15 @@ namespace MachineLearning.Learning.Regression
         private const string ADD_NEW_CONFIGS_COMMAND = "addNewConfigs";
         private const string EXCHANGE_CONFIGS_COMMAND = "exchangeConfigs";
 
-        private static readonly Dictionary<string, ConfigurationExchangeStrategies> strategiesByName =
+        private static readonly Dictionary<string, ConfigurationAdditionStrategies> additionStrategiesByName =
+            new Dictionary<string, ConfigurationAdditionStrategies>
+            {
+                {"none", ConfigurationAdditionStrategies.NONE},
+                {"simple", ConfigurationAdditionStrategies.SIMPLE},
+                {"matrix", ConfigurationAdditionStrategies.MATRIX}
+            };
+
+        private static readonly Dictionary<string, ConfigurationExchangeStrategies> exchangeStrategiesByName =
             new Dictionary<string, ConfigurationExchangeStrategies>
             {
                 {"none", ConfigurationExchangeStrategies.NONE},
@@ -54,20 +70,9 @@ namespace MachineLearning.Learning.Regression
         private double currentGlobalError = Double.MaxValue;
 
         /// <summary>
-        /// The sampling task for switching the sampling strategy to find new configurations.
+        /// The strategy to add new configurations after an active learning round.
         /// </summary>
-        private string addNewConfigsSamplingTask;
-
-        /// <summary>
-        /// If set to true, new configurations are added at the beginning of every active learning round.
-        /// </summary>
-        private bool shouldAddNewConfigurations = false;
-
-        /// <summary>
-        /// If set to true, configurations are exchanged between the learning set and the validation set.
-        /// Also performs one additional learning in an active learning round.
-        /// </summary>
-        private bool shouldExchangeConfigurations = false;
+        private ConfigurationAdditionStrategy additionStrategy = new NoOpAdditionStrategy();
 
         /// <summary>
         /// The strategy to exchange configurations after an active learning round.
@@ -92,14 +97,37 @@ namespace MachineLearning.Learning.Regression
                 switch (task)
                 {
                     case ADD_NEW_CONFIGS_COMMAND:
-                        addNewConfigsSamplingTask = string.Join(" ", taskParameters);
-                        shouldAddNewConfigurations = true;
+                        string additionStrategyName = taskParameters[0];
+                        if (additionStrategiesByName.ContainsKey(additionStrategyName))
+                        {
+                            switch (additionStrategiesByName[additionStrategyName])
+                            {
+                                case ConfigurationAdditionStrategies.NONE:
+                                    additionStrategy = new NoOpAdditionStrategy();
+                                    break;
+                                case ConfigurationAdditionStrategies.SIMPLE:
+                                    additionStrategy = new SimpleDistributionBasedAdditionStrategy(mlSettings,
+                                        configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
+                                    break;
+                                case ConfigurationAdditionStrategies.MATRIX:
+                                    additionStrategy = new MatrixDistributionBasedAdditionStrategy(mlSettings,
+                                        configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
+                                    break;
+                                default:
+                                    return false;
+                            }
+                        }
+                        else
+                        {
+                            GlobalState.logError.logLine("Invalid addition strategy: " + tokens[1]);
+                            return false;
+                        }
                         break;
                     case EXCHANGE_CONFIGS_COMMAND:
-                        string strategyName = taskParameters[0];
-                        if (strategiesByName.ContainsKey(strategyName))
+                        string exchangeStrategyName = taskParameters[0];
+                        if (exchangeStrategiesByName.ContainsKey(exchangeStrategyName))
                         {
-                            switch (strategiesByName[strategyName])
+                            switch (exchangeStrategiesByName[exchangeStrategyName])
                             {
                                 case ConfigurationExchangeStrategies.NONE:
                                     exchangeStrategy = new NoOpExchangeStrategy();
@@ -116,7 +144,6 @@ namespace MachineLearning.Learning.Regression
                                 default:
                                     return false;
                             }
-                            shouldExchangeConfigurations = true;
                         }
                         else
                         {
@@ -132,14 +159,6 @@ namespace MachineLearning.Learning.Regression
             return true;
         }
 
-        private static void printConfigs(List<Configuration> configs)
-        {
-            foreach (string s in configs.Select(config => config.ToString()).OrderBy(config => config))
-            {
-                Console.WriteLine(s);
-            }
-        }
-
         /// <summary>
         /// Learns a model using multiple rounds of <see cref="Learning"/>.
         /// </summary>
@@ -149,28 +168,26 @@ namespace MachineLearning.Learning.Regression
             if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet,
                 out List<Configuration> validationSet)) return;
             Console.WriteLine("initial learning set");
-            printConfigs(learningSet);
+            foreach (string s in learningSet.Select(config => config.ToString()).OrderBy(config => config))
+            {
+                Console.WriteLine(s);
+            }
 
             // learn initial model
             currentRound = 1;
             List<Feature> currentModel = null;
             LearnNewModel(learningSet, validationSet, ref currentModel);
 
+            bool shouldAddNewConfigurations = !(additionStrategy is NoOpAdditionStrategy);
+            bool shouldExchangeConfigurations = !(exchangeStrategy is NoOpExchangeStrategy);
+
             while (!shouldAbortActiveLearning())
             {
                 currentRound++;
                 if (shouldAddNewConfigurations)
                 {
-                    if (currentRound == 2)
-                    {
-                        configBuilder.clear();
-                        configBuilder.performOneCommand(addNewConfigsSamplingTask);
-                    }
-                    else
-                    {
-                        configBuilder.binaryParams.updateSeeds();
-                    }
-                    List<Configuration> configsForNextRun = GetConfigsForNextRun(learningSet, validationSet, currentModel);
+                    List<Configuration> configsForNextRun = additionStrategy.FindNewConfigurations(learningSet,
+                        validationSet, currentModel);
                     learningSet.AddRange(configsForNextRun);
                 }
                 if (shouldAddNewConfigurations && shouldExchangeConfigurations)
@@ -184,109 +201,6 @@ namespace MachineLearning.Learning.Regression
                 }
                 LearnNewModel(learningSet, validationSet, ref currentModel);
             }
-        }
-
-        private List<Configuration> GetConfigsForNextRun(List<Configuration> learningSet, List<Configuration> validationSet, List<Feature> currentModel)
-        {
-            List<Configuration> existingConfigurations = new List<Configuration>(learningSet);
-            foreach (Configuration config in validationSet)
-            {
-                if (!existingConfigurations.Contains(config))
-                {
-                    existingConfigurations.Add(config);
-                }
-            }
-            configBuilder.existingConfigurations = existingConfigurations;
-            int maxNumberOfConfigs = (int) Math.Round(0.1 * learningSet.Count);
-            List<Configuration> badConfigs =
-                SortedConfigsByError(learningSet, currentModel).Take(maxNumberOfConfigs).ToList();
-            if (badConfigs.Count == 0)
-            {
-                throw new Exception("learning set is to small");
-            }
-            Dictionary<BinaryOption, List<int>> matrix = new Dictionary<BinaryOption, List<int>>();
-            foreach (Configuration badConfig in badConfigs)
-            {
-                foreach (BinaryOption binaryOption in GlobalState.varModel.BinaryOptions)
-                {
-                    if (!binaryOption.Optional && !binaryOption.hasAlternatives()) continue;
-                    int entry = badConfig.BinaryOptions.ContainsKey(binaryOption)
-                        && badConfig.BinaryOptions[binaryOption] == BinaryOption.BinaryValue.Selected
-                            ? 1
-                            : 0;
-                    if (matrix.ContainsKey(binaryOption))
-                    {
-                        matrix[binaryOption].Add(entry);
-                    }
-                    else
-                    {
-                        matrix[binaryOption] = new List<int> {entry};
-                    }
-                }
-            }
-            List<Tuple<BinaryOption, int>> optionsSortedByOccurrence =
-                matrix.Select(pair => new Tuple<BinaryOption, int>(pair.Key, pair.Value.Sum()))
-                    .OrderByDescending(tuple => tuple.Item2)
-                    .ToList();
-            Tuple<BinaryOption, int> first = optionsSortedByOccurrence.First();
-            List<BinaryOption> maximalOptions = optionsSortedByOccurrence.TakeWhile(tuple => tuple.Item2 == first.Item2).Select(tuple => tuple.Item1).ToList();
-            Console.WriteLine("matrix");
-            foreach (KeyValuePair<BinaryOption, List<int>> pair in matrix.OrderBy(pair => pair.Key.Name))
-            {
-                if (pair.Value.Sum() == first.Item2)
-                {
-                    Console.WriteLine(pair.Key.Name.PadLeft(20) + ": " + string.Join(" ", pair.Value) + " <-");
-                }
-                else
-                {
-                    Console.WriteLine(pair.Key.Name.PadLeft(20) + ": " + string.Join(" ", pair.Value));
-                }
-            }
-
-            List<Configuration> result = new List<Configuration>();
-            Console.WriteLine("new configs");
-            foreach (BinaryOption maximalOption in maximalOptions)
-            {
-                List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
-                // TODO List<BinaryOption> blackList = maximalOptions.Where(c => !c.Equals(maximalOption)).ToList();
-                List<BinaryOption> blackList = new List<BinaryOption>();
-                List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList, blackList);
-                configBuilder.existingConfigurations.AddRange(newConfigs);
-                result.AddRange(newConfigs);
-                Console.WriteLine("for " + maximalOption);
-                printConfigs(newConfigs);
-            }
-            return result;
-        }
-
-        private IEnumerable<Configuration> SortedConfigsByError(List<Configuration> configs, List<Feature> model)
-        {
-            List<Tuple<Configuration, double>> list = new List<Tuple<Configuration, double>>();
-            foreach (Configuration c in configs)
-            {
-                double estimatedValue = FeatureSubsetSelection.estimate(model, c);
-                double realValue = c.GetNFPValue(GlobalState.currentNFP);
-                double error = 0;
-                switch (mlSettings.lossFunction)
-                {
-                    case ML_Settings.LossFunction.RELATIVE:
-                        error = Math.Abs((estimatedValue - realValue) / realValue) * 100;
-                        break;
-                    case ML_Settings.LossFunction.LEASTSQUARES:
-                        error = Math.Pow(realValue - estimatedValue, 2);
-                        break;
-                    case ML_Settings.LossFunction.ABSOLUTE:
-                        error = Math.Abs(realValue - estimatedValue);
-                        break;
-                }
-                list.Add(new Tuple<Configuration, double>(c, error));
-            }
-            Console.WriteLine("predictions");
-            foreach (Tuple<Configuration, double> tuple in list.OrderBy(tuple => tuple.Item1.ToString()))
-            {
-                Console.WriteLine(tuple.Item1 + " -> " + tuple.Item2);
-            }
-            return list.OrderByDescending(tuple => tuple.Item2).Select(tuple => tuple.Item1);
         }
 
         private bool PrepareActiveLearning(string[] parameters, out List<Configuration> learningSet,

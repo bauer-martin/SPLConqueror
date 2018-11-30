@@ -104,6 +104,11 @@
     <Compile Include="Learning\ML_Settings.cs" />
     <Compile Include="Learning\ML_SettingsGenerator.cs" />
     <Compile Include="Learning\Regression\ActiveLearning.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\DistributionBasedAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\ConfigurationAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\MatrixAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\NoOpAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\SimpleConfigurationAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\LargestValidationErrorExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\ConfigurationExchangeStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\MostSimilarPerformanceExchangeStrategy.cs" />
@@ -173,7 +178,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PreBuildEvent>copy "$(SolutionDir)packages\z3x64win.4.5.0.1\libz3.dll" "$(SolutionDir)packages\z3x64win.4.5.0.1\lib\"</PreBuildEvent>
