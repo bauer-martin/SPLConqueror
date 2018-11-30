@@ -77,9 +77,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             foreach (BinaryOption maximalOption in maximalOptions)
             {
                 List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
-                // TODO List<BinaryOption> blackList = maximalOptions.Where(c => !c.Equals(maximalOption)).ToList();
-                List<BinaryOption> blackList = new List<BinaryOption>();
-                List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList, blackList);
+                List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
                 configBuilder.existingConfigurations.AddRange(newConfigs);
                 result.AddRange(newConfigs);
                 Console.WriteLine("for " + maximalOption);

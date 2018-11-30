@@ -553,7 +553,7 @@ namespace MachineLearning.Solver
         }
 
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> whiteList, List<BinaryOption> blackList)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> whiteList)
         {
             if (_z3Cache == null)
             {
@@ -592,13 +592,6 @@ namespace MachineLearning.Solver
                 foreach (BinaryOption binaryOption in whiteList)
                 {
                     solver.Add(optionToTerm[binaryOption]);
-                }
-            }
-            if (blackList != null)
-            {
-                foreach (BinaryOption binaryOption in blackList)
-                {
-                    solver.Add(z3Context.MkNot(optionToTerm[binaryOption]));
                 }
             }
 

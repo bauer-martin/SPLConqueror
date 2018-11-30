@@ -604,8 +604,7 @@ namespace MachineLearning.Sampling
             return buildConfigs(vm, binaryStrategiesValidation, numericStrategiesValidation, hybridStrategiesValidation);
         }
 
-        public List<Configuration> buildConfigs(VariabilityModel vm, List<BinaryOption> whiteList,
-            List<BinaryOption> blackList)
+        public List<Configuration> buildConfigs(VariabilityModel vm, List<BinaryOption> whiteList)
         {
             if (hybridStrategies.Count == 0)
             {
@@ -622,7 +621,7 @@ namespace MachineLearning.Sampling
                 };
                 hybrid.SetSamplingParameters(parameterValue);
                 hybrid.SetExistingConfigurations(existingConfigurations);
-                hybrid.ComputeSamplingStrategy(whiteList, blackList);
+                hybrid.ComputeSamplingStrategy(whiteList);
                 if (hybrid.selectedConfigurations.Any(config => existingConfigurations.Contains(config)))
                 {
                     throw new Exception("configuration already exists");
@@ -971,7 +970,7 @@ namespace MachineLearning.Sampling
             foreach (HybridStrategy hybrid in hybridStrategies)
             {
                 hybrid.SetExistingConfigurations(existingConfigurations);
-                hybrid.ComputeSamplingStrategy(null, null);
+                hybrid.ComputeSamplingStrategy(null);
                 allSampledConfigurations.AddRange(hybrid.selectedConfigurations);
             }
             return allSampledConfigurations;

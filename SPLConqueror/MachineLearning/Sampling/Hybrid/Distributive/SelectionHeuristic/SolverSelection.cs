@@ -66,7 +66,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         /// <param name="allBuckets">The buckets containing at least one configuration.</param>
         /// <param name="count">The number of configurations to select.</param>
         /// <param name="optimization">The optimization to use</param>
-        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, List<BinaryOption> blackList, Optimization optimization = Optimization.NONE)
+        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, Optimization optimization = Optimization.NONE)
         {
             wantedDistribution = new Dictionary<double, double>(wantedDistribution);
             Random rand = new Random(seed);
@@ -152,24 +152,24 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 if (optimization == Optimization.NONE)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, null, whiteList, blackList);
+                        distanceOfBucket, null, whiteList);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0], whiteList, blackList);
+                        distanceOfBucket, featureWeight[0], whiteList);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket], whiteList, blackList);
+                        distanceOfBucket, featureWeight[currentBucket], whiteList);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
                 if (solution == null)
                 {
-                    if ((whiteList == null || whiteList.Count == 0) && (blackList == null || blackList.Count == 0))
+                    if (whiteList == null || whiteList.Count == 0)
                     {
                         // TODO maybe optimize performance: additionally sample configuration from bucket to check if there are any more configurations in the bucket
                         noSamples[currentBucket] = true;
