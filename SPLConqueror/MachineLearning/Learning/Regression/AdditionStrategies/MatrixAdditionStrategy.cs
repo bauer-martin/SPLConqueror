@@ -59,32 +59,14 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             Tuple<BinaryOption, int> first = optionsSortedByOccurrence.First();
             List<BinaryOption> maximalOptions = optionsSortedByOccurrence.TakeWhile(tuple => tuple.Item2 == first.Item2)
                 .Select(tuple => tuple.Item1).ToList();
-            Console.WriteLine("matrix");
-            foreach (KeyValuePair<BinaryOption, List<int>> pair in matrix.OrderBy(pair => pair.Key.Name))
-            {
-                if (pair.Value.Sum() == first.Item2)
-                {
-                    Console.WriteLine(pair.Key.Name.PadLeft(20) + ": " + string.Join(" ", pair.Value) + " <-");
-                }
-                else
-                {
-                    Console.WriteLine(pair.Key.Name.PadLeft(20) + ": " + string.Join(" ", pair.Value));
-                }
-            }
 
             List<Configuration> result = new List<Configuration>();
-            Console.WriteLine("new configs");
             foreach (BinaryOption maximalOption in maximalOptions)
             {
                 List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
                 List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
                 configBuilder.existingConfigurations.AddRange(newConfigs);
                 result.AddRange(newConfigs);
-                Console.WriteLine("for " + maximalOption);
-                foreach (string s in newConfigs.Select(config => config.ToString()).OrderBy(config => config))
-                {
-                    Console.WriteLine(s);
-                }
             }
             return result;
         }
@@ -110,11 +92,6 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                         break;
                 }
                 list.Add(new Tuple<Configuration, double>(c, error));
-            }
-            Console.WriteLine("predictions");
-            foreach (Tuple<Configuration, double> tuple in list.OrderBy(tuple => tuple.Item1.ToString()))
-            {
-                Console.WriteLine(tuple.Item1 + " -> " + tuple.Item2);
             }
             return list.OrderByDescending(tuple => tuple.Item2).Select(tuple => tuple.Item1);
         }
