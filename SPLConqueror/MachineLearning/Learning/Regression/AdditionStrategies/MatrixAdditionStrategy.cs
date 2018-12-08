@@ -25,41 +25,9 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 }
             }
             configBuilder.existingConfigurations = existingConfigurations;
-            int maxNumberOfConfigs = (int) Math.Round(0.1 * learningSet.Count);
-            List<Configuration> badConfigs =
-                SortedConfigsByError(learningSet, currentModel).Take(maxNumberOfConfigs).ToList();
-            if (badConfigs.Count == 0)
-            {
-                throw new Exception("learning set is to small");
-            }
-            Dictionary<BinaryOption, List<int>> matrix = new Dictionary<BinaryOption, List<int>>();
-            foreach (Configuration badConfig in badConfigs)
-            {
-                foreach (BinaryOption binaryOption in GlobalState.varModel.BinaryOptions)
-                {
-                    if (!binaryOption.Optional && !binaryOption.hasAlternatives()) continue;
-                    int entry = badConfig.BinaryOptions.ContainsKey(binaryOption)
-                        && badConfig.BinaryOptions[binaryOption] == BinaryOption.BinaryValue.Selected
-                            ? 1
-                            : 0;
-                    if (matrix.ContainsKey(binaryOption))
-                    {
-                        matrix[binaryOption].Add(entry);
-                    }
-                    else
-                    {
-                        matrix[binaryOption] = new List<int> {entry};
-                    }
-                }
-            }
-            List<Tuple<BinaryOption, int>> optionsSortedByOccurrence =
-                matrix.Select(pair => new Tuple<BinaryOption, int>(pair.Key, pair.Value.Sum()))
-                    .OrderByDescending(tuple => tuple.Item2)
-                    .ToList();
-            Tuple<BinaryOption, int> first = optionsSortedByOccurrence.First();
-            List<BinaryOption> maximalOptions = optionsSortedByOccurrence.TakeWhile(tuple => tuple.Item2 == first.Item2)
-                .Select(tuple => tuple.Item1).ToList();
-
+            List<Configuration> badConfigs = FindBadConfigs(validationSet, currentModel);
+            Dictionary<BinaryOption, List<int>> matrix = CreateMatrix(badConfigs);
+            List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
             List<Configuration> result = new List<Configuration>();
             foreach (BinaryOption maximalOption in maximalOptions)
             {
@@ -69,6 +37,18 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 result.AddRange(newConfigs);
             }
             return result;
+        }
+
+        private List<Configuration> FindBadConfigs(List<Configuration> validationSet, List<Feature> currentModel)
+        {
+            int maxNumberOfConfigs = (int) Math.Round(0.1 * validationSet.Count);
+            List<Configuration> badConfigs =
+                SortedConfigsByError(validationSet, currentModel).Take(maxNumberOfConfigs).ToList();
+            if (badConfigs.Count == 0)
+            {
+                throw new Exception("validationSet set is to small");
+            }
+            return badConfigs;
         }
 
         private IEnumerable<Configuration> SortedConfigsByError(List<Configuration> configs, List<Feature> model)
@@ -94,6 +74,51 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 list.Add(new Tuple<Configuration, double>(c, error));
             }
             return list.OrderByDescending(tuple => tuple.Item2).Select(tuple => tuple.Item1);
+        }
+
+        private static Dictionary<BinaryOption, List<int>> CreateMatrix(List<Configuration> badConfigs)
+        {
+            Dictionary<BinaryOption, List<int>> matrix = new Dictionary<BinaryOption, List<int>>();
+            foreach (Configuration badConfig in badConfigs)
+            {
+                foreach (BinaryOption binaryOption in GlobalState.varModel.BinaryOptions)
+                {
+                    if (!binaryOption.Optional && !binaryOption.hasAlternatives()) continue;
+                    int entry = badConfig.BinaryOptions.ContainsKey(binaryOption)
+                        && badConfig.BinaryOptions[binaryOption] == BinaryOption.BinaryValue.Selected
+                            ? 1
+                            : 0;
+                    if (matrix.ContainsKey(binaryOption))
+                    {
+                        matrix[binaryOption].Add(entry);
+                    }
+                    else
+                    {
+                        matrix[binaryOption] = new List<int> {entry};
+                    }
+                }
+            }
+            return matrix;
+        }
+
+        private static List<BinaryOption> GetMaximalOptions(Dictionary<BinaryOption, List<int>> matrix)
+        {
+            List<BinaryOption> maximalOptions = new List<BinaryOption>();
+            int maxOccurrence = Int32.MinValue;
+            foreach (KeyValuePair<BinaryOption, List<int>> keyValuePair in matrix)
+            {
+                int sum = keyValuePair.Value.Sum();
+                if (sum > maxOccurrence)
+                {
+                    maxOccurrence = sum;
+                    maximalOptions = new List<BinaryOption> {keyValuePair.Key};
+                }
+                else if (sum == maxOccurrence)
+                {
+                    maximalOptions.Add(keyValuePair.Key);
+                }
+            }
+            return maximalOptions;
         }
     }
 }
