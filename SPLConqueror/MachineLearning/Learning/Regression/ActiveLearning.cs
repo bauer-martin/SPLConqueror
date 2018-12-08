@@ -12,7 +12,8 @@ namespace MachineLearning.Learning.Regression
     {
         NONE,
         SIMPLE,
-        MATRIX
+        MATRIX,
+        MATRIX2
     }
 
     public enum ConfigurationExchangeStrategies
@@ -33,7 +34,8 @@ namespace MachineLearning.Learning.Regression
             {
                 {"none", ConfigurationAdditionStrategies.NONE},
                 {"simple", ConfigurationAdditionStrategies.SIMPLE},
-                {"matrix", ConfigurationAdditionStrategies.MATRIX}
+                {"matrix", ConfigurationAdditionStrategies.MATRIX},
+                {"matrix2", ConfigurationAdditionStrategies.MATRIX2}
             };
 
         private static readonly Dictionary<string, ConfigurationExchangeStrategies> exchangeStrategiesByName =
@@ -111,6 +113,10 @@ namespace MachineLearning.Learning.Regression
                                     break;
                                 case ConfigurationAdditionStrategies.MATRIX:
                                     additionStrategy = new MatrixDistributionBasedAdditionStrategy(mlSettings,
+                                        configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
+                                    break;
+                                case ConfigurationAdditionStrategies.MATRIX2:
+                                    additionStrategy = new Matrix2DistributionBasedAdditionStrategy(mlSettings,
                                         configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
                                     break;
                                 default:
