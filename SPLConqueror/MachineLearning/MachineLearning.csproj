@@ -106,8 +106,8 @@
     <Compile Include="Learning\Regression\ActiveLearning.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\DistributionBasedAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\ConfigurationAdditionStrategy.cs" />
-    <Compile Include="Learning\Regression\AdditionStrategies\Matrix2AdditionStrategy.cs" />
-    <Compile Include="Learning\Regression\AdditionStrategies\MatrixAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\MatrixVICAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\MatrixMaxAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\NoOpAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\SimpleConfigurationAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\ExchangeStrategies\LargestValidationErrorExchangeStrategy.cs" />

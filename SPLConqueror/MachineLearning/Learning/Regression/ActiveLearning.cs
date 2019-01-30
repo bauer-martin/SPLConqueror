@@ -12,8 +12,8 @@ namespace MachineLearning.Learning.Regression
     {
         NONE,
         SIMPLE,
-        MATRIX,
-        MATRIX2
+        MATRIX_MAX,
+        MATRIX_VIC
     }
 
     public enum ConfigurationExchangeStrategies
@@ -34,8 +34,8 @@ namespace MachineLearning.Learning.Regression
             {
                 {"none", ConfigurationAdditionStrategies.NONE},
                 {"simple", ConfigurationAdditionStrategies.SIMPLE},
-                {"matrix", ConfigurationAdditionStrategies.MATRIX},
-                {"matrix2", ConfigurationAdditionStrategies.MATRIX2}
+                {"matrixMax", ConfigurationAdditionStrategies.MATRIX_MAX},
+                {"matrixVIC", ConfigurationAdditionStrategies.MATRIX_VIC}
             };
 
         private static readonly Dictionary<string, ConfigurationExchangeStrategies> exchangeStrategiesByName =
@@ -111,12 +111,12 @@ namespace MachineLearning.Learning.Regression
                                     additionStrategy = new SimpleDistributionBasedAdditionStrategy(mlSettings,
                                         configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
                                     break;
-                                case ConfigurationAdditionStrategies.MATRIX:
-                                    additionStrategy = new MatrixDistributionBasedAdditionStrategy(mlSettings,
+                                case ConfigurationAdditionStrategies.MATRIX_MAX:
+                                    additionStrategy = new MatrixMaxAdditionStrategy(mlSettings,
                                         configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
                                     break;
-                                case ConfigurationAdditionStrategies.MATRIX2:
-                                    additionStrategy = new Matrix2DistributionBasedAdditionStrategy(mlSettings,
+                                case ConfigurationAdditionStrategies.MATRIX_VIC:
+                                    additionStrategy = new MatrixVICAdditionStrategy(mlSettings,
                                         configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
                                     break;
                                 default:

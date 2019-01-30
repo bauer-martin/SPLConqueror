@@ -6,9 +6,9 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.AdditionStrategies
 {
-    class MatrixDistributionBasedAdditionStrategy : DistributionBasedAdditionStrategy
+    class MatrixMaxAdditionStrategy : DistributionBasedAdditionStrategy
     {
-        public MatrixDistributionBasedAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
+        public MatrixMaxAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
             string sampleTask) : base(mlSettings, configBuilder, sampleTask)
         {
         }
