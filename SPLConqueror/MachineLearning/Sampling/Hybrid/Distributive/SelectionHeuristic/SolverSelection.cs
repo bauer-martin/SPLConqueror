@@ -117,7 +117,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
             }
 
             bool[] noSamples = new bool[allBuckets.Count];
-
+            Dictionary<double, int> sampleSetFrequency = makeFrequencyMap(existingConfigurations, wantedDistribution.Keys);
 
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
@@ -133,6 +133,8 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
                 // Note: This method works only for binary features and therefore, only integer buckets
                 int distanceOfBucket = Convert.ToInt32(wantedDistribution.ElementAt(currentBucket).Key);
+                sampleSetFrequency[distanceOfBucket] -= 1;
+                if (sampleSetFrequency[distanceOfBucket] > 0) continue;
 
                 // Repeat if there are currently no solutions in the bucket.
                 // This is intended to reduce the work of the solver.
@@ -202,6 +204,27 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
             }
 
             return selectedConfigurations;
+        }
+
+        private Dictionary<double, int> makeFrequencyMap(List<Configuration> configurations,
+            Dictionary<double, double>.KeyCollection wantedDistributionKeys)
+        {
+            Dictionary<double, int> dict = new Dictionary<double, int>();
+            Dictionary<int, int> frequency = configurations.Select(config => config.getBinaryOptions(BinaryOption.BinaryValue.Selected).Count)
+                .GroupBy(elem => elem)
+                .ToDictionary(grouping => grouping.Key, grouping => new List<int>(grouping).Count);
+            foreach (double key in wantedDistributionKeys)
+            {
+                if (frequency.ContainsKey((int) key))
+                {
+                    dict[key] = frequency[(int) key];
+                }
+                else
+                {
+                    dict[key] = 0;
+                }
+            }
+            return dict;
         }
 
         /// <summary>
