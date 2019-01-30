@@ -185,8 +185,7 @@ namespace MachineLearning.Learning.Regression
 
             // learn initial model
             currentRound = 1;
-            currentModel = null;
-            LearnNewModel();
+            LearnInitialModel();
 
             bool shouldAddNewConfigurations = !(additionStrategy is NoOpAdditionStrategy);
             bool shouldExchangeConfigurations = !(exchangeStrategy is NoOpExchangeStrategy);
@@ -244,12 +243,31 @@ namespace MachineLearning.Learning.Regression
             return true;
         }
 
+        private void LearnInitialModel()
+        {
+            GlobalState.logInfo.logLine("Learning set: " + currentLearningSet.Count + ", Validation set: "
+                + currentValidationSet.Count);
+            Learning exp = new Learning(currentLearningSet, currentValidationSet)
+            {
+                metaModel = influenceModel,
+                mlSettings = this.mlSettings
+            };
+            exp.learn(currentModel);
+            if (exp.models.Count != 1)
+            {
+                GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
+                Environment.Exit(0);
+            }
+            FeatureSubsetSelection fss = exp.models[0];
+            currentModel = fss.LearningHistory.Last().FeatureSet;
+            currentValidationError = fss.finalError;
+            currentGlobalError = fss.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+            GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
+        }
+
         private void LearnNewModel()
         {
-            if (currentModel != null)
-            {
-                previousModel = new List<Feature>(currentModel);
-            }
+            previousModel = new List<Feature>(currentModel);
             GlobalState.logInfo.logLine("Learning set: " + currentLearningSet.Count + ", Validation set: "
                 + currentLearningSet.Count);
             Learning exp = new Learning(currentLearningSet, currentValidationSet)
@@ -263,11 +281,11 @@ namespace MachineLearning.Learning.Regression
                 GlobalState.logError.logLine("There should be exactly one learned model! Aborting active learning!");
                 Environment.Exit(0);
             }
-            FeatureSubsetSelection model = exp.models[0];
-            currentModel = model.LearningHistory.Last().FeatureSet;
+            FeatureSubsetSelection fss = exp.models[0];
+            currentModel = fss.LearningHistory.Last().FeatureSet;
             previousValidationError = currentValidationError;
-            currentValidationError = model.finalError;
-            currentGlobalError = model.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
+            currentValidationError = fss.finalError;
+            currentGlobalError = fss.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
         }
 
