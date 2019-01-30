@@ -25,7 +25,12 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 }
             }
             configBuilder.existingConfigurations = existingConfigurations;
-            List<Configuration> badConfigs = FindBadConfigs(validationSet, currentModel);
+
+            // find configurations that can not be predicted
+            int maxNumberOfConfigs = (int) Math.Round(0.1 * validationSet.Count);
+            List<Configuration> badConfigs = SortedConfigsByError(validationSet, currentModel)
+                .Take(maxNumberOfConfigs).ToList();
+
             Dictionary<BinaryOption, List<int>> matrix = CreateMatrix(badConfigs);
             List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
             List<Configuration> result = new List<Configuration>();
@@ -37,18 +42,6 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 result.AddRange(newConfigs);
             }
             return result;
-        }
-
-        private List<Configuration> FindBadConfigs(List<Configuration> validationSet, List<Feature> currentModel)
-        {
-            int maxNumberOfConfigs = (int) Math.Round(0.1 * validationSet.Count);
-            List<Configuration> badConfigs =
-                SortedConfigsByError(validationSet, currentModel).Take(maxNumberOfConfigs).ToList();
-            if (badConfigs.Count == 0)
-            {
-                throw new Exception("validationSet set is to small");
-            }
-            return badConfigs;
         }
 
         private IEnumerable<Configuration> SortedConfigsByError(List<Configuration> configs, List<Feature> model)
