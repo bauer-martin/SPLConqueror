@@ -57,19 +57,24 @@ namespace MachineLearning.Learning.Regression
         private int currentRound = -1;
 
         /// <summary>
-        /// The relative error of the previous active learning round.
+        /// The validation error of the active learning round.
         /// </summary>
-        private double previousRelativeError = Double.MaxValue;
-
-        /// <summary>
-        /// The relative error of the current active learning round.
-        /// </summary>
-        private double currentRelativeError = Double.MaxValue;
+        private double previousValidationError = Double.MaxValue;
+        private double currentValidationError = Double.MaxValue;
 
         /// <summary>
         /// The global error of the current active learning round.
         /// </summary>
         private double currentGlobalError = Double.MaxValue;
+
+        private List<Configuration> previousValidationSet = null;
+        private List<Configuration> currentValidationSet = null;
+
+        private List<Configuration> previousLearningSet = null;
+        private List<Configuration> currentLearningSet = null;
+
+        private List<Feature> previousModel;
+        private List<Feature> currentModel;
 
         /// <summary>
         /// The strategy to add new configurations after an active learning round.
@@ -171,18 +176,17 @@ namespace MachineLearning.Learning.Regression
         /// <param name="parameters">The parameters for the 'active-learn-splconqueror' command</param>
         public void learn(string[] parameters)
         {
-            if (!PrepareActiveLearning(parameters, out List<Configuration> learningSet,
-                out List<Configuration> validationSet)) return;
+            if (!PrepareActiveLearning(parameters)) return;
             Console.WriteLine("initial learning set");
-            foreach (string s in learningSet.Select(config => config.ToString()).OrderBy(config => config))
+            foreach (string s in currentLearningSet.Select(config => config.ToString()).OrderBy(config => config))
             {
                 Console.WriteLine(s);
             }
 
             // learn initial model
             currentRound = 1;
-            List<Feature> currentModel = null;
-            LearnNewModel(learningSet, validationSet, ref currentModel);
+            currentModel = null;
+            LearnNewModel();
 
             bool shouldAddNewConfigurations = !(additionStrategy is NoOpAdditionStrategy);
             bool shouldExchangeConfigurations = !(exchangeStrategy is NoOpExchangeStrategy);
@@ -190,61 +194,65 @@ namespace MachineLearning.Learning.Regression
             while (!shouldAbortActiveLearning())
             {
                 currentRound++;
+                previousLearningSet = new List<Configuration>(currentLearningSet);
+                previousValidationSet = new List<Configuration>(currentValidationSet);
                 if (shouldAddNewConfigurations)
                 {
-                    List<Configuration> configsForNextRun = additionStrategy.FindNewConfigurations(learningSet,
-                        validationSet, currentModel);
-                    learningSet.AddRange(configsForNextRun);
+                    List<Configuration> configsForNextRun = additionStrategy.FindNewConfigurations(currentLearningSet,
+                        currentValidationSet, currentModel);
+                    currentLearningSet.AddRange(configsForNextRun);
                 }
                 if (shouldAddNewConfigurations && shouldExchangeConfigurations)
                 {
-                    LearnNewModel(learningSet, validationSet, ref currentModel);
+                    LearnNewModel();
                     if (shouldAbortActiveLearning()) break;
                 }
                 if (shouldExchangeConfigurations)
                 {
-                    exchangeStrategy.exchangeConfigurations(learningSet, validationSet, currentModel);
+                    exchangeStrategy.exchangeConfigurations(currentLearningSet, currentValidationSet, currentModel);
                 }
-                LearnNewModel(learningSet, validationSet, ref currentModel);
+                LearnNewModel();
             }
         }
 
-        private bool PrepareActiveLearning(string[] parameters, out List<Configuration> learningSet,
-            out List<Configuration> validationSet)
+        private bool PrepareActiveLearning(string[] parameters)
         {
             bool shouldProceed = parseActiveLearningParameters(parameters);
             if (!shouldProceed)
             {
-                learningSet = null;
-                validationSet = null;
+                currentLearningSet = null;
+                currentValidationSet = null;
                 return false;
             }
             Tuple<List<Configuration>, List<Configuration>> learnAndValidation =
                 configBuilder.buildSetsEfficient(mlSettings);
-            learningSet = learnAndValidation.Item1;
-            validationSet = learnAndValidation.Item2;
-            if (learningSet.Count == 0 && validationSet.Count == 0)
+            currentLearningSet = learnAndValidation.Item1;
+            currentValidationSet = learnAndValidation.Item2;
+            if (currentLearningSet.Count == 0 && currentValidationSet.Count == 0)
             {
                 GlobalState.logInfo.logLine("The learning set is empty! Cannot start learning!");
                 return false;
             }
-            if (learningSet.Count == 0)
+            if (currentLearningSet.Count == 0)
             {
-                learningSet = validationSet;
+                currentLearningSet = currentValidationSet;
             }
-            else if (validationSet.Count == 0)
+            else if (currentValidationSet.Count == 0)
             {
-                validationSet = learningSet;
+                currentValidationSet = currentLearningSet;
             }
             return true;
         }
 
-        private void LearnNewModel(List<Configuration> learningSet, List<Configuration> validationSet,
-            ref List<Feature> currentModel)
+        private void LearnNewModel()
         {
-            GlobalState.logInfo.logLine("Learning set: " + learningSet.Count + ", Validation set: "
-                + validationSet.Count);
-            Learning exp = new Learning(learningSet, validationSet)
+            if (currentModel != null)
+            {
+                previousModel = new List<Feature>(currentModel);
+            }
+            GlobalState.logInfo.logLine("Learning set: " + currentLearningSet.Count + ", Validation set: "
+                + currentLearningSet.Count);
+            Learning exp = new Learning(currentLearningSet, currentValidationSet)
             {
                 metaModel = influenceModel,
                 mlSettings = this.mlSettings
@@ -257,8 +265,8 @@ namespace MachineLearning.Learning.Regression
             }
             FeatureSubsetSelection model = exp.models[0];
             currentModel = model.LearningHistory.Last().FeatureSet;
-            previousRelativeError = currentRelativeError;
-            currentRelativeError = model.finalError;
+            previousValidationError = currentValidationError;
+            currentValidationError = model.finalError;
             currentGlobalError = model.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
         }
@@ -272,7 +280,7 @@ namespace MachineLearning.Learning.Regression
                 return true;
             }
 
-            double improvement = previousRelativeError - currentRelativeError;
+            double improvement = previousValidationError - currentValidationError;
             if (improvement < mlSettings.minImprovementPerActiveLearningRound)
             {
                 GlobalState.logInfo.logLine(
@@ -280,7 +288,7 @@ namespace MachineLearning.Learning.Regression
                 return true;
             }
 
-            if (currentRelativeError < mlSettings.abortError)
+            if (currentValidationError < mlSettings.abortError)
             {
                 GlobalState.logInfo.logLine("Aborting active learning because model is already good enough");
                 return true;
