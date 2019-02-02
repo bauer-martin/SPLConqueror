@@ -151,19 +151,9 @@ namespace MachineLearning.Learning.Regression
                 {
                     List<Configuration> configsForNextRun = additionStrategy.FindNewConfigurations(currentLearningSet,
                         currentValidationSet, currentModel);
-                    if (configsForNextRun.Count == 0)
-                    {
-                        GlobalState.logError.logLine("Unable to find new configurations!");
-                        return;
-                    }
                     currentLearningSet.AddRange(configsForNextRun);
-                    currentValidationSet.AddRange(configsForNextRun);
-                    LearnNewModel(configsForNextRun);
                 }
-                else
-                {
-                    LearnNewModel(currentLearningSet);
-                }
+                LearnNewModel();
             }
         }
 
@@ -218,14 +208,12 @@ namespace MachineLearning.Learning.Regression
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
         }
 
-        private void LearnNewModel(List<Configuration> newConfigs)
+        private void LearnNewModel()
         {
             previousModel = new List<Feature>(currentModel);
-            GlobalState.logInfo.logLine("Learning set: " + newConfigs.Count + ", Validation set: "
-                + currentValidationSet.Count);
-
-            // learn new model based on newConfigs
-            Learning exp = new Learning(newConfigs, currentValidationSet)
+            GlobalState.logInfo.logLine("Learning set: " + currentLearningSet.Count + ", Validation set: "
+                + currentLearningSet.Count);
+            Learning exp = new Learning(currentLearningSet, currentValidationSet)
             {
                 metaModel = influenceModel,
                 mlSettings = this.mlSettings
@@ -237,26 +225,11 @@ namespace MachineLearning.Learning.Regression
                 Environment.Exit(0);
             }
             FeatureSubsetSelection fss = exp.models[0];
-            List<Feature> modelForNewConfigs = fss.LearningHistory.Last().FeatureSet;
-
-            // adjust coefficients based on learning set including newConfigs
-            fss = new FeatureSubsetSelection(influenceModel, mlSettings);
-            LearningRound learningRound = fss.LearnWithTrueModel(modelForNewConfigs, currentLearningSet, currentValidationSet);
-            currentModel = learningRound.FeatureSet;
-
-            // evaluate models
-            previousValidationError = fss.computeError(previousModel, currentValidationSet, false);
-            currentValidationError = fss.computeError(currentModel, currentValidationSet, false);
+            currentModel = fss.LearningHistory.Last().FeatureSet;
+            previousValidationError = currentValidationError;
+            currentValidationError = fss.finalError;
             currentGlobalError = fss.computeError(currentModel, GlobalState.allMeasurements.Configurations, false);
             GlobalState.logInfo.logLine("globalError = " + currentGlobalError);
-
-            // print statistics
-            Console.WriteLine("Pi(S) = " + fss.computeError(previousModel, previousLearningSet, false));
-            Console.WriteLine("Pi(S^+) = " + fss.computeError(previousModel, newConfigs, false));
-            Console.WriteLine("Pi(S^O) = " + previousValidationError);
-            Console.WriteLine("Pi'(S) = " + fss.computeError(currentModel, previousLearningSet, false));
-            Console.WriteLine("Pi'(S^+) = " + fss.computeError(currentModel, newConfigs, false));
-            Console.WriteLine("Pi'(S^O) = " + currentValidationError);
         }
 
         private bool shouldAbortActiveLearning()

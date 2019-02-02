@@ -264,20 +264,8 @@ namespace MachineLearning.Learning.Regression
 		/// <returns>All information that is relevant for the learning process as <see cref="LearningRound"/></returns>
 		public LearningRound LearnWithTrueModel(List<Feature> features)
         {
-            return LearnWithTrueModel(features, GlobalState.allMeasurements.Configurations,
-                GlobalState.allMeasurements.Configurations);
-        }
-
-        /// <summary>
-        /// Receives a list of features and learns the coefficients for each of them based on the given learning set
-        /// and validation set.
-        /// The whole information is returned as <see cref="LearningRound"/>.
-        /// </summary>
-        /// <returns>All information that is relevant for the learning process as <see cref="LearningRound"/></returns>
-        public LearningRound LearnWithTrueModel(List<Feature> features, List<Configuration> learningSet, List<Configuration> validationSet)
-        {
-            setLearningSet(learningSet);
-            setValidationSet(validationSet);
+            setLearningSet(GlobalState.allMeasurements.Configurations);
+            setValidationSet(GlobalState.allMeasurements.Configurations);
             startTime = DateTime.Now;
             ModelFit fi = evaluateCandidate(features, MLsettings.considerEpsilonTube);
 
