@@ -151,6 +151,12 @@ namespace MachineLearning.Learning.Regression
                 {
                     List<Configuration> configsForNextRun = additionStrategy.FindNewConfigurations(currentLearningSet,
                         currentValidationSet, currentModel);
+                    if (configsForNextRun.Count == 0)
+                    {
+                        GlobalState.logInfo.logLine(
+                            "Aborting active learning because no new configurations can be found");
+                        return;
+                    }
                     currentLearningSet.AddRange(configsForNextRun);
                 }
                 LearnNewModel();

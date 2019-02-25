@@ -171,11 +171,8 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
                 if (solution == null)
                 {
-                    if (whiteList == null || whiteList.Count == 0)
-                    {
-                        // TODO maybe optimize performance: additionally sample configuration from bucket to check if there are any more configurations in the bucket
-                        noSamples[currentBucket] = true;
-                    }
+                    // TODO maybe optimize performance: additionally sample configuration from bucket to check if there are any more configurations in the bucket
+                    noSamples[currentBucket] = true;
                     // As a consequence, the probability to pick this bucket is set to 0 and the whole
                     // distribution is readjusted so that the sum of all probabilities is equal to 1 (i.e., 100%).
                     wantedDistribution[wantedDistribution.ElementAt(currentBucket).Key] = 0d;
@@ -198,7 +195,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 }
             }
 
-            if (selectedConfigurations.Count < count)
+            if (selectedConfigurations.Count < count && (whiteList == null || whiteList.Count == 0))
             {
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }

@@ -32,15 +32,25 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 .Take(maxNumberOfConfigs).ToList();
 
             Dictionary<BinaryOption, List<int>> matrix = CreateMatrix(badConfigs);
-            List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
             List<Configuration> result = new List<Configuration>();
-            foreach (BinaryOption maximalOption in maximalOptions)
+            do
             {
-                List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
-                List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
-                configBuilder.existingConfigurations.AddRange(newConfigs);
-                result.AddRange(newConfigs);
-            }
+                List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
+                foreach (BinaryOption maximalOption in maximalOptions)
+                {
+                    List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
+                    List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
+                    if (newConfigs.Count > 0)
+                    {
+                        configBuilder.existingConfigurations.AddRange(newConfigs);
+                        result.AddRange(newConfigs);
+                    }
+                    else
+                    {
+                        matrix.Remove(maximalOption);
+                    }
+                }
+            } while (result.Count == 0 && matrix.Count > 0);
             return result;
         }
 

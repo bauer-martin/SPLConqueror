@@ -24,6 +24,11 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
                 sum += distribution[key];
             }
 
+            if (sum <= 0)
+            {
+                return distribution;
+            }
+
             foreach (double key in distribution.Keys)
             {
                 newDistribution[key] = distribution[key] / sum;
