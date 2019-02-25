@@ -82,7 +82,7 @@ namespace MachineLearning.Solver
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of certain feature combinations.</param>
         /// <returns>A list of <see cref="BinaryOption"/>, which should be selected.</returns>
-        List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> whiteList);
+        List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> desiredOptions);
 
         /// <summary>
         /// Adds the given configuration as a constraint to the solver.

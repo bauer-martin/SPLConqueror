@@ -102,7 +102,7 @@ namespace MachineLearning.Sampling.Hybrid
         /// Computes the sampling set using the provided parameters. 
         /// </summary>
         /// <returns><code>True</code> if the computation was successful.</returns>
-        public abstract bool ComputeSamplingStrategy(List<BinaryOption> whiteList);
+        public abstract bool ComputeSamplingStrategy(List<BinaryOption> desiredOptions);
 
         /// <summary>
         /// Create a string representing the selected parameters.

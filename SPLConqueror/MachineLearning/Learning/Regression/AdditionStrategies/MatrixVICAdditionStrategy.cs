@@ -46,9 +46,9 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    List<BinaryOption> whiteList = new List<BinaryOption>(influence);
-                    List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
-                    Console.WriteLine("(" + i + ") wanted " + string.Join(",", whiteList) + " got " + string.Join(",", newConfigs));
+                    List<BinaryOption> desiredOptions = new List<BinaryOption>(influence);
+                    List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, desiredOptions);
+                    Console.WriteLine("(" + i + ") wanted " + string.Join(",", desiredOptions) + " got " + string.Join(",", newConfigs));
                     configBuilder.existingConfigurations.AddRange(newConfigs);
                     result.AddRange(newConfigs);
                 }

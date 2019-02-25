@@ -553,7 +553,7 @@ namespace MachineLearning.Solver
         }
 
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> whiteList)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, List<BinaryOption> desiredOptions)
         {
             if (_z3Cache == null)
             {
@@ -587,9 +587,9 @@ namespace MachineLearning.Solver
             Dictionary<BinaryOption, BoolExpr> optionToTerm = cache.GetOptionToTermMapping();
             Context z3Context = cache.GetContext();
             solver.Push();
-            if (whiteList != null)
+            if (desiredOptions != null)
             {
-                foreach (BinaryOption binaryOption in whiteList)
+                foreach (BinaryOption binaryOption in desiredOptions)
                 {
                     solver.Add(optionToTerm[binaryOption]);
                 }

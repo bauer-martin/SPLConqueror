@@ -66,7 +66,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
         /// <param name="allBuckets">The buckets containing at least one configuration.</param>
         /// <param name="count">The number of configurations to select.</param>
         /// <param name="optimization">The optimization to use</param>
-        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> whiteList, Optimization optimization = Optimization.NONE)
+        public List<Configuration> SampleFromDistribution(Dictionary<double, double> wantedDistribution, List<double> allBuckets, int count, List<BinaryOption> desiredOptions, Optimization optimization = Optimization.NONE)
         {
             wantedDistribution = new Dictionary<double, double>(wantedDistribution);
             Random rand = new Random(seed);
@@ -154,18 +154,18 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 if (optimization == Optimization.NONE)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, null, whiteList);
+                        distanceOfBucket, null, desiredOptions);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0], whiteList);
+                        distanceOfBucket, featureWeight[0], desiredOptions);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
                     solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket], whiteList);
+                        distanceOfBucket, featureWeight[currentBucket], desiredOptions);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
@@ -195,7 +195,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 }
             }
 
-            if (selectedConfigurations.Count < count && (whiteList == null || whiteList.Count == 0))
+            if (selectedConfigurations.Count < count && (desiredOptions == null || desiredOptions.Count == 0))
             {
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }

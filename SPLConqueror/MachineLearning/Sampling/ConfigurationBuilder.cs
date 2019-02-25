@@ -604,7 +604,7 @@ namespace MachineLearning.Sampling
             return buildConfigs(vm, binaryStrategiesValidation, numericStrategiesValidation, hybridStrategiesValidation);
         }
 
-        public List<Configuration> buildConfigs(VariabilityModel vm, List<BinaryOption> whiteList)
+        public List<Configuration> buildConfigs(VariabilityModel vm, List<BinaryOption> desiredOptions)
         {
             if (hybridStrategies.Count == 0)
             {
@@ -621,7 +621,7 @@ namespace MachineLearning.Sampling
                 };
                 hybrid.SetSamplingParameters(parameterValue);
                 hybrid.SetExistingConfigurations(existingConfigurations);
-                hybrid.ComputeSamplingStrategy(whiteList);
+                hybrid.ComputeSamplingStrategy(desiredOptions);
                 if (hybrid.selectedConfigurations.Any(config => existingConfigurations.Contains(config)))
                 {
                     throw new Exception("configuration already exists");

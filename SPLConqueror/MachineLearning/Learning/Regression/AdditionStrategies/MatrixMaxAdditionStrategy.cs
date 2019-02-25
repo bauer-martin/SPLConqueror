@@ -38,8 +38,8 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
                 foreach (BinaryOption maximalOption in maximalOptions)
                 {
-                    List<BinaryOption> whiteList = new List<BinaryOption> {maximalOption};
-                    List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, whiteList);
+                    List<BinaryOption> desiredOptions = new List<BinaryOption> {maximalOption};
+                    List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, desiredOptions);
                     if (newConfigs.Count > 0)
                     {
                         configBuilder.existingConfigurations.AddRange(newConfigs);
