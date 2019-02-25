@@ -35,7 +35,21 @@ It can be used to continue the execution of script files that are aborted in the
 ## How to install SPL Conqueror
 
 **Note: Since mono version 5.16.0, the results between mono and .NET when performing machine learning differ.**
-
+<details>
+<summary>
+Via Docker
+</summary>
+We provide a Dockerfile in this repository for an automatic setup of SPL Conqueror in a Docker container.
+To set up the Docker container, make sure that you have properly installed Docker (https://docs.docker.com/get-started/) and the Docker daemon is running.
+Afterwards, the image is set up by:
+```
+sudo docker build -t splconqueror ./
+```
+Based on this image, a container is created and an interactive session is started by:
+```
+sudo docker run -ti splconqueror
+```
+</details>
 <details>
 <summary>
 On Ubuntu 16.04
@@ -47,7 +61,7 @@ Submodules can be cloned on the command line by:
 git submodule update --init --recursive
 ```
 
-2. Install Mono and MonoDevelop(Recommended: Mono-Version 5.4.1.6+ -- description available on https://www.mono-project.com/download/stable/ -- und die MonoDevelop-Version 5.10.0+)
+2. Install Mono and MonoDevelop(Recommended: Mono-Version 5.4.1.6+ -- description available on https://www.mono-project.com/download/stable/ -- and MonoDevelop-Version 5.10.0+)
 ```
 sudo apt install mono-complete monodevelop
 ```
@@ -484,6 +498,8 @@ Before starting the learning process upon the loaded data, one can adjust the se
 | learnTimeLimit | Defines the time limit for the learning process. If 0, no time limit. Format: HH:MM:SS | 0 | TimeSpan |
 | scoreMeasure | Defines which measure is used to select the best candidate and to compute the score of a candidate. | RELERROR | RELERROR, INFLUENCE |
 | outputRoundsToStdout | If true, the info about the rounds is output not only to the log file at the end of the learning, but also to the stdout during the learning after each round completion. | false | true, false |
+| debug | Print model of selected learners in scikit-learn(currently on supports Random Forest, DecisionTree and SVR with linear kernel). | false | true,false |
+| pythonInfluenceAnalysis | Perform regression on the predictions of algorithms provided by scikit-learn. | false | true,false |
 
 Generally, to change the default settings, there are two options, namely:
 1. The first is to add the settings in the format ```SETTING_NAME:VALUE``` to the *mlsettings*-command. For instance, if the number of learning rounds should be reduced to 25, allow logarithmic functions and don't want to stop on long learning rounds, the associated command would be:
@@ -686,6 +702,18 @@ Sometimes it makes sense to split up the current .a-script into smaller scripts 
 An example would be as follows:
 ```script C:\subScript.a```
 
+#### Convert Measurements
+
+It is possible to convert measurement files and variability models that contain numeric options to files that only contain binary options.
+For this the ```convert-measurements``` and ```convert-vm``` commands are provided. These commands convert all files that match the patterns that are provided.
+These commands are used as follows:
+
+```convert-[measurements/vm] <base_directory> <search_pattern_to_subdirectories> <pattern_to_find_files> <target_folder>```
+
+Note that to convert .csv measurements files, the corresponding needs to be loaded first.
+An example for this command would be:
+```convert-measurements E:\case-studies\ system1-version1.5.* system1*.xml E:\case-studies\system1-bin\```
+
 </details>
 <details>
 <summary>Additional command-line commands</summary>
@@ -697,12 +725,20 @@ An example would be as follows:
 Use the `define-python-path` command to set which python interpreter should be used.
 If `<path>` is a directory, then SPLConqueror uses `python.exe` on Windows and `python` on all other operating systems.
 
+**Note**: In SPL Conqueror, only python3 is supported. Additionally, the ```sklearn``` module (version 0.19.0) is needed. We recommend to set up a virtual environment by using virtualenv.
+
 #### Learning with scikit-learn
 
 ```learn-python <learner>```
 
 To learn with an algorithm provided by scikit-learn use the ```learn-python``` command. Currently the SVR, DecisionTreeRegression, RandomForestRegressor, BaggingSVR, KNeighborsRegressor and Kernelridge learners are supported. The learning results will be written in the into the folder where the log file is located.
 For more information on the algorithms see:[Scikit-Learn](http://scikit-learn.org/stable/documentation.html)
+
+Further, machine-learning parameters for the individual strategies can be passed as additional arguments. The parameters have to be separated by whitespaces and each machine-learning paramter has to be passed in the form of
+
+```parameter_name=value```
+
+. The full list of the machine-learning parameters for each individual algorithm can be found in the [Scikit-Learn API documentation](https://scikit-learn.org/stable/modules/classes.html)
 
 #### Performing parameter optimization for scikit-learn
 

@@ -102,6 +102,11 @@ namespace CommandLine
         public const string COMMAND_PYTHON_LEARN = "learn-python";
         public const string COMMAND_PYTHON_LEARN_OPT = "learn-python-opt";
 
+        #region Conversion Commands
+        public const string COMMAND_CONVERT_MEASUREMENTS = "convert-measurements";
+        public const string COMMAND_CONVERT_VM = "convert-vm";
+        #endregion
+
         #region Intern commands
         // shouldn't be used by user.
         public const string ROLLBACK_FLAG = "rollback";
@@ -914,6 +919,41 @@ namespace CommandLine
                         break;
                     }
 
+                case COMMAND_CONVERT_MEASUREMENTS:
+                    List<string> convertm_jobs = new List<string>();
+                    foreach (string directory in Directory.GetDirectories(@taskAsParameter[0], taskAsParameter[1]))
+                    {
+                        convertm_jobs.AddRange(Directory.GetFiles(directory, taskAsParameter[2]));
+                    }
+                    convertm_jobs.ForEach(job =>
+                    {
+                        string rootTargetDir = taskAsParameter[3].EndsWith(Path.DirectorySeparatorChar.ToString()) ? taskAsParameter[3] : taskAsParameter[3] + Path.DirectorySeparatorChar;
+                        string jobDir = rootTargetDir + Path.GetDirectoryName(job).Split(new char[] { Path.DirectorySeparatorChar }).Last() + Path.DirectorySeparatorChar;
+                        if (!Directory.Exists(jobDir))
+                            Directory.CreateDirectory(jobDir);
+                        if (job.EndsWith(".xml"))
+                            Util.ConvertUtil.convertToBinaryXml(job, jobDir + Path.GetFileNameWithoutExtension(job) + "_bin.xml" );
+                        else if (job.EndsWith(".csv"))
+                            Util.ConvertUtil.convertToBinaryCSV(job, jobDir + Path.GetFileNameWithoutExtension(job) + "_bin.csv", GlobalState.varModel);
+                    });
+                    break;
+                case COMMAND_CONVERT_VM:
+                    List<string> convertv_jobs = new List<string>();
+                    foreach (string directory in Directory.GetDirectories(@taskAsParameter[0], taskAsParameter[1]))
+                    {
+                        convertv_jobs.AddRange(Directory.GetFiles(directory, taskAsParameter[2]));
+                    }
+                    convertv_jobs.ForEach(job =>
+                    {
+                        string rootTargetDir = taskAsParameter[3].EndsWith(Path.DirectorySeparatorChar.ToString()) ? taskAsParameter[3] : taskAsParameter[3] + Path.DirectorySeparatorChar;
+                        string jobDir = rootTargetDir + Path.GetDirectoryName(job).Split(new char[] { Path.DirectorySeparatorChar }).Last() + Path.DirectorySeparatorChar;
+                        if (!Directory.Exists(jobDir))
+                            Directory.CreateDirectory(jobDir);
+                        VariabilityModel vm = Util.ConvertUtil.transformVarModelAllbinary(SPLConqueror_Core.VariabilityModel.loadFromXML(job));
+                        vm.saveXML(jobDir + Path.GetFileNameWithoutExtension(job) + "_bin.xml");
+                    });
+                    break;
+
                 default:
                     bool didPerformCommand = configBuilder.performOneCommand(line);
                     if (didPerformCommand)
@@ -1211,12 +1251,55 @@ namespace CommandLine
                 }
                 else
                 {
+                    string treePath = " ";
+                    if (mlSettings.debug)
+                    {
+                        treePath = (targetPath.Split(Path.DirectorySeparatorChar)).Last();
+                        treePath = targetPath.Substring(0, (targetPath.Length - ((treePath).Length)));
+                        treePath += samplingIdentifier + "_tree_" + taskAsParameter[0] + ".tree";
+                    }
+
                     pyInterpreter.setupApplication(configsLearnFile, nfpLearnFile, configsValFile, nfpValFile,
-                        PythonWrapper.START_LEARN, GlobalState.varModel);
+                        PythonWrapper.START_LEARN, GlobalState.varModel, treePath);
                     PythonPredictionWriter csvWriter = new PythonPredictionWriter(targetPath, taskAsParameter,
                         GlobalState.varModel.Name + "_" + samplingIdentifier);
-                    pyInterpreter.getLearningResult(GlobalState.allMeasurements.Configurations, csvWriter);
+                    List<Configuration> predictedByPython;
+                    double error = pyInterpreter.getLearningResult(GlobalState.allMeasurements.Configurations, csvWriter, out predictedByPython);
+
+                    if (File.Exists(treePath))
+                    {
+                        GlobalState.logInfo.logLine("Elapsed learning time(seconds): " + pyInterpreter.getTimeToLearning());
+                        while (pyInterpreter.isRunning())
+                            System.Threading.Thread.Sleep(100);
+                        StreamReader reader = new StreamReader(treePath);
+                        string content = reader.ReadToEnd();
+                        reader.Close();
+                        for (int i = 0; i < GlobalState.optionOrder.Count; ++i)
+                        {
+                            if (taskAsParameter[0].ToLower() == "svr")
+                                content = content.Replace("C(" + i + ")", GlobalState.optionOrder[i].Name);
+                            else
+                                content = content.Replace("(" + i + "<", "(" + GlobalState.optionOrder[i].Name + "<")
+                                    .Replace("(" + i + ">", "(" + GlobalState.optionOrder[i].Name + ">");
+                        }
+                        StreamWriter writer = new StreamWriter(treePath);
+                        writer.Write(content);
+                        writer.Close();
+                    }
+
+                    if (mlSettings.pythonInfluenceAnalysis)
+                    {
+                        List<Configuration> tmp = GlobalState.allMeasurements.Configurations;
+                        GlobalState.allMeasurements.Configurations = predictedByPython;
+                        learnWithAllMeasurements();
+                        GlobalState.allMeasurements.Configurations = tmp;
+                    }
+
                     GlobalState.logInfo.logLine("Prediction finished, results written in " + csvWriter.getPath());
+                    if (!Double.IsNaN(error))
+                    {
+                        GlobalState.logInfo.logLine("Error rate: " + error);
+                    }
                     csvWriter.close();
                 }
             }
