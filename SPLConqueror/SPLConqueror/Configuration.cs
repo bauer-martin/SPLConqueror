@@ -115,7 +115,7 @@ namespace SPLConqueror_Core
                                 + ", make sure your measurements contain all numeric options.");
                         }
                     }
-                    else if (!GlobalState.allMeasurements.blacklisted.Contains(option.Value.Name.ToLower()))
+                    else if (!GlobalState.allMeasurements.blacklisted.Contains(option.Value))
                     {
                         optionValues[option.Key - shift] = numericOptions[option.Value as NumericOption];
                     }
@@ -127,13 +127,13 @@ namespace SPLConqueror_Core
                 else
                 {
                     if (GlobalState.allMeasurements.blacklisted != null &&
-                        GlobalState.allMeasurements.blacklisted.Contains(option.Value.Name.ToLower()))
+                        GlobalState.allMeasurements.blacklisted.Contains(option.Value))
                     {
                         shift++;
                     }
                     else
                     {
-                        if (binaryOptions.ContainsKey(option.Value as BinaryOption))
+                        if (binaryOptions.ContainsKey((BinaryOption) option.Value))
                         {
                             optionValues[option.Key - shift] = 1.0;
                         }

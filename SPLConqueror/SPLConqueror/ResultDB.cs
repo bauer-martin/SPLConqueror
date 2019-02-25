@@ -23,7 +23,7 @@ namespace SPLConqueror_Core
         /// <summary>
         /// A list containing the blacklisted features.
         /// </summary>
-        public List<String> blacklisted;
+        public List<ConfigurationOption> blacklisted;
 
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace SPLConqueror_Core
         /// Set the blacklisted features.
         /// </summary>
         /// <param name="blacklist">The features to ignore/blacklist.</param>
-        public void setBlackList(List<String> blacklist)
+        public void setBlackList(List<ConfigurationOption> blacklist)
         {
             this.blacklisted = blacklist;
         }
@@ -143,7 +143,7 @@ namespace SPLConqueror_Core
                 foreach (NumericOption opt in GlobalState.varModel.NumericOptions)
                 {
 
-                    if (this.blacklisted.Contains(opt.Name.ToLower()))
+                    if (this.blacklisted.Contains(opt))
                     {
                         continue;
                     }

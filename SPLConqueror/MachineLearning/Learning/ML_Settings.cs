@@ -188,7 +188,7 @@ namespace MachineLearning.Learning
         /// </summary>
         public bool pythonInfluenceAnalysis = false;
 
-        public List<string> blacklisted = new List<string>();
+        public List<ConfigurationOption> blacklisted = new List<ConfigurationOption>();
 
         /// <summary>
         /// Returns a new settings object with the settings specified in the file as key value pair. Settings not being specified in this file will have the default value. 
@@ -287,7 +287,7 @@ namespace MachineLearning.Learning
                 String[] optionsToBlacklist = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (String option in optionsToBlacklist)
                 {
-                    this.blacklisted.Add(option.ToLower());
+                    this.blacklisted.Add(GlobalState.varModel.getOption(option));
                 }
                 this.blacklisted = this.blacklisted.Distinct().ToList();
                 return true;
@@ -408,13 +408,13 @@ namespace MachineLearning.Learning
         /// </summary>
         public void checkAndCleanBlacklisted()
         {
-            List<string> toRemove = new List<string>();
-            foreach (string blacklistedFeature in blacklisted)
+            List<ConfigurationOption> toRemove = new List<ConfigurationOption>();
+            foreach (ConfigurationOption blacklistedFeature in blacklisted)
             {
                 bool isValidFeature = false;
                 foreach (BinaryOption binOpt in GlobalState.varModel.BinaryOptions)
                 {
-                    if (binOpt.ToString().ToLower().Equals(blacklistedFeature))
+                    if (binOpt.Equals(blacklistedFeature))
                     {
                         GlobalState.logError.logLine(binOpt.ToString() + ": Cannot blacklist binary features.");
                     }
@@ -422,7 +422,7 @@ namespace MachineLearning.Learning
 
                 foreach (NumericOption numOpt in GlobalState.varModel.NumericOptions)
                 {
-                    if (numOpt.ToString().ToLower().Equals(blacklistedFeature))
+                    if (numOpt.Equals(blacklistedFeature))
                     {
                         isValidFeature = true;
                     }
@@ -454,7 +454,7 @@ namespace MachineLearning.Learning
                     if (field.Name == "blacklisted")
                     {
                         sb.Append(field.Name + ":");
-                        ((List<String>)field.GetValue(this)).ForEach(x => sb.Append(x + ","));
+                        ((List<ConfigurationOption>)field.GetValue(this)).ForEach(x => sb.Append(x + ","));
                         sb.Append(" ");
                     }
                     else

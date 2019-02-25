@@ -113,14 +113,14 @@ namespace SPLConqueror_Core
         /// </summary>
         /// <param name="blacklist">A list containing all numeric options that should not be considered in the learning process.</param>
         /// <returns>A list containing all numeric configuration options that are considered in the learning process.</returns>
-        public List<NumericOption> getNonBlacklistedNumericOptions(List<String> blacklist)
+        public List<NumericOption> getNonBlacklistedNumericOptions(List<ConfigurationOption> blacklist)
         {
             List<NumericOption> result = new List<NumericOption>();
             foreach (NumericOption opt in this.numericOptions)
             {
                 if (blacklist != null)
                 {
-                    if (!blacklist.Contains(opt.Name.ToLower()))
+                    if (!blacklist.Contains(opt))
                     {
                         result.Add(opt);
                     }

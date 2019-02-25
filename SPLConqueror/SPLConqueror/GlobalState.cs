@@ -242,7 +242,7 @@ namespace SPLConqueror_Core
                 foreach (var numOpt in conf.NumericOptions.Keys)
                 {
                     if (allMeasurements.blacklisted != null &&
-                        allMeasurements.blacklisted.Contains(numOpt.Name.ToLower()))
+                        allMeasurements.blacklisted.Contains(numOpt))
                     {
                         continue;
                     }

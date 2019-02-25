@@ -58,7 +58,7 @@ namespace MachineLearning.Sampling
         // The default variant generator is the one using the CSP solver of the Microsoft solver foundation
         public static IVariantGenerator vg = new VariantGenerator();
 
-        public List<String> blacklisted;
+        public List<ConfigurationOption> blacklisted;
         public List<Configuration> existingConfigurations = new List<Configuration>();
 
         public void clear()
