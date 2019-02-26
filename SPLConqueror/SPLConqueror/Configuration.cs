@@ -54,7 +54,7 @@ namespace SPLConqueror_Core
 
 
         /// <summary>
-        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variablity model and not in the given set of binary options are assumed to have
+        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variability model and not in the given set of binary options are assumed to have
         /// their default value.
         /// </summary>
         /// <param name="binarySelection">A valid set of binary options.</param>
@@ -72,7 +72,7 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variablity model and not in the given set of binary options are assumed to have
+        /// Creates a configuration with the given set an binary and numeric features selected. Binary features existing in the variability model and not in the given set of binary options are assumed to have
         /// their default value.
         /// </summary>
         /// <param name="binarySelection">A valid set of binary options.</param>
@@ -87,6 +87,27 @@ namespace SPLConqueror_Core
             createIndex();
         }
 
+        /// <summary>
+        /// Creates a configuration with the given set an binary and numeric features selected.
+        /// Binary features existing in the variability model and not in the given set of binary options are
+        /// assumed to have their default value.
+        /// </summary>
+        /// <param name="binarySelection">A valid set of binary options.</param>
+        /// <param name="numericSelection">A valid selection of values of numeric options.</param>
+        /// <param name="createIndex">Whether to create the index or not.</param>
+        public Configuration(Dictionary<BinaryOption, BinaryOption.BinaryValue> binarySelection,
+            Dictionary<NumericOption, double> numericSelection, bool createIndex)
+        {
+            binaryOptions = binarySelection;
+            if (numericSelection != null)
+                numericOptions = numericSelection;
+            identifier = generateIdentifier(DEFAULT_SEPARATOR);
+
+            if (createIndex)
+            {
+                this.createIndex();
+            }
+        }
 
         private void createIndex()
         {

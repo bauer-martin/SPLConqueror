@@ -204,6 +204,19 @@ namespace SPLConqueror_Core
             return true;
         }
 
+        /// <summary>
+        /// All configuration options that participate in the constraint.
+        /// </summary>
+        public List<ConfigurationOption> ParticipatingOptions()
+        {
+            List<ConfigurationOption> result = new List<ConfigurationOption>();
+            result.AddRange(leftHandSide.participatingBoolOptions);
+            result.AddRange(leftHandSide.participatingNumOptions);
+            result.AddRange(rightHandSide.participatingBoolOptions);
+            result.AddRange(rightHandSide.participatingNumOptions);
+            return result.Distinct().ToList();
+        }
+
 
         /// <summary>
         /// Returns the string representation of the constraint consisting of the left hand side, the comparator and the right hand side of the 

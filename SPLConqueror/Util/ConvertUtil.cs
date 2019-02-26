@@ -133,6 +133,7 @@ namespace Util
                 }
             }
             transformNumericConstraintsToBoolean(transformedVarModel, vm);
+            transformMixedConstraintsToBoolean(transformedVarModel, vm);
             return transformedVarModel;
 
         }
@@ -218,6 +219,77 @@ namespace Util
             List<string> inCNF = nonCNFFormula.Split(new char[] { '&' }).ToList();
             return inCNF;
 
+        }
+
+        private static void transformMixedConstraintsToBoolean(VariabilityModel newVariabilityModel, VariabilityModel vm)
+        {
+            foreach (MixedConstraint constraint in vm.MixedConstraints)
+            {
+            List<ConfigurationOption> options = constraint.ParticipatingOptions();
+            List<List<double>> allValues = options.Select(option =>
+            {
+                switch (option)
+                {
+                    case BinaryOption _:
+                        return new List<double> {0, 1};
+                    case NumericOption numericOption:
+                        return numericOption.getAllValues();
+                    default:
+                        throw new NotImplementedException();
+                }
+            }).ToList();
+
+            List<List<double>> cartesianProduct = CartesianProduct(allValues);
+            foreach (List<double> values in cartesianProduct)
+            {
+                Dictionary<BinaryOption, BinaryOption.BinaryValue> binarySelection =
+                    new Dictionary<BinaryOption, BinaryOption.BinaryValue>();
+                Dictionary<NumericOption, double> numericSelection = new Dictionary<NumericOption, double>();
+                for (int i = 0; i < options.Count; i++)
+                {
+                    switch (options[i])
+                    {
+                        case BinaryOption binaryOption:
+                            binarySelection[binaryOption] = values[i] == 0
+                                ? BinaryOption.BinaryValue.Deselected
+                                : BinaryOption.BinaryValue.Selected;
+                            break;
+                        case NumericOption numericOption:
+                            numericSelection[numericOption] = values[i];
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                if (!constraint.requirementsFulfilled(new Configuration(binarySelection, numericSelection, false)))
+                {
+                    List<string> terms = values.Zip(options, (value, option) =>
+                    {
+                        switch (option)
+                        {
+                            case BinaryOption _:
+                                return value == 0 ? option.Name : "!" + option.Name;
+                            case NumericOption _:
+                                return "!" + option.Name + "_" + value;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }).ToList();
+                    string newConstraint = String.Join(" | ", terms);
+                    newVariabilityModel.BinaryConstraints.Add(newConstraint);
+                }
+            }
+            }
+        }
+
+        private static List<List<T>> CartesianProduct<T>(IEnumerable<IEnumerable<T>> sequences)
+        {
+            IEnumerable<IEnumerable<T>> result = new[] { Enumerable.Empty<T>() };
+            foreach (IEnumerable<T> sequence in sequences)
+            {
+                result = result.SelectMany(_ => sequence, (acc, nextSequence) => acc.Concat(new[] {nextSequence}));
+            }
+            return result.Select(x => x.ToList()).ToList();
         }
 
         #endregion
