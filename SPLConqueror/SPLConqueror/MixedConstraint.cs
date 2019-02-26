@@ -18,12 +18,6 @@ namespace SPLConqueror_Core
 
         private const string POSITIVE = "pos";
 
-        private InfluenceFunction leftHandSide = null;
-
-        private InfluenceFunction rightHandSide = null;
-
-        private VariabilityModel var;
-
         private string requirement;
 
         private string negativeOrPositiveExpr;
@@ -64,11 +58,6 @@ namespace SPLConqueror_Core
             {
                 throw new ArgumentException(String.Format("The expression kind {0} is not valid. Expression can either be neg or pos.", exprKind));
             }
-
-            String[] parts = base.ToString().Split(new string[] { ">", "<", "=", "<=", ">=" }, StringSplitOptions.None);
-            leftHandSide = new InfluenceFunction(parts[0], varMod);
-            rightHandSide = new InfluenceFunction(parts[parts.Length - 1], varMod);
-            var = varMod;
         }
 
         /// <summary>
@@ -138,44 +127,6 @@ namespace SPLConqueror_Core
             {
                 throw new ArgumentException("Illegal Requirement for mixed constraints");
             }
-        }
-
-        private Tuple<bool, bool> preCheckConfigReqOne(Configuration config)
-        {
-            bool hasAllConfigs = true;
-            bool hasAtLeastOne = false;
-            foreach (BinaryOption bo in leftHandSide.participatingBoolOptions.Union(rightHandSide.participatingBoolOptions))
-            {
-                if (!config.BinaryOptions.ContainsKey(bo))
-                {
-                    hasAllConfigs = false;
-                }
-                else if (config.BinaryOptions.ContainsKey(bo))
-                {
-                    hasAtLeastOne = true;
-                }
-
-
-            }
-
-            foreach (NumericOption no in leftHandSide.participatingNumOptions.Union(rightHandSide.participatingNumOptions))
-            {
-                InfluenceFunction func = new InfluenceFunction(no.ToString(), GlobalState.varModel);
-                if (!config.NumericOptions.ContainsKey(no))
-                {
-                    hasAllConfigs = false;
-
-                }
-                else if (func.eval(config) == 0)
-                {
-                    hasAllConfigs = false;
-                }
-                else if (config.NumericOptions.ContainsKey(no))
-                {
-                    hasAtLeastOne = true;
-                }
-            }
-            return Tuple.Create(hasAllConfigs, hasAtLeastOne);
         }
 
         /// <summary>
