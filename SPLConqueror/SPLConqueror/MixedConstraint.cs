@@ -61,19 +61,19 @@ namespace SPLConqueror_Core
         }
 
         /// <summary>
-        /// Returns <code>true</code> iff the requirements are fulfilled by the given configuration; <code>false</code> otherwise.
+        /// Tests whether a configuration holds for the given non-boolean constraint.
         /// </summary>
-        /// <param name="conf">The current configuration to check.</param>
-        /// <returns><code>true</code> iff the requirements are fulfilled by the given configuration; <code>false</code> otherwise.</returns>
-        public bool requirementsFulfilled(Configuration conf)
+        /// <param name="config">The configuration of interest.</param>
+        /// <returns>True is the configuration holds for the constraint.</returns>
+        public override bool configIsValid(Configuration config)
         {
             if (negativeOrPositiveExpr.Equals(POSITIVE))
             {
-                return evaluatePos(conf);
+                return evaluatePos(config);
             }
             else if (negativeOrPositiveExpr.Equals(NEGATIVE))
             {
-                return evaluateNeg(conf);
+                return evaluateNeg(config);
             }
             else
             {
@@ -85,7 +85,14 @@ namespace SPLConqueror_Core
         {
             if (requirement.Equals(REQUIRE_ALL))
             {
-                return base.configIsValidNeg(conf);
+                if (!configHasOptionsOfConstraint(conf))
+                {
+                    return true;
+                }
+                else
+                {
+                    return !base.configIsValid(conf);
+                }
             }
             else if (requirement.Equals(REQUIRE_NONE))
             {

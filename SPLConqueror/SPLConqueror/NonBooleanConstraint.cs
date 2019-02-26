@@ -57,7 +57,7 @@ namespace SPLConqueror_Core
         /// </summary>
         /// <param name="config">The configuration of interest.</param>
         /// <returns>True is the configuration holds for the constraint.</returns>
-        public bool configIsValid(Configuration config)
+        public virtual bool configIsValid(Configuration config)
         {
             if (!configHasOptionsOfConstraint(config))
                 return true;
@@ -156,28 +156,7 @@ namespace SPLConqueror_Core
         }
 
 
-        /// <summary>
-        /// Checks if a configuration violates a non boolean constraint.
-        /// </summary>
-        /// <param name="config">The configuration that will be checked.</param>
-        /// <returns>Returns true if not all options of the constraint are present
-        ///          or if the configuration violates the constraint. Else returns
-        ///          false.
-        /// </returns>
-        protected bool configIsValidNeg(Configuration config)
-        {
-            if (!configHasOptionsOfConstraint(config))
-            {
-                return true;
-            }
-            else
-            {
-                return !configIsValid(config);
-            }
-
-        }
-
-        private bool configHasOptionsOfConstraint(Configuration config)
+        protected bool configHasOptionsOfConstraint(Configuration config)
         {
             foreach (BinaryOption bo in leftHandSide.participatingBoolOptions.Union(rightHandSide.participatingBoolOptions))
             {

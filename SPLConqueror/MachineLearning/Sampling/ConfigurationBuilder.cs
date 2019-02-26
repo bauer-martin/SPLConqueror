@@ -645,7 +645,7 @@ namespace MachineLearning.Sampling
                 bool isValid = true;
                 foreach (MixedConstraint constr in vm.MixedConstraints)
                 {
-                    if (!constr.requirementsFulfilled(toTest))
+                    if (!constr.configIsValid(toTest))
                     {
                         isValid = false;
                     }
@@ -956,7 +956,7 @@ namespace MachineLearning.Sampling
                 bool isValid = true;
                 foreach (MixedConstraint constr in vm.MixedConstraints)
                 {
-                    if (!constr.requirementsFulfilled(toTest))
+                    if (!constr.configIsValid(toTest))
                     {
                         isValid = false;
                     }

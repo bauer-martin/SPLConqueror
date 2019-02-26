@@ -89,7 +89,7 @@ namespace MachineLearning.Solver
             List<MixedConstraint> mixedConstraints = vm.MixedConstraints;
             foreach (MixedConstraint constraint in mixedConstraints)
             {
-                if (!constraint.requirementsFulfilled(c))
+                if (!constraint.configIsValid(c))
                 {
                     return false;
                 }

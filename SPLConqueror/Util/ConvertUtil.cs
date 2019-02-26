@@ -102,8 +102,6 @@ namespace Util
             VariabilityModel transformedVarModel = new VariabilityModel(vm.Name);
 
             vm.BinaryOptions.ForEach(x => transformedVarModel.addConfigurationOption(x));
-            vm.BinaryConstraints.ForEach(constraint =>
-                convertToCNF(constraint).ForEach(convertedConstraint => transformedVarModel.BinaryConstraints.Add(convertedConstraint)));
 
             foreach (NumericOption currNumOpt in vm.NumericOptions)
             {
@@ -132,99 +130,23 @@ namespace Util
                     currentOption.Excluded_Options = excluded;
                 }
             }
-            transformNumericConstraintsToBoolean(transformedVarModel, vm);
-            transformMixedConstraintsToBoolean(transformedVarModel, vm);
-            return transformedVarModel;
-
-        }
-
-        private static void transformNumericConstraintsToBoolean(VariabilityModel newVariabilityModel, VariabilityModel vm)
-        {
-            foreach (NonBooleanConstraint constraintToTransform in vm.NonBooleanConstraints)
+            transformedVarModel.BinaryConstraints.AddRange(vm.BinaryConstraints);
+            foreach (NonBooleanConstraint constraint in vm.NonBooleanConstraints)
             {
-                String constraintAsExpression = constraintToTransform.ToString();
-
-                string[] parts = constraintAsExpression.Split(new String[] { "=", "<", ">", "<=", ">=" }, StringSplitOptions.None);
-                InfluenceFunction leftHandSide = new InfluenceFunction(parts[0], vm);
-                InfluenceFunction rightHandSide = new InfluenceFunction(parts[parts.Length - 1], vm);
-
-                // Find all possible assignments for the participating numeric options to turn it into a CNF clause
-                // TODO: Maybe use a solver 
-                List<NumericOption> allParticipatingNumericOptions = leftHandSide.participatingNumOptions.ToList()
-                                                            .Union(rightHandSide.participatingNumOptions.ToList()).Distinct().ToList();
-
-                List<List<double>> allPossibleValues = new List<List<double>>();
-                allParticipatingNumericOptions.ForEach(x => allPossibleValues.Add(x.getAllValues()));
-
-                var cartesianProduct = allPossibleValues.First().Select(x => x.ToString());
-                foreach (List<double> possibleValue in allPossibleValues.Skip(1))
-                {
-                    cartesianProduct = from product in cartesianProduct
-                                       from newValue in possibleValue
-                                       select product + "$" + newValue;
-                }
-
-                // Find all invalid Configurations, turn each invalid Configuration into a or clause and combine them to a CNF 
-                IEnumerable<string> invalidConfigs = cartesianProduct
-                    .Where(x => !testIfValidConfiguration(x, allParticipatingNumericOptions, constraintToTransform));
-                StringBuilder nonBooleanConstraintAsBoolean = new StringBuilder();
-                foreach (string validConfig in invalidConfigs)
-                {
-                    List<string> binaryRepresentation = validConfig.Split(new char[] { '$' })
-                        .Zip(allParticipatingNumericOptions, (x, y) => "!" + y.Name + "_" + x).ToList();
-                    nonBooleanConstraintAsBoolean.Append(binaryRepresentation.First());
-                    for (int i = 1; i < binaryRepresentation.Count; i++)
-                    {
-                        nonBooleanConstraintAsBoolean.Append(" | " + binaryRepresentation.ElementAt(i));
-                    }
-                    nonBooleanConstraintAsBoolean.Append(" & ");
-                }
-
-                if (nonBooleanConstraintAsBoolean.Length > 0)
-                {
-                    // Remove trailing ' & '
-                    nonBooleanConstraintAsBoolean.Length = nonBooleanConstraintAsBoolean.Length - 3;
-                    convertToCNF(nonBooleanConstraintAsBoolean.ToString()).ForEach(clause => newVariabilityModel.BinaryConstraints.Add(clause.Trim()));
-                }
+                var newConstraints = transformToBooleanConstraints(constraint);
+                transformedVarModel.BinaryConstraints.AddRange(newConstraints);
             }
-
-        }
-
-        private static bool testIfValidConfiguration(string configuration
-            , List<NumericOption> participatingOptions, NonBooleanConstraint constraintToTest)
-        {
-            Dictionary<NumericOption, double> numericSelection = new Dictionary<NumericOption, double>();
-            string[] values = configuration.Split(new char[] { '$' });
-            for (int i = 0; i < participatingOptions.Count; i++)
-            {
-                numericSelection.Add(participatingOptions.ElementAt(i), Double.Parse(values[i]));
-            }
-            return constraintToTest.configIsValid(numericSelection);
-        }
-
-        private static List<string> convertToCNF(string nonCNFFormula)
-        {
-            // Assumption no '(',')', etc are used since these arent supported by SPLConqueror either
-            // and functions with both & and | are already in CNF
-            if (!nonCNFFormula.Contains("|"))
-            {
-                return nonCNFFormula.Split(new char[] { '&' }).Select(variable => variable.Trim()).ToList();
-            }
-            if (!nonCNFFormula.Contains("&"))
-            {
-                List<string> oneClause = new List<string>();
-                oneClause.Add(nonCNFFormula);
-                return oneClause;
-            }
-            List<string> inCNF = nonCNFFormula.Split(new char[] { '&' }).ToList();
-            return inCNF;
-
-        }
-
-        private static void transformMixedConstraintsToBoolean(VariabilityModel newVariabilityModel, VariabilityModel vm)
-        {
             foreach (MixedConstraint constraint in vm.MixedConstraints)
             {
+                var newConstraints = transformToBooleanConstraints(constraint);
+                transformedVarModel.BinaryConstraints.AddRange(newConstraints);
+            }
+            return transformedVarModel;
+        }
+
+        private static List<string> transformToBooleanConstraints(NonBooleanConstraint constraint)
+        {
+            List<string> constraints = new List<string>();
             List<ConfigurationOption> options = constraint.ParticipatingOptions();
             List<List<double>> allValues = options.Select(option =>
             {
@@ -239,8 +161,7 @@ namespace Util
                 }
             }).ToList();
 
-            List<List<double>> cartesianProduct = CartesianProduct(allValues);
-            foreach (List<double> values in cartesianProduct)
+            foreach (List<double> values in CartesianProduct(allValues))
             {
                 Dictionary<BinaryOption, BinaryOption.BinaryValue> binarySelection =
                     new Dictionary<BinaryOption, BinaryOption.BinaryValue>();
@@ -261,7 +182,7 @@ namespace Util
                             throw new NotImplementedException();
                     }
                 }
-                if (!constraint.requirementsFulfilled(new Configuration(binarySelection, numericSelection, false)))
+                if (!constraint.configIsValid(new Configuration(binarySelection, numericSelection, false)))
                 {
                     List<string> terms = values.Zip(options, (value, option) =>
                     {
@@ -276,10 +197,10 @@ namespace Util
                         }
                     }).ToList();
                     string newConstraint = String.Join(" | ", terms);
-                    newVariabilityModel.BinaryConstraints.Add(newConstraint);
+                    constraints.Add(newConstraint);
                 }
             }
-            }
+            return constraints;
         }
 
         private static List<List<T>> CartesianProduct<T>(IEnumerable<IEnumerable<T>> sequences)
