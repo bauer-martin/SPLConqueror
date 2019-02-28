@@ -7,7 +7,8 @@ namespace MachineLearning.Solver
     public enum SolverType
     {
         MICROSOFT_SOLVER_FOUNDATION,
-        Z3
+        Z3,
+        CHOCO
     }
 
     public static class SolverTypeMethods
@@ -20,6 +21,8 @@ namespace MachineLearning.Solver
                     return "msf";
                 case SolverType.Z3:
                     return "z3";
+                case SolverType.CHOCO:
+                    return "choco";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -32,6 +35,9 @@ namespace MachineLearning.Solver
 
         private static SolverType _selectedSolverType;
         private static ICheckConfigSAT _satisfiabilityChecker;
+
+        // choco solver helper
+        private static JavaSolverAdapter _javaSolverAdapter;
 
         static SolverFactory()
         {
@@ -62,12 +68,24 @@ namespace MachineLearning.Solver
                     case SolverType.Z3:
                         _satisfiabilityChecker = new CheckConfigSATZ3();
                         break;
+                    case SolverType.CHOCO:
+                        SetupJavaSolverAdapter();
+                        _satisfiabilityChecker = new ChocoCheckConfigSAT(_javaSolverAdapter);
+                        break;
                     default:
                         throw new InvalidOperationException(_selectedSolverType.GetName()
                             + " does not support satisfiability checking");
                 }
             }
             return _satisfiabilityChecker;
+        }
+
+        private static void SetupJavaSolverAdapter()
+        {
+            if (_javaSolverAdapter == null)
+            {
+                _javaSolverAdapter = new JavaSolverAdapter();
+            }
         }
     }
 }
