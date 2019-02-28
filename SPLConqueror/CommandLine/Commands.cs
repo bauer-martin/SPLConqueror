@@ -92,6 +92,7 @@ namespace CommandLine
         public const string COMMAND_SET_NFP = "nfp";
         public const string COMMAND_SET_MLSETTING = "mlsettings";
         public const string COMMAND_SET_SOLVER = "solver";
+        public const string COMMAND_SET_MY_SOLVER = "mysolver";
 
         #region splconqueror learn with sampling
         public const string COMMAND_START_LEARNING_SPL_CONQUEROR = "learn-splconqueror";
@@ -606,6 +607,10 @@ namespace CommandLine
                     writer.Flush();
                     writer.Close();
                     ostrm.Close();
+                    break;
+                case COMMAND_SET_MY_SOLVER:
+                    string solverName = task.Trim();
+                    SolverFactory.SetSelectedSolver(solverName);
                     break;
                 case COMMAND_SET_SOLVER:
                     // Select the solver
