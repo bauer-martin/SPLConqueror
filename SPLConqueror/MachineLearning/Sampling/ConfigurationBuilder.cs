@@ -879,6 +879,7 @@ namespace MachineLearning.Sampling
             // Hybrid designs
             if (hybridStrats.Count != 0)
             {
+                existingConfigurations = new List<Configuration>(result);
                 List<Configuration> configurations = ExecuteHybridStrategy(hybridStrats, vm);
 
                 if (numericStrats.Count == 0 && binaryStrats.Count == 0)
@@ -898,31 +899,45 @@ namespace MachineLearning.Sampling
                     }
 
 
-                    // Build the cartesian product
-                    List<Configuration> newResult = new List<Configuration>();
-                    foreach (Configuration config in result)
+                    if (hybridStrats.Count > 1)
                     {
-                        foreach (Configuration hybridConfiguration in configurations)
-                        {
-                            Dictionary<BinaryOption, BinaryOption.BinaryValue> binOpts = new Dictionary<BinaryOption, BinaryOption.BinaryValue>(config.BinaryOptions);
-                            Dictionary<NumericOption, double> numOpts = new Dictionary<NumericOption, double>(config.NumericOptions);
-
-                            Dictionary<BinaryOption, BinaryOption.BinaryValue> hybridBinOpts = hybridConfiguration.BinaryOptions;
-                            foreach (BinaryOption binOpt in hybridConfiguration.BinaryOptions.Keys)
-                            {
-                                binOpts.Add(binOpt, hybridBinOpts[binOpt]);
-                            }
-
-                            Dictionary<NumericOption, double> hybridNumOpts = hybridConfiguration.NumericOptions;
-                            foreach (NumericOption numOpt in hybridConfiguration.NumericOptions.Keys)
-                            {
-                                numOpts.Add(numOpt, hybridNumOpts[numOpt]);
-                            }
-
-                            newResult.Add(new Configuration(binOpts, numOpts));
-                        }
+                        // TODO handling of more than one hybrid strategy
+                        throw new NotImplementedException("Handling more than one hybrid strategy has not been fully implemented yet!");
                     }
-                    result = newResult;
+                    HybridStrategy hybridStrategy = hybridStrategies.First();
+                    if (hybridStrategy.GetSamplingParameters(DistributionSensitive.ONLY_BINARY).Equals("true") && binaryStrats.Count > 0
+                        || hybridStrategy.GetSamplingParameters(DistributionSensitive.ONLY_NUMERIC).Equals("true") && numericStrats.Count > 0)
+                    {
+                        result.AddRange(configurations);
+                    }
+                    else
+                    {
+                        // Build the cartesian product
+                        List<Configuration> newResult = new List<Configuration>();
+                        foreach (Configuration config in result)
+                        {
+                            foreach (Configuration hybridConfiguration in configurations)
+                            {
+                                Dictionary<BinaryOption, BinaryOption.BinaryValue> binOpts = new Dictionary<BinaryOption, BinaryOption.BinaryValue>(config.BinaryOptions);
+                                Dictionary<NumericOption, double> numOpts = new Dictionary<NumericOption, double>(config.NumericOptions);
+
+                                Dictionary<BinaryOption, BinaryOption.BinaryValue> hybridBinOpts = hybridConfiguration.BinaryOptions;
+                                foreach (BinaryOption binOpt in hybridConfiguration.BinaryOptions.Keys)
+                                {
+                                    binOpts.Add(binOpt, hybridBinOpts[binOpt]);
+                                }
+
+                                Dictionary<NumericOption, double> hybridNumOpts = hybridConfiguration.NumericOptions;
+                                foreach (NumericOption numOpt in hybridConfiguration.NumericOptions.Keys)
+                                {
+                                    numOpts.Add(numOpt, hybridNumOpts[numOpt]);
+                                }
+
+                                newResult.Add(new Configuration(binOpts, numOpts));
+                            }
+                        }
+                        result = newResult;
+                    }
                 }
             }
 
