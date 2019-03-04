@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MachineLearning.Solver;
 
 
 namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
@@ -96,6 +97,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
             bool[] noSamples = new bool[allBuckets.Count];
 
 
+            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
                 double randomDouble = rand.NextDouble();
@@ -119,27 +121,27 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                     throw new InvalidProgramException("A bucket was selected that already contains no more samples! This shouldn't happen.");
                 }
 
-                if (ConfigurationBuilder.vg is Solver.Z3VariantGenerator)
+                if (vg is Solver.Z3VariantGenerator)
                 {
-                    ((Solver.Z3VariantGenerator)ConfigurationBuilder.vg).setSeed(Convert.ToUInt32(this.seed));
+                    ((Solver.Z3VariantGenerator)vg).setSeed(Convert.ToUInt32(this.seed));
                 }
 
                 List<BinaryOption> solution = null;
                 // Now select the configuration by using the solver
                 if (optimization == Optimization.NONE)
                 {
-                    solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, null, selectedConfigurationsFromBucket[currentBucket]);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
-                    solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, featureWeight[0], selectedConfigurationsFromBucket[currentBucket]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
-                    solution = ConfigurationBuilder.vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, featureWeight[currentBucket], selectedConfigurationsFromBucket[currentBucket]);
                 }
 
@@ -174,7 +176,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }
 
-            ConfigurationBuilder.vg.ClearCache();
+            vg.ClearCache();
 
             return selectedConfigurations;
         }

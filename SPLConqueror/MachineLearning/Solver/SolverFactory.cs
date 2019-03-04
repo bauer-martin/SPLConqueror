@@ -35,6 +35,7 @@ namespace MachineLearning.Solver
 
         private static SolverType _selectedSolverType;
         private static ICheckConfigSAT _satisfiabilityChecker;
+        private static IVariantGenerator _variantGenerator;
 
         // choco solver helper
         private static JavaSolverAdapter _javaSolverAdapter;
@@ -46,6 +47,9 @@ namespace MachineLearning.Solver
             {
                 _solverTypesByName[solverType.GetName()] = solverType;
             }
+            _solverTypesByName["smt"] = SolverType.Z3;
+            _solverTypesByName["csp"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
+            _solverTypesByName["microsoft solver foundation"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
         }
 
         public static void SetSelectedSolver(string name)
@@ -78,6 +82,26 @@ namespace MachineLearning.Solver
                 }
             }
             return _satisfiabilityChecker;
+        }
+
+        public static IVariantGenerator GetVariantGenerator()
+        {
+            if (_variantGenerator == null)
+            {
+                switch (_selectedSolverType)
+                {
+                    case SolverType.MICROSOFT_SOLVER_FOUNDATION:
+                        _variantGenerator = new MSFVariantGenerator();
+                        break;
+                    case SolverType.Z3:
+                        _variantGenerator = new Z3VariantGenerator();
+                        break;
+                    default:
+                        throw new InvalidOperationException(_selectedSolverType.GetName()
+                            + " does not support variant generation");
+                }
+            }
+            return _variantGenerator;
         }
 
         private static void SetupJavaSolverAdapter()

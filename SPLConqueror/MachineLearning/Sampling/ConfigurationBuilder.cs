@@ -16,9 +16,6 @@ namespace MachineLearning.Sampling
         public static Dictionary<SamplingStrategies, List<BinaryOption>> optionsToConsider = new Dictionary<SamplingStrategies, List<BinaryOption>>();
         public static BinaryParameters binaryParams = new BinaryParameters();
 
-        // The default variant generator is the one using the CSP solver of the Microsoft solver foundation
-        public static IVariantGenerator vg = new MSFVariantGenerator();
-
         private static List<String> blacklisted;
 
         public static void setBlacklisted(List<String> blacklist)
@@ -38,6 +35,7 @@ namespace MachineLearning.Sampling
             List<ExperimentalDesign> experimentalDesigns, List<HybridStrategy> hybridStrategies)
         {
             List<Configuration> result = new List<Configuration>();
+            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
 
             List<List<BinaryOption>> binaryConfigs = new List<List<BinaryOption>>();
             List<Dictionary<NumericOption, Double>> numericConfigs = new List<Dictionary<NumericOption, double>>();

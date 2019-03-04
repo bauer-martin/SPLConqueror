@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MachineLearning.Solver;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Sampling.Heuristics
@@ -62,7 +63,8 @@ namespace MachineLearning.Sampling.Heuristics
                         List<BinaryOption> tempConfig = new List<BinaryOption>();
                         tempConfig.Add(current);
                         tempConfig.Add(pair);
-                        tempConfig = ConfigurationBuilder.vg.MinimizeConfig(tempConfig, vm, true, null);
+                        tempConfig = SolverFactory.GetVariantGenerator()
+                            .MinimizeConfig(tempConfig, vm, true, null);
 
                         if (tempConfig.Count > 0 && !Configuration.containsBinaryConfiguration(configurations, tempConfig))
                             configurations.Add(tempConfig);

@@ -24,7 +24,7 @@ namespace SamplingUnitTest
         {
             Commands cmd = new Commands();
             cmd.performOneCommand(Commands.COMMAND_CLEAR_GLOBAL);
-            
+
             if (file != null)
             {
                 string path = Path.GetFullPath(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..//..//.."))
@@ -36,9 +36,8 @@ namespace SamplingUnitTest
             {
                 SampleUtil.loadVM();
             }
-            
-            
-            ConfigurationBuilder.vg = VariantGeneratorFactory.GetVariantGenerator("z3");
+
+            SolverFactory.SetSelectedSolver(SolverType.Z3.GetName());
         }
 
         [Test, Order(1)]

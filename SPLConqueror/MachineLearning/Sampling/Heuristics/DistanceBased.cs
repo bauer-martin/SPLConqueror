@@ -1,6 +1,7 @@
 ﻿using SPLConqueror_Core;
 using System;
 using System.Collections.Generic;
+using MachineLearning.Solver;
 
 namespace MachineLearning.Sampling.Heuristics
 {
@@ -56,8 +57,9 @@ namespace MachineLearning.Sampling.Heuristics
                 optionWeight = Int32.Parse(parameter[OPTION_WEIGHT]);
             }
 
-            List<BinaryOption> minimalConfiguration = ConfigurationBuilder.vg.MinimizeConfig(new List<BinaryOption>(), vm, true, null);
-            return ConfigurationBuilder.vg.DistanceMaximization(vm, minimalConfiguration, numberConfigs, optionWeight);
+            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
+            List<BinaryOption> minimalConfiguration = vg.MinimizeConfig(new List<BinaryOption>(), vm, true, null);
+            return vg.DistanceMaximization(vm, minimalConfiguration, numberConfigs, optionWeight);
         }
     }
 }

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using MachineLearning.Solver;
 
 namespace SPLConqueror_GUI
 {
@@ -459,7 +460,8 @@ namespace SPLConqueror_GUI
         {
             occuranceOfOptions.Clear();
 
-            foreach (List<BinaryOption> variant in ConfigurationBuilder.vg.GenerateAllVariantsFast(currentModel))
+            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
+            foreach (List<BinaryOption> variant in vg.GenerateAllVariantsFast(currentModel))
             {
                 foreach (BinaryOption opt in variant)
                 {
@@ -1876,7 +1878,7 @@ namespace SPLConqueror_GUI
 
             populatePlot(constantChartRepl, constantValues, constantLabels);
 
-            int amountOfVariants = ConfigurationBuilder.vg.GenerateAllVariantsFast(currentModel).Count;
+            int amountOfVariants = SolverFactory.GetVariantGenerator().GenerateAllVariantsFast(currentModel).Count;
 
             // Update max and max occurance chart
             foreach (KeyValuePair<string, double> entry in constantMaxInfluences)

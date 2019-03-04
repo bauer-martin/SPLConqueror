@@ -152,7 +152,6 @@
     <Compile Include="Sampling\ExperimentalDesigns\FactorialDesign.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\SelectionHeuristic\SolverSelection.cs" />
     <Compile Include="Solver\ISolver.cs" />
-    <Compile Include="Solver\VariantGenerator\VariantGeneratorFactory.cs" />
     <Compile Include="Solver\VariantGenerator\VariantGeneratorUtilities.cs" />
     <Compile Include="Solver\z3\CheckConfigSATZ3.cs" />
     <Compile Include="Solver\z3\Z3Cache.cs" />

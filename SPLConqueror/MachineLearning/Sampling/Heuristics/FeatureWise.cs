@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MachineLearning.Solver;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Sampling.Heuristics
@@ -59,7 +60,7 @@ namespace MachineLearning.Sampling.Heuristics
                     }
                     else
                     {
-                        tme = ConfigurationBuilder.vg.MinimizeConfig(tme, vm, true, null);
+                        tme = SolverFactory.GetVariantGenerator().MinimizeConfig(tme, vm, true, null);
                         if (tme != null && Configuration.containsBinaryConfiguration(this.configurations, tme) == false)
                             this.configurations.Add(tme);
                     }
@@ -79,13 +80,14 @@ namespace MachineLearning.Sampling.Heuristics
         public List<List<BinaryOption>> generateFeatureWiseConfigsCSP(VariabilityModel vm)
         {
             this.configurations.Clear();
+            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
             foreach (var opt in vm.BinaryOptions)
             {
                 if (opt == vm.Root)
                     continue;
                 List<BinaryOption> temp = new List<BinaryOption>();
                 temp.Add(opt);
-                temp = ConfigurationBuilder.vg.MinimizeConfig(temp, vm, true, null);
+                temp = vg.MinimizeConfig(temp, vm, true, null);
                 if (temp != null && Configuration.containsBinaryConfiguration(this.configurations, temp) == false)
                     this.configurations.Add(temp);
 
@@ -96,7 +98,7 @@ namespace MachineLearning.Sampling.Heuristics
                 withoutOpt.Remove(opt);
                 List<BinaryOption> excluded = new List<BinaryOption>();
                 excluded.Add(opt);
-                withoutOpt = ConfigurationBuilder.vg.MinimizeConfig(withoutOpt, vm, true, excluded);
+                withoutOpt = vg.MinimizeConfig(withoutOpt, vm, true, excluded);
                 if (withoutOpt != null && Configuration.containsBinaryConfiguration(this.configurations, withoutOpt) == false)
                     this.configurations.Add(withoutOpt);
             }
