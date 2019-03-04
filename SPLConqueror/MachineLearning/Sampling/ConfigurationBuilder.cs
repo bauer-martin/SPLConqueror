@@ -35,7 +35,7 @@ namespace MachineLearning.Sampling
             List<ExperimentalDesign> experimentalDesigns, List<HybridStrategy> hybridStrategies)
         {
             List<Configuration> result = new List<Configuration>();
-            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
+            IVariantGenerator vg = SolverManager.VariantGenerator;
 
             List<List<BinaryOption>> binaryConfigs = new List<List<BinaryOption>>();
             List<Dictionary<NumericOption, Double>> numericConfigs = new List<Dictionary<NumericOption, double>>();

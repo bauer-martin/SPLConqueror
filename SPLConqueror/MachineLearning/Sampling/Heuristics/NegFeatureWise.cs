@@ -38,7 +38,7 @@ namespace MachineLearning.Sampling.Heuristics
                         continue;
                     List<BinaryOption> removedElements = null;
                     //Get a configuration without the feature based on the maximum configuration: config
-                    List<BinaryOption> configToMeasure = SolverFactory.GetVariantGenerator()
+                    List<BinaryOption> configToMeasure = SolverManager.VariantGenerator
                         .GenerateConfigWithoutOption(binOpt, config, out removedElements, vm);
 
                     if (configToMeasure == null)
@@ -89,7 +89,7 @@ namespace MachineLearning.Sampling.Heuristics
                         currentElementUnderConsdiration = e;
                         //Constructing new Configuration without the current element
                         List<BinaryOption> configToMeasure = new List<BinaryOption>();
-                        configToMeasure = SolverFactory.GetVariantGenerator()
+                        configToMeasure = SolverManager.VariantGenerator
                             .GenerateConfigWithoutOption(e, currentConfig, out removedElements, vm);
 
                         if (configToMeasure == null)
@@ -118,7 +118,7 @@ namespace MachineLearning.Sampling.Heuristics
         {
             Dictionary<BinaryOption, List<BinaryOption>> alternatives = new Dictionary<BinaryOption, List<BinaryOption>>();
             List<List<BinaryOption>> maxConfigurations = new List<List<BinaryOption>>();
-            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
+            IVariantGenerator vg = SolverManager.VariantGenerator;
             maxConfigurations.AddRange(vg.FindAllConfigs(null, vm, false, null));
             bool existAlternative = false;
 
@@ -241,8 +241,7 @@ namespace MachineLearning.Sampling.Heuristics
                     config.Add(toConfigure);
                     config.Add(k);
                     List<List<BinaryOption>> temp = new List<List<BinaryOption>>();
-                    temp = SolverFactory.GetVariantGenerator()
-                        .FindAllConfigs(config, vm, false, null);
+                    temp = SolverManager.VariantGenerator.FindAllConfigs(config, vm, false, null);
                     if (temp == null || temp.Count == 0)
                         continue;
                     config = temp[0];

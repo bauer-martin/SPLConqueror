@@ -67,8 +67,7 @@ namespace MachineLearning.Sampling.Heuristics
         {
             if (candidates.Count == t)
             {
-                candidates = SolverFactory.GetVariantGenerator()
-                    .FindConfig(candidates, vm, true, null);
+                candidates = SolverManager.VariantGenerator.FindConfig(candidates, vm, true, null);
                 if (candidates.Count != 0)
                 {
                     result.Add(candidates);

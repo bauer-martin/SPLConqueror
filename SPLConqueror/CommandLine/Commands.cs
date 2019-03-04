@@ -538,7 +538,7 @@ namespace CommandLine
 
                     List<Configuration> invalid = GlobalState.allMeasurements.Configurations
                         .Where(conf => !GlobalState.varModel.isInModel(conf)).ToList();
-                    ICheckConfigSAT satChecker = SolverFactory.GetSatisfiabilityChecker();
+                    ICheckConfigSAT satChecker = SolverManager.SatisfiabilityChecker;
                     invalid = invalid.Union(GlobalState.allMeasurements.Configurations
                         .Where(conf => !satChecker.checkConfigurationSAT(conf.BinaryOptions.ToList()
                         .Where(kv => kv.Value == BinaryOption.BinaryValue.Selected).ToList()
@@ -609,7 +609,7 @@ namespace CommandLine
                     break;
                 case COMMAND_SET_SOLVER:
                     string solverName = task.Trim();
-                    SolverFactory.SetSelectedSolver(solverName);
+                    SolverManager.SetSelectedSolver(solverName);
                     break;
                 case COMMAND_PREDICT_ALL_CONFIGURATIONS_SPLC:
                     {

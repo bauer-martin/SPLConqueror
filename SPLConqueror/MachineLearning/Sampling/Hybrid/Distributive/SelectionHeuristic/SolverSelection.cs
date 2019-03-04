@@ -97,7 +97,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
             bool[] noSamples = new bool[allBuckets.Count];
 
 
-            IVariantGenerator vg = SolverFactory.GetVariantGenerator();
+            IVariantGenerator vg = SolverManager.VariantGenerator;
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
                 double randomDouble = rand.NextDouble();
