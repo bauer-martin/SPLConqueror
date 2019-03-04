@@ -31,13 +31,13 @@ namespace MachineLearning.Solver
             throw new NotImplementedException();
         }
 
-        public List<BinaryOption> MinimizeConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize,
+        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize,
             List<BinaryOption> unWantedOptions)
         {
             throw new NotImplementedException();
         }
 
-        public List<List<BinaryOption>> MaximizeConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize,
+        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize,
             List<BinaryOption> unwantedOptions)
         {
             throw new NotImplementedException();

@@ -58,7 +58,7 @@ namespace MachineLearning.Sampling.Heuristics
             }
 
             IVariantGenerator vg = SolverFactory.GetVariantGenerator();
-            List<BinaryOption> minimalConfiguration = vg.MinimizeConfig(new List<BinaryOption>(), vm, true, null);
+            List<BinaryOption> minimalConfiguration = vg.FindConfig(new List<BinaryOption>(), vm, true, null);
             return vg.DistanceMaximization(vm, minimalConfiguration, numberConfigs, optionWeight);
         }
     }

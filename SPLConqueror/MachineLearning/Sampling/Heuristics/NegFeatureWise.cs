@@ -119,7 +119,7 @@ namespace MachineLearning.Sampling.Heuristics
             Dictionary<BinaryOption, List<BinaryOption>> alternatives = new Dictionary<BinaryOption, List<BinaryOption>>();
             List<List<BinaryOption>> maxConfigurations = new List<List<BinaryOption>>();
             IVariantGenerator vg = SolverFactory.GetVariantGenerator();
-            maxConfigurations.AddRange(vg.MaximizeConfig(null, vm, false, null));
+            maxConfigurations.AddRange(vg.FindAllConfigs(null, vm, false, null));
             bool existAlternative = false;
 
             if (allAlternativeCombinations)
@@ -174,7 +174,7 @@ namespace MachineLearning.Sampling.Heuristics
                 if (!existAlternative)
                 {
                     List<BinaryOption> config = new List<BinaryOption>();
-                    maxConfigurations.AddRange(vg.MaximizeConfig(config, vm, false, null));
+                    maxConfigurations.AddRange(vg.FindAllConfigs(config, vm, false, null));
                 }
             }
 
@@ -196,11 +196,11 @@ namespace MachineLearning.Sampling.Heuristics
                     temp.Add(elem);
                     if (!allAlternativeCombinations)
                     {
-                        maxConfigurations.Add(vg.MaximizeConfig(temp, vm, false, null)[0]);
+                        maxConfigurations.Add(vg.FindAllConfigs(temp, vm, false, null)[0]);
                     }
                     else
                     {
-                        maxConfigurations.AddRange(vg.MaximizeConfig(temp, vm, false, null));
+                        maxConfigurations.AddRange(vg.FindAllConfigs(temp, vm, false, null));
                     }
                 }
             }
@@ -242,7 +242,7 @@ namespace MachineLearning.Sampling.Heuristics
                     config.Add(k);
                     List<List<BinaryOption>> temp = new List<List<BinaryOption>>();
                     temp = SolverFactory.GetVariantGenerator()
-                        .MaximizeConfig(config, vm, false, null);
+                        .FindAllConfigs(config, vm, false, null);
                     if (temp == null || temp.Count == 0)
                         continue;
                     config = temp[0];

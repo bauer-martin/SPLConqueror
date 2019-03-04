@@ -442,7 +442,7 @@ namespace MachineLearning.Solver
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
-        public List<List<BinaryOption>> MaximizeConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions)
+        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions)
         {
             List<List<BinaryOption>> optimalConfigurations = new List<List<BinaryOption>>();
 
@@ -525,7 +525,7 @@ namespace MachineLearning.Solver
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
         /// <returns>The valid configuration (or null if there is none) that satisfies the VM and the goal.</returns>
-        public List<BinaryOption> MinimizeConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unWantedOptions)
+        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unWantedOptions)
         {
             List<BoolExpr> variables;
             Dictionary<BoolExpr, BinaryOption> termToOption;
