@@ -168,8 +168,8 @@ namespace MachineLearning.Solver
                 Configuration c = new Configuration(confOpts.Item1, confOpts.Item2);
                 // Check if the non-boolean constraints are satisfied
                 bool configIsValid = vm.configurationIsValid(c);
-                bool isInConfigurationFile = !VariantGenerator.IsInConfigurationFile(c, allConfigurations);
-                bool fulfillsMixedConstraintrs = VariantGenerator.FulfillsMixedConstraints(c, vm);
+                bool isInConfigurationFile = !VariantGeneratorUtilities.IsInConfigurationFile(c, allConfigurations);
+                bool fulfillsMixedConstraintrs = VariantGeneratorUtilities.FulfillsMixedConstraints(c, vm);
                 if (configIsValid && isInConfigurationFile && fulfillsMixedConstraintrs)
                 {
                     allConfigurations.Add(c);
