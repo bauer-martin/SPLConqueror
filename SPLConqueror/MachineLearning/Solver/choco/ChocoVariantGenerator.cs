@@ -26,6 +26,11 @@ namespace MachineLearning.Solver
             return result;
         }
 
+        private static List<List<BinaryOption>> ParseBinaryConfigs(string str, VariabilityModel vm)
+        {
+            return str.Split(';').Select(s => ParseBinaryOptions(s, vm)).ToList();
+        }
+
         public List<List<BinaryOption>> DistanceMaximization(VariabilityModel vm,
             List<BinaryOption> minimalConfiguration, int numberToSample, int optionWeight)
         {
@@ -72,7 +77,23 @@ namespace MachineLearning.Solver
         public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize,
             List<BinaryOption> unwantedOptions)
         {
-            throw new NotImplementedException();
+            _adapter.LoadVm(vm);
+            _adapter.SetSolver(SolverType.CHOCO);
+            string optionsString = String.Join(",", config.Select(o => o.Name));
+            string optimizationString = minimize ? "minimize" : "maximize";
+            string response;
+            if (unwantedOptions == null)
+            {
+                response = _adapter.Execute($"find-all-optimal-configs {optimizationString} {optionsString}");
+            }
+            else
+            {
+                string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
+                response = _adapter.Execute(
+                    $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}");
+            }
+            List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
+            return optimalConfigs;
         }
 
         public List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved,
