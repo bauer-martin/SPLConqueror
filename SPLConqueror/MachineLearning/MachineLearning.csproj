@@ -148,7 +148,7 @@
     <Compile Include="Solver\VariantGenerator\IVariantGenerator.cs" />
     <Compile Include="Learning\LinearProgramming\SolverLP.cs" />
     <Compile Include="Solver\CSPsolver.cs" />
-    <Compile Include="Solver\VariantGenerator\VariantGenerator.cs" />
+    <Compile Include="Solver\VariantGenerator\MSFVariantGenerator.cs" />
     <Compile Include="Sampling\ExperimentalDesigns\FactorialDesign.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\SelectionHeuristic\SolverSelection.cs" />
     <Compile Include="Solver\ISolver.cs" />

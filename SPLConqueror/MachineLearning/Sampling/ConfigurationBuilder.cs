@@ -17,7 +17,7 @@ namespace MachineLearning.Sampling
         public static BinaryParameters binaryParams = new BinaryParameters();
 
         // The default variant generator is the one using the CSP solver of the Microsoft solver foundation
-        public static IVariantGenerator vg = new VariantGenerator();
+        public static IVariantGenerator vg = new MSFVariantGenerator();
 
         private static List<String> blacklisted;
 

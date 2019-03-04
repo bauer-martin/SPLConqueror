@@ -20,7 +20,7 @@ namespace MachineLearning.Solver
                 case "csp":
                 case "microsoft solver foundation":
                 case "msf":
-                    return new VariantGenerator();
+                    return new MSFVariantGenerator();
                 default:
                     return null;
             }
