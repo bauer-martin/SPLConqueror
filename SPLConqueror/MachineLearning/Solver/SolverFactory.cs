@@ -96,6 +96,10 @@ namespace MachineLearning.Solver
                     case SolverType.Z3:
                         _variantGenerator = new Z3VariantGenerator();
                         break;
+                    case SolverType.CHOCO:
+                        SetupJavaSolverAdapter();
+                        _variantGenerator = new ChocoVariantGenerator(_javaSolverAdapter);
+                        break;
                     default:
                         throw new InvalidOperationException(_selectedSolverType.GetName()
                             + " does not support variant generation");
