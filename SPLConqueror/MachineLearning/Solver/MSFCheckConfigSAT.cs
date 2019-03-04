@@ -10,7 +10,7 @@ using MicrosoftSolverFoundation;
 
 namespace MachineLearning.Solver
 {
-    public class CheckConfigSAT : ICheckConfigSAT
+    public class MSFCheckConfigSAT : ICheckConfigSAT
     {
 
         /// <summary>
@@ -97,10 +97,10 @@ namespace MachineLearning.Solver
                 return false;
         }
 
-        public static CheckConfigSAT execute()
+        public static MSFCheckConfigSAT execute()
         {
             return ccs;
         }
-        private static CheckConfigSAT ccs = new CheckConfigSAT();
+        private static MSFCheckConfigSAT ccs = new MSFCheckConfigSAT();
     }
 }

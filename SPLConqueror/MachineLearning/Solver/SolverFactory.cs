@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MachineLearning.Solver;
 
 namespace MachineLearning.Solver
 {
@@ -30,6 +31,7 @@ namespace MachineLearning.Solver
         private static readonly Dictionary<string, SolverType> _solverTypesByName;
 
         private static SolverType _selectedSolverType;
+        private static ICheckConfigSAT _satisfiabilityChecker;
 
         static SolverFactory()
         {
@@ -46,6 +48,26 @@ namespace MachineLearning.Solver
                 throw new ArgumentOutOfRangeException($"The solver '{name}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
             _selectedSolverType = _solverTypesByName[name];
+        }
+
+        public static ICheckConfigSAT GetSatisfiabilityChecker()
+        {
+            if (_satisfiabilityChecker == null)
+            {
+                switch (_selectedSolverType)
+                {
+                    case SolverType.MICROSOFT_SOLVER_FOUNDATION:
+                        _satisfiabilityChecker = new MSFCheckConfigSAT();
+                        break;
+                    case SolverType.Z3:
+                        _satisfiabilityChecker = new CheckConfigSATZ3();
+                        break;
+                    default:
+                        throw new InvalidOperationException(_selectedSolverType.GetName()
+                            + " does not support satisfiability checking");
+                }
+            }
+            return _satisfiabilityChecker;
         }
     }
 }

@@ -75,7 +75,7 @@ namespace SPLConqueror_GUI
         protected Dictionary<NumericOption, float> numericSettings = new Dictionary<NumericOption, float>();
         private Dictionary<ConfigurationOption, double> factorizationPriorities =
             new Dictionary<ConfigurationOption, double>();
-        private MachineLearning.Solver.ICheckConfigSAT sat = new MachineLearning.Solver.CheckConfigSAT();
+        private MachineLearning.Solver.ICheckConfigSAT sat = new MachineLearning.Solver.MSFCheckConfigSAT();
 
         // Everything for the measurements
         private bool measurementsLoaded = false;

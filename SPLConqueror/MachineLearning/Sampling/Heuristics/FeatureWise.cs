@@ -40,9 +40,9 @@ namespace MachineLearning.Sampling.Heuristics
                         optionalFirstLevelElements.Add(binOpt);
                 }
             }
-            Solver.CheckConfigSAT checkSAT = new Solver.CheckConfigSAT();
+            Solver.ICheckConfigSAT satChecker = Solver.SolverFactory.GetSatisfiabilityChecker();
             //Generating new configurations: one per option
-            if (checkSAT.checkConfigurationSAT(firstLevelMandatoryFeatures, vm, false))
+            if (satChecker.checkConfigurationSAT(firstLevelMandatoryFeatures, vm, false))
                 this.configurations.Add(firstLevelMandatoryFeatures);
             foreach (BinaryOption e in binOptions)
             {
@@ -52,7 +52,7 @@ namespace MachineLearning.Sampling.Heuristics
                 if (!tme.Contains(e))
                 {
                     tme.Add(e);
-                    if (checkSAT.checkConfigurationSAT(tme, vm, false))
+                    if (satChecker.checkConfigurationSAT(tme, vm, false))
                     {
                         if (!this.configurations.Contains(tme))
                             this.configurations.Add(tme);

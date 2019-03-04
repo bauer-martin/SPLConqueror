@@ -539,9 +539,9 @@ namespace CommandLine
 
                     List<Configuration> invalid = GlobalState.allMeasurements.Configurations
                         .Where(conf => !GlobalState.varModel.isInModel(conf)).ToList();
-                    CheckConfigSAT constraintSystem = new CheckConfigSAT();
+                    ICheckConfigSAT satChecker = SolverFactory.GetSatisfiabilityChecker();
                     invalid = invalid.Union(GlobalState.allMeasurements.Configurations
-                        .Where(conf => !constraintSystem.checkConfigurationSAT(conf.BinaryOptions.ToList()
+                        .Where(conf => !satChecker.checkConfigurationSAT(conf.BinaryOptions.ToList()
                         .Where(kv => kv.Value == BinaryOption.BinaryValue.Selected).ToList()
                         .Select(kv => kv.Key).ToList(), GlobalState.varModel, false))).ToList();
                     invalid.ForEach(conf => GlobalState.logError.logLine("Invalid configuration:" + conf.ToString()));
