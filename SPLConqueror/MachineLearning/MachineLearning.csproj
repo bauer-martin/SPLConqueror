@@ -140,28 +140,27 @@
     <Compile Include="Solver\choco\JavaAdapter.cs" />
     <Compile Include="Solver\choco\JavaException.cs" />
     <Compile Include="Solver\choco\JavaSolverAdapter.cs" />
-    <Compile Include="Solver\MSFCheckConfigSAT.cs" />
-    <Compile Include="Solver\ConstraintSystemCache.cs" />
+    <Compile Include="Solver\IVariantGenerator.cs" />
     <Compile Include="Solver\ICheckConfigSAT.cs" />
     <Compile Include="Learning\LinearProgramming\ISolverLP.cs" />
+    <Compile Include="Solver\msf\ConstraintSystemCache.cs" />
+    <Compile Include="Solver\msf\CSPsolver.cs" />
+    <Compile Include="Solver\msf\MSFCheckConfigSAT.cs" />
+    <Compile Include="Solver\msf\MSFVariantGenerator.cs" />
     <Compile Include="Solver\SolverFactory.cs" />
-    <Compile Include="Solver\VariantGenerator\IVariantGenerator.cs" />
     <Compile Include="Learning\LinearProgramming\SolverLP.cs" />
-    <Compile Include="Solver\CSPsolver.cs" />
-    <Compile Include="Solver\VariantGenerator\MSFVariantGenerator.cs" />
     <Compile Include="Sampling\ExperimentalDesigns\FactorialDesign.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\SelectionHeuristic\SolverSelection.cs" />
-    <Compile Include="Solver\ISolver.cs" />
-    <Compile Include="Solver\VariantGenerator\VariantGeneratorUtilities.cs" />
+    <Compile Include="Solver\VariantGeneratorUtilities.cs" />
     <Compile Include="Solver\z3\CheckConfigSATZ3.cs" />
     <Compile Include="Solver\z3\Z3Cache.cs" />
     <Compile Include="Solver\z3\Z3Solver.cs" />
-    <Compile Include="Solver\VariantGenerator\Z3VariantGenerator.cs" />
     <Compile Include="Solver\z3\WeightMinimizer.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\BinomialDistribution.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\NormalDistribution.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\GeometricDistribution.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\DistributionUtils.cs" />
+    <Compile Include="Solver\z3\Z3VariantGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SPLConqueror\SPLConqueror_Core.csproj">

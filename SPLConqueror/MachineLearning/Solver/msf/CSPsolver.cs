@@ -94,7 +94,7 @@ namespace MicrosoftSolverFoundation
                     S.AddConstraints(S.Or(equals.ToArray()));
                 }
 
-                //Alternative or other exclusion constraints                
+                //Alternative or other exclusion constraints
                 if (current.Excluded_Options.Count > 0 && current is BinaryOption)
                 {
                     BinaryOption binOpt = (BinaryOption)current;
@@ -161,7 +161,7 @@ namespace MicrosoftSolverFoundation
             }
 
             //Handle global cross-tree constraints involving multiple options at a time
-            // the constraints should be in conjunctive normal form 
+            // the constraints should be in conjunctive normal form
             foreach (string constraint in vm.BinaryConstraints)
             {
                 bool and = false;
@@ -213,7 +213,7 @@ namespace MicrosoftSolverFoundation
         /// <returns>The generated constraint system consisting of logical terms representing configuration options as well as their boolean constraints.</returns>
         internal static ConstraintSystem getConstraintSystem(out List<CspTerm> variables, out Dictionary<BinaryOption, CspTerm> optionToTerm, out Dictionary<CspTerm, BinaryOption> termToOption, VariabilityModel vm)
         {
-            //Reusing seems to not work correctely. The problem: configurations are realized as additional constraints for the system. 
+            //Reusing seems to not work correctely. The problem: configurations are realized as additional constraints for the system.
             //however, when checking for the next config, the old config's constraints remain in the solver such that we have a wrong result.
             /*
             if (csystem != null && variables_global != null && optionToTerm_global != null && termToOption_global != null && vm != null)
@@ -264,7 +264,7 @@ namespace MicrosoftSolverFoundation
                         S.AddConstraints(S.Implies(parent, cT));//mandatory child relationship
                 }
 
-                //Alternative or other exclusion constraints                
+                //Alternative or other exclusion constraints
                 if (current.Excluded_Options.Count > 0)
                 {
                     List<ConfigurationOption> alternativeOptions = current.collectAlternativeOptions();
@@ -331,7 +331,7 @@ namespace MicrosoftSolverFoundation
             }
 
             //Handle global cross-tree constraints involving multiple options at a time
-            // the constraints should be in conjunctive normal form 
+            // the constraints should be in conjunctive normal form
             foreach (string constraint in vm.BinaryConstraints)
             {
                 bool and = false;
