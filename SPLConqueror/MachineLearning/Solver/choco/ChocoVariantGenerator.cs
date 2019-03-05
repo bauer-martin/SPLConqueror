@@ -104,7 +104,15 @@ namespace MachineLearning.Solver
             List<BinaryOption> originalConfig, out List<BinaryOption> removedElements,
             VariabilityModel vm)
         {
-            throw new NotImplementedException();
+            _adapter.LoadVm(vm);
+            _adapter.SetSolver(SolverType.CHOCO);
+            string optionsString = String.Join(",", originalConfig.Select(o => o.Name));
+            string response = _adapter.Execute(
+                $"generate-config-without-option {optionsString} {optionToBeRemoved.Name}");
+            string[] tokens = response.Split(' ');
+            List<BinaryOption> optimalConfig = ParseBinaryOptions(tokens[0], vm);
+            removedElements = ParseBinaryOptions(tokens[1], vm);
+            return optimalConfig;
         }
 
         public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
