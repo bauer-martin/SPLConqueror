@@ -5,9 +5,9 @@ namespace MachineLearning.Solver
 {
     public enum SolverType
     {
-        MICROSOFT_SOLVER_FOUNDATION,
-        Z3,
-        CHOCO
+        MICROSOFT_SOLVER_FOUNDATION = 1,
+        Z3 = 2,
+        CHOCO = 3
     }
 
     public static class SolverTypeMethods
@@ -61,7 +61,12 @@ namespace MachineLearning.Solver
 
         public static ISolverFactory DefaultSolverFactory
         {
-            get { return GetSolverFactory(_selectedSolverType); }
+            get
+            {
+                if (_selectedSolverType == 0)
+                    throw new InvalidOperationException("solver type has not been set");
+                return GetSolverFactory(_selectedSolverType);
+            }
         }
 
         public static ISolverFactory GetSolverFactory(SolverType solverType)
