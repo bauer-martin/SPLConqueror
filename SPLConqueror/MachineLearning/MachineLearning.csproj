@@ -137,19 +137,19 @@
     <Compile Include="Sampling\Hybrid\Hybrid.cs" />
     <Compile Include="Sampling\SamplingStrategies.cs" />
     <Compile Include="Solver\choco\ChocoCheckConfigSAT.cs" />
-    <Compile Include="Solver\choco\ChocoSolverFactory.cs" />
+    <Compile Include="Solver\choco\ChocoSolverFacade.cs" />
     <Compile Include="Solver\choco\ChocoVariantGenerator.cs" />
     <Compile Include="Solver\choco\JavaAdapter.cs" />
     <Compile Include="Solver\choco\JavaException.cs" />
     <Compile Include="Solver\choco\JavaSolverAdapter.cs" />
-    <Compile Include="Solver\ISolverFactory.cs" />
+    <Compile Include="Solver\ISolverFacade.cs" />
     <Compile Include="Solver\IVariantGenerator.cs" />
     <Compile Include="Solver\ICheckConfigSAT.cs" />
     <Compile Include="Learning\LinearProgramming\ISolverLP.cs" />
     <Compile Include="Solver\msf\ConstraintSystemCache.cs" />
     <Compile Include="Solver\msf\CSPsolver.cs" />
     <Compile Include="Solver\msf\MSFCheckConfigSAT.cs" />
-    <Compile Include="Solver\msf\MSFSolverFactory.cs" />
+    <Compile Include="Solver\msf\MSFSolverFacade.cs" />
     <Compile Include="Solver\msf\MSFVariantGenerator.cs" />
     <Compile Include="Solver\SolverManager.cs" />
     <Compile Include="Learning\LinearProgramming\SolverLP.cs" />
@@ -164,7 +164,7 @@
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\NormalDistribution.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\GeometricDistribution.cs" />
     <Compile Include="Sampling\Hybrid\Distributive\Distribution\DistributionUtils.cs" />
-    <Compile Include="Solver\z3\Z3SolverFactory.cs" />
+    <Compile Include="Solver\z3\Z3SolverFacade.cs" />
     <Compile Include="Solver\z3\Z3VariantGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

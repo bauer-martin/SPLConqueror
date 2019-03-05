@@ -33,7 +33,7 @@ namespace MachineLearning.Solver
         private static readonly Dictionary<string, SolverType> _solverTypesByName;
 
         private static SolverType _selectedSolverType;
-        private static readonly Dictionary<SolverType, ISolverFactory> _solverFactories;
+        private static readonly Dictionary<SolverType, ISolverFacade> _solverFacade;
 
         // java-based solvers need access to JVM
         private static JavaSolverAdapter _javaSolverAdapter;
@@ -48,7 +48,7 @@ namespace MachineLearning.Solver
             _solverTypesByName["smt"] = SolverType.Z3;
             _solverTypesByName["csp"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
             _solverTypesByName["microsoft solver foundation"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
-            _solverFactories = new Dictionary<SolverType, ISolverFactory>();
+            _solverFacade = new Dictionary<SolverType, ISolverFacade>();
         }
 
         public static void SetSelectedSolver(string name)
@@ -59,52 +59,52 @@ namespace MachineLearning.Solver
             _selectedSolverType = _solverTypesByName[name];
         }
 
-        public static ISolverFactory DefaultSolverFactory
+        public static ISolverFacade DefaultSolverFacade
         {
             get
             {
                 if (_selectedSolverType == 0)
                     throw new InvalidOperationException("solver type has not been set");
-                return GetSolverFactory(_selectedSolverType);
+                return GetSolverFacade(_selectedSolverType);
             }
         }
 
-        public static ISolverFactory GetSolverFactory(SolverType solverType)
+        public static ISolverFacade GetSolverFacade(SolverType solverType)
         {
-            if (!_solverFactories.ContainsKey(solverType))
+            if (!_solverFacade.ContainsKey(solverType))
             {
-                ISolverFactory factory;
+                ISolverFacade facade;
                 switch (solverType)
                 {
                     case SolverType.MICROSOFT_SOLVER_FOUNDATION:
-                        factory = new MSFSolverFactory();
+                        facade = new MSFSolverFacade();
                         break;
                     case SolverType.Z3:
-                        factory = new Z3SolverFactory();
+                        facade = new Z3SolverFacade();
                         break;
                     case SolverType.CHOCO:
                         if (_javaSolverAdapter == null)
                         {
                             _javaSolverAdapter = new JavaSolverAdapter();
                         }
-                        factory = new ChocoSolverFactory(_javaSolverAdapter);
+                        facade = new ChocoSolverFacade(_javaSolverAdapter);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                _solverFactories[solverType] = factory;
+                _solverFacade[solverType] = facade;
             }
-            return _solverFactories[solverType];
+            return _solverFacade[solverType];
         }
 
         public static ICheckConfigSAT DefaultSatisfiabilityChecker
         {
-            get { return DefaultSolverFactory.CreateSatisfiabilityChecker(); }
+            get { return DefaultSolverFacade.SatisfiabilityChecker; }
         }
 
         public static IVariantGenerator DefaultVariantGenerator
         {
-            get { return DefaultSolverFactory.CreateVariantGenerator(); }
+            get { return DefaultSolverFacade.VariantGenerator; }
         }
     }
 }
