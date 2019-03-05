@@ -538,7 +538,7 @@ namespace CommandLine
 
                     List<Configuration> invalid = GlobalState.allMeasurements.Configurations
                         .Where(conf => !GlobalState.varModel.isInModel(conf)).ToList();
-                    ICheckConfigSAT satChecker = SolverManager.SatisfiabilityChecker;
+                    ICheckConfigSAT satChecker = SolverManager.DefaultSatisfiabilityChecker;
                     invalid = invalid.Union(GlobalState.allMeasurements.Configurations
                         .Where(conf => !satChecker.checkConfigurationSAT(conf.BinaryOptions.ToList()
                         .Where(kv => kv.Value == BinaryOption.BinaryValue.Selected).ToList()

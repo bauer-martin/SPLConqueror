@@ -307,7 +307,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
                 result[d] = new List<Configuration>();
             }
 
-            List<Configuration> allConfigurations = SolverManager.VariantGenerator
+            List<Configuration> allConfigurations = SolverManager.DefaultVariantGenerator
                 .GenerateAllVariants(GlobalState.varModel, this.optionsToConsider);
 
             foreach (Configuration c in allConfigurations)

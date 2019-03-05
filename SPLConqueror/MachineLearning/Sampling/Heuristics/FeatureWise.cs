@@ -41,7 +41,7 @@ namespace MachineLearning.Sampling.Heuristics
                         optionalFirstLevelElements.Add(binOpt);
                 }
             }
-            Solver.ICheckConfigSAT satChecker = Solver.SolverManager.SatisfiabilityChecker;
+            Solver.ICheckConfigSAT satChecker = Solver.SolverManager.DefaultSatisfiabilityChecker;
             //Generating new configurations: one per option
             if (satChecker.checkConfigurationSAT(firstLevelMandatoryFeatures, vm, false))
                 this.configurations.Add(firstLevelMandatoryFeatures);
@@ -60,7 +60,7 @@ namespace MachineLearning.Sampling.Heuristics
                     }
                     else
                     {
-                        tme = SolverManager.VariantGenerator.FindConfig(tme, vm, true, null);
+                        tme = SolverManager.DefaultVariantGenerator.FindConfig(tme, vm, true, null);
                         if (tme != null && Configuration.containsBinaryConfiguration(this.configurations, tme) == false)
                             this.configurations.Add(tme);
                     }
@@ -80,7 +80,7 @@ namespace MachineLearning.Sampling.Heuristics
         public List<List<BinaryOption>> generateFeatureWiseConfigsCSP(VariabilityModel vm)
         {
             this.configurations.Clear();
-            IVariantGenerator vg = SolverManager.VariantGenerator;
+            IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
             foreach (var opt in vm.BinaryOptions)
             {
                 if (opt == vm.Root)

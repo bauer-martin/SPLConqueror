@@ -33,7 +33,7 @@ namespace MachineLearning.Solver
         private static readonly Dictionary<string, SolverType> _solverTypesByName;
 
         private static SolverType _selectedSolverType;
-        private static ISolverFactory _solverFactory;
+        private static readonly Dictionary<SolverType, ISolverFactory> _solverFactories;
 
         // java-based solvers need access to JVM
         private static JavaSolverAdapter _javaSolverAdapter;
@@ -48,6 +48,7 @@ namespace MachineLearning.Solver
             _solverTypesByName["smt"] = SolverType.Z3;
             _solverTypesByName["csp"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
             _solverTypesByName["microsoft solver foundation"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
+            _solverFactories = new Dictionary<SolverType, ISolverFactory>();
         }
 
         public static void SetSelectedSolver(string name)
@@ -56,42 +57,49 @@ namespace MachineLearning.Solver
                 throw new ArgumentOutOfRangeException($"The solver '{name}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
             _selectedSolverType = _solverTypesByName[name];
-            switch (_selectedSolverType)
-            {
-                case SolverType.MICROSOFT_SOLVER_FOUNDATION:
-                    _solverFactory = new MSFSolverFactory();
-                    break;
-                case SolverType.Z3:
-                    _solverFactory = new Z3SolverFactory();
-                    break;
-                case SolverType.CHOCO:
-                    if (_javaSolverAdapter == null)
-                    {
-                        _javaSolverAdapter = new JavaSolverAdapter();
-                    }
-                    _solverFactory = new ChocoSolverFactory(_javaSolverAdapter);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
-        public static ICheckConfigSAT SatisfiabilityChecker
+        public static ISolverFactory DefaultSolverFactory
         {
-            get
-            {
-                if (_solverFactory == null) throw new InvalidOperationException("solver has not been set");
-                return _solverFactory.CreateSatisfiabilityChecker();
-            }
+            get { return GetSolverFactory(_selectedSolverType); }
         }
 
-        public static IVariantGenerator VariantGenerator
+        public static ISolverFactory GetSolverFactory(SolverType solverType)
         {
-            get
+            if (!_solverFactories.ContainsKey(solverType))
             {
-                if (_solverFactory == null) throw new InvalidOperationException("solver has not been set");
-                return _solverFactory.CreateVariantGenerator();
+                ISolverFactory factory;
+                switch (solverType)
+                {
+                    case SolverType.MICROSOFT_SOLVER_FOUNDATION:
+                        factory = new MSFSolverFactory();
+                        break;
+                    case SolverType.Z3:
+                        factory = new Z3SolverFactory();
+                        break;
+                    case SolverType.CHOCO:
+                        if (_javaSolverAdapter == null)
+                        {
+                            _javaSolverAdapter = new JavaSolverAdapter();
+                        }
+                        factory = new ChocoSolverFactory(_javaSolverAdapter);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                _solverFactories[solverType] = factory;
             }
+            return _solverFactories[solverType];
+        }
+
+        public static ICheckConfigSAT DefaultSatisfiabilityChecker
+        {
+            get { return DefaultSolverFactory.CreateSatisfiabilityChecker(); }
+        }
+
+        public static IVariantGenerator DefaultVariantGenerator
+        {
+            get { return DefaultSolverFactory.CreateVariantGenerator(); }
         }
     }
 }
