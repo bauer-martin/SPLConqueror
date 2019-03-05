@@ -83,17 +83,24 @@ namespace MachineLearning.Solver
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(SolverType.CHOCO);
-            string optionsString = String.Join(",", config.Select(o => o.Name));
             string optimizationString = minimize ? "minimize" : "maximize";
             string command;
-            if (unwantedOptions == null)
+            if (config == null)
             {
-                command = $"find-all-optimal-configs {optimizationString} {optionsString}";
+                command = $"find-all-optimal-configs {optimizationString}";
             }
             else
             {
-                string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
-                command = $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}";
+                string optionsString = String.Join(",", config.Select(o => o.Name));
+                if (unwantedOptions == null)
+                {
+                    command = $"find-all-optimal-configs {optimizationString} {optionsString}";
+                }
+                else
+                {
+                    string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
+                    command = $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}";
+                }
             }
             string response = _adapter.Execute(command);
             List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
