@@ -63,17 +63,17 @@ namespace MachineLearning.Solver
             _adapter.SetSolver(SolverType.CHOCO);
             string optionsString = String.Join(",", config.Select(o => o.Name));
             string optimizationString = minimize ? "minimize" : "maximize";
-            string response;
+            string command;
             if (unWantedOptions == null)
             {
-                response = _adapter.Execute($"find-optimal-config {optimizationString} {optionsString}");
+                command = $"find-optimal-config {optimizationString} {optionsString}";
             }
             else
             {
                 string unwantedOptionsString = String.Join(",", unWantedOptions.Select(o => o.Name));
-                response = _adapter.Execute(
-                    $"find-optimal-config {optimizationString} {optionsString} {unwantedOptionsString}");
+                command = $"find-optimal-config {optimizationString} {optionsString} {unwantedOptionsString}";
             }
+            string response = _adapter.Execute(command);
             List<BinaryOption> optimalConfig = ParseBinaryOptions(response, vm);
             return optimalConfig;
         }
@@ -85,17 +85,17 @@ namespace MachineLearning.Solver
             _adapter.SetSolver(SolverType.CHOCO);
             string optionsString = String.Join(",", config.Select(o => o.Name));
             string optimizationString = minimize ? "minimize" : "maximize";
-            string response;
+            string command;
             if (unwantedOptions == null)
             {
-                response = _adapter.Execute($"find-all-optimal-configs {optimizationString} {optionsString}");
+                command = $"find-all-optimal-configs {optimizationString} {optionsString}";
             }
             else
             {
                 string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
-                response = _adapter.Execute(
-                    $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}");
+                command = $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}";
             }
+            string response = _adapter.Execute(command);
             List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
             return optimalConfigs;
         }
