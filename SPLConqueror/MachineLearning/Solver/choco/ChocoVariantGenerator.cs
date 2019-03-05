@@ -49,7 +49,11 @@ namespace MachineLearning.Solver
 
         public List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel vm, int n)
         {
-            throw new NotImplementedException();
+            _adapter.LoadVm(vm);
+            _adapter.SetSolver(SolverType.CHOCO);
+            string response = _adapter.Execute($"generate-up-to {n}");
+            List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
+            return optimalConfigs;
         }
 
         public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize,
