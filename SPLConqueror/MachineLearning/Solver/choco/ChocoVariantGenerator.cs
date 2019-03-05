@@ -44,7 +44,7 @@ namespace MachineLearning.Solver
 
         public List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm)
         {
-            throw new NotImplementedException();
+            return GenerateUpToNFast(vm, -1);
         }
 
         public List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel vm, int n)
