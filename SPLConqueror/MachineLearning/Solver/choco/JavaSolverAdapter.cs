@@ -51,7 +51,7 @@ namespace MachineLearning.Solver
             _selectedSolver = solverType;
         }
 
-        private static void ThrowExceptionIfError(String response)
+        public void ThrowExceptionIfError(String response)
         {
             if (response.StartsWith(ERROR_PREFIX))
                 throw new JavaException(response);
