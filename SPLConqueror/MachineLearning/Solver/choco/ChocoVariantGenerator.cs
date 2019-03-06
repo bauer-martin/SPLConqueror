@@ -39,7 +39,12 @@ namespace MachineLearning.Solver
 
         public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)
         {
-            throw new NotImplementedException();
+            _adapter.LoadVm(vm);
+            _adapter.SetSolver(SolverType.CHOCO);
+            string optionsString = String.Join(",", optionsToConsider.Select(o => o.Name));
+            string response = _adapter.Execute($"generate-all-variants {optionsString}");
+            List<List<BinaryOption>> allVariants = ParseBinaryConfigs(response, vm);
+            return allVariants.Select(binarySelection => new Configuration(binarySelection)).ToList();
         }
 
         public List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm)
