@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
@@ -6,27 +8,62 @@ namespace MachineLearning.Solver
     public class JavaSolverAdapter
     {
         private const string ERROR_PREFIX = "error: ";
-        private JavaAdapter _adapter;
+        private Process _javaProcess;
+        private StreamReader _javaOutput;
+        private StreamReader _javaError;
+        private StreamWriter _javaInput;
         private string _loadedVmName;
         private SolverType _selectedSolver;
 
         private void Setup()
         {
-            _adapter = new JavaAdapter(
-                "/Users/martinbauer/Documents/Education/Master/Semester10/Masterarbeit/"
-                + "spl-conqueror-solvers-java/build/libs/spl-conqueror-solver-java-all-1.0-SNAPSHOT.jar");
-            _adapter.Start();
+            string pathToJar = "/Users/martinbauer/Documents/Education/Master/Semester10/Masterarbeit/"
+                + "spl-conqueror-solvers-java/build/libs/spl-conqueror-solver-java-all-1.0-SNAPSHOT.jar";
+            _javaProcess = new Process
+            {
+                StartInfo =
+                {
+                    FileName = "/usr/bin/java",
+                    Arguments = $"-jar {pathToJar}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true
+                }
+            };
+            _javaProcess.Start();
+            _javaOutput = _javaProcess.StandardOutput;
+            _javaError = _javaProcess.StandardError;
+            _javaInput = _javaProcess.StandardInput;
         }
 
-        public string Execute(String command)
+        internal string Execute(String command)
         {
-            if (_adapter == null) Setup();
-            string response = _adapter.Execute(command);
+            if (_javaProcess == null) Setup();
+            _javaInput.WriteLine(command);
+            string response = _javaOutput.ReadLine();
+            if (response == null)
+            {
+                string errorMessage = _javaError.ReadToEnd();
+                GlobalState.logError.logLine(errorMessage);
+                throw new JavaException("Jar execution terminated; see error log.");
+            }
             ThrowExceptionIfError(response);
             return response;
         }
 
-        public void Terminate() { _adapter?.Terminate(); }
+        public void TerminateJavaProcess()
+        {
+            if (_javaProcess == null || _javaProcess.HasExited) return;
+            _javaInput.WriteLine("exit");
+            _javaProcess.WaitForExit();
+            _javaProcess = null;
+            _javaOutput = null;
+            _javaError = null;
+            _javaInput = null;
+            _loadedVmName = null;
+            _selectedSolver = 0;
+        }
 
         public void LoadVm(VariabilityModel vm)
         {
@@ -35,9 +72,8 @@ namespace MachineLearning.Solver
                 if (_loadedVmName.Equals(vm.Name)) return;
                 throw new InvalidOperationException("switching variability model is not supported");
             }
-            if (_adapter == null) Setup();
             string vmPath = vm.Path;
-            string response = _adapter.Execute($"load-vm {vmPath}");
+            string response = Execute($"load-vm {vmPath}");
             ThrowExceptionIfError(response);
             _loadedVmName = vm.Name;
         }
@@ -45,8 +81,7 @@ namespace MachineLearning.Solver
         public void SetSolver(SolverType solverType)
         {
             if (solverType == _selectedSolver) return;
-            if (_adapter == null) Setup();
-            string response = _adapter.Execute($"select-solver {solverType.GetName()}");
+            string response = Execute($"select-solver {solverType.GetName()}");
             ThrowExceptionIfError(response);
             _selectedSolver = solverType;
         }
