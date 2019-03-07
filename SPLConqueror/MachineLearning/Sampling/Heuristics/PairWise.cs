@@ -63,7 +63,7 @@ namespace MachineLearning.Sampling.Heuristics
                         List<BinaryOption> tempConfig = new List<BinaryOption>();
                         tempConfig.Add(current);
                         tempConfig.Add(pair);
-                        tempConfig = SolverManager.DefaultVariantGenerator.FindConfig(tempConfig, vm, true, null);
+                        tempConfig = SolverManager.DefaultVariantGenerator.FindConfig(tempConfig, vm, null);
 
                         if (tempConfig.Count > 0 && !Configuration.containsBinaryConfiguration(configurations, tempConfig))
                             configurations.Add(tempConfig);

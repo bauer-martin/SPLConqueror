@@ -56,50 +56,48 @@ namespace MachineLearning.Solver
             return optimalConfigs;
         }
 
-        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize,
+        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm,
             List<BinaryOption> unWantedOptions)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(SolverType.CHOCO);
             string optionsString = String.Join(",", config.Select(o => o.Name));
-            string optimizationString = minimize ? "minimize" : "maximize";
             string command;
             if (unWantedOptions == null)
             {
-                command = $"find-optimal-config {optimizationString} {optionsString}";
+                command = $"find-optimal-config {optionsString}";
             }
             else
             {
                 string unwantedOptionsString = String.Join(",", unWantedOptions.Select(o => o.Name));
-                command = $"find-optimal-config {optimizationString} {optionsString} {unwantedOptionsString}";
+                command = $"find-optimal-config {optionsString} {unwantedOptionsString}";
             }
             string response = _adapter.Execute(command);
             List<BinaryOption> optimalConfig = ParseBinaryOptions(response, vm);
             return optimalConfig;
         }
 
-        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize,
+        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm,
             List<BinaryOption> unwantedOptions)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(SolverType.CHOCO);
-            string optimizationString = minimize ? "minimize" : "maximize";
             string command;
             if (config == null)
             {
-                command = $"find-all-optimal-configs {optimizationString}";
+                command = $"find-all-optimal-configs";
             }
             else
             {
                 string optionsString = String.Join(",", config.Select(o => o.Name));
                 if (unwantedOptions == null)
                 {
-                    command = $"find-all-optimal-configs {optimizationString} {optionsString}";
+                    command = $"find-all-optimal-configs {optionsString}";
                 }
                 else
                 {
                     string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
-                    command = $"find-all-optimal-configs {optimizationString} {optionsString} {unwantedOptionsString}";
+                    command = $"find-all-optimal-configs {optionsString} {unwantedOptionsString}";
                 }
             }
             string response = _adapter.Execute(command);

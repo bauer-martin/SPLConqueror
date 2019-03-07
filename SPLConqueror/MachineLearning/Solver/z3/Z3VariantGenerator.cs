@@ -331,10 +331,9 @@ namespace MachineLearning.Solver
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
-        /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
-        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions)
+        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unwantedOptions)
         {
             List<List<BinaryOption>> optimalConfigurations = new List<List<BinaryOption>>();
 
@@ -365,15 +364,7 @@ namespace MachineLearning.Solver
                 BinaryOption currOption = termToOption[variables[r]];
                 ArithExpr numericVariable = z3Context.MkIntConst(currOption.Name);
 
-                int weight;
-                if (minimize)
-                {
-                    weight = 1;
-                }
-                else
-                {
-                    weight = -1;
-                }
+                int weight = -1;
 
                 if (unwantedOptions != null && (unwantedOptions.Contains(termToOption[variables[r]]) && !config.Contains(termToOption[variables[r]])))
                 {
@@ -414,10 +405,9 @@ namespace MachineLearning.Solver
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
-        /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
         /// <returns>The valid configuration (or null if there is none) that satisfies the VM and the goal.</returns>
-        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unWantedOptions)
+        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unWantedOptions)
         {
             List<BoolExpr> variables;
             Dictionary<BoolExpr, BinaryOption> termToOption;
@@ -438,63 +428,38 @@ namespace MachineLearning.Solver
 
             Model model = null;
 
-            if (minimize == true)
+            //Defining Goals
+            ArithExpr[] optimizationGoals = new ArithExpr[variables.Count];
+
+            for (int r = 0; r < variables.Count; r++)
             {
+                BinaryOption currOption = termToOption[variables[r]];
+                ArithExpr numericVariable = z3Context.MkIntConst(currOption.Name);
 
-                //Defining Goals
-                ArithExpr[] optimizationGoals = new ArithExpr[variables.Count];
-
-                for (int r = 0; r < variables.Count; r++)
+                int weight = 1;
+                if (unWantedOptions != null && (unWantedOptions.Contains(termToOption[variables[r]]) && !config.Contains(termToOption[variables[r]])))
                 {
-                    BinaryOption currOption = termToOption[variables[r]];
-                    ArithExpr numericVariable = z3Context.MkIntConst(currOption.Name);
-
-                    int weight = 1;
-                    if (unWantedOptions != null && (unWantedOptions.Contains(termToOption[variables[r]]) && !config.Contains(termToOption[variables[r]])))
-                    {
-                        weight = 1000;
-                    }
-
-                    constraints.Add(z3Context.MkEq(numericVariable, z3Context.MkITE(variables[r], z3Context.MkInt(weight), z3Context.MkInt(0))));
-
-                    optimizationGoals[r] = numericVariable;
-
-                }
-                // For minimization, we need the class 'Optimize'
-                Optimize optimizer = z3Context.MkOptimize();
-                optimizer.Assert(constraints.ToArray());
-                optimizer.MkMinimize(z3Context.MkAdd(optimizationGoals));
-
-                if (optimizer.Check() != Status.SATISFIABLE)
-                {
-                    return new List<BinaryOption>();
-                }
-                else
-                {
-                    model = optimizer.Model;
+                    weight = 1000;
                 }
 
+                constraints.Add(z3Context.MkEq(numericVariable, z3Context.MkITE(variables[r], z3Context.MkInt(weight), z3Context.MkInt(0))));
+
+                optimizationGoals[r] = numericVariable;
+
+            }
+            // For minimization, we need the class 'Optimize'
+            Optimize optimizer = z3Context.MkOptimize();
+            optimizer.Assert(constraints.ToArray());
+            optimizer.MkMinimize(z3Context.MkAdd(optimizationGoals));
+
+            if (optimizer.Check() != Status.SATISFIABLE)
+            {
+                return new List<BinaryOption>();
             }
             else
             {
-                // Return the first configuration returned by the solver
-                Microsoft.Z3.Solver solver = z3Context.MkSolver();
-
-                solver.Set (RANDOM_SEED, z3RandomSeed);
-
-                solver.Assert(constraints.ToArray());
-
-                if (solver.Check() != Status.SATISFIABLE)
-                {
-                    return new List<BinaryOption>();
-                }
-                else
-                {
-                    model = solver.Model;
-                }
-
+                model = optimizer.Model;
             }
-
 
             List<BinaryOption> result = RetrieveConfiguration(variables, model, termToOption);
 

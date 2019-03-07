@@ -282,10 +282,9 @@ namespace MachineLearning.Solver
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
-        /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
         /// <returns>The valid configuration (or null if there is none) that satisfies the VM and the goal.</returns>
-        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unWantedOptions)
+        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unWantedOptions)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
@@ -304,15 +303,10 @@ namespace MachineLearning.Solver
             CspTerm[] finalGoals = new CspTerm[variables.Count];
             for (int r = 0; r < variables.Count; r++)
             {
-                if (minimize == true)
-                {
-                    if (unWantedOptions != null && (unWantedOptions.Contains(termToElem[variables[r]]) && !config.Contains(termToElem[variables[r]])))
-                        finalGoals[r] = variables[r] * 100;
-                    else
-                        finalGoals[r] = variables[r] * 1;
-                }
+                if (unWantedOptions != null && (unWantedOptions.Contains(termToElem[variables[r]]) && !config.Contains(termToElem[variables[r]])))
+                    finalGoals[r] = variables[r] * 100;
                 else
-                    finalGoals[r] = variables[r] * -1;   // dynamic cost map
+                    finalGoals[r] = variables[r] * 1;
             }
 
             S.TryAddMinimizationGoals(S.Sum(finalGoals));
@@ -320,7 +314,7 @@ namespace MachineLearning.Solver
             ConstraintSolverSolution soln = S.Solve();
             List<string> erg2 = new List<string>();
             List<BinaryOption> tempConfig = new List<BinaryOption>();
-            while (soln.HasFoundSolution)
+            if (soln.HasFoundSolution)
             {
                 tempConfig.Clear();
                 foreach (CspTerm cT in variables)
@@ -328,10 +322,6 @@ namespace MachineLearning.Solver
                     if (soln.GetIntegerValue(cT) == 1)
                         tempConfig.Add(termToElem[cT]);
                 }
-
-                if (minimize && tempConfig != null)
-                    break;
-                soln.GetNext();
             }
             return tempConfig;
         }
@@ -341,10 +331,9 @@ namespace MachineLearning.Solver
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
-        /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
-        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions)
+        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unwantedOptions)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
@@ -363,32 +352,10 @@ namespace MachineLearning.Solver
             CspTerm[] finalGoals = new CspTerm[variables.Count];
             for (int r = 0; r < variables.Count; r++)
             {
-                if (minimize == true)
-                {
-                    BinaryOption binOpt = termToElem[variables[r]];
-                    if (unwantedOptions != null && (unwantedOptions.Contains(binOpt) && !config.Contains(binOpt)))
-                    {
-                        finalGoals[r] = variables[r] * 10000;
-                    }
-                    else
-                    {
-                        // Element is part of an altnerative Group  ... we want to select always the same option of the group, so we give different weights to the member of the group
-                        //Functionality deactivated... todo needs further handling
-                        /*if (binOpt.getAlternatives().Count != 0)
-                        {
-                            finalGoals[r] = variables[r] * (binOpt.getID() * 10);
-                        }
-                        else
-                        {*/
-                        finalGoals[r] = variables[r] * 1;
-                        //}
-
-                        // wenn in einer alternative, dann bekommt es einen wert nach seiner reihenfolge
-                        // id mal 10
-                    }
-                }
+                if (unwantedOptions != null && (unwantedOptions.Contains(termToElem[variables[r]]) && !config.Contains(termToElem[variables[r]])))
+                    finalGoals[r] = variables[r] * 10000;
                 else
-                    finalGoals[r] = variables[r] * -1;   // dynamic cost map
+                    finalGoals[r] = variables[r] * 1;
             }
             S.TryAddMinimizationGoals(S.Sum(finalGoals));
 
@@ -403,11 +370,6 @@ namespace MachineLearning.Solver
                 {
                     if (soln.GetIntegerValue(cT) == 1)
                         tempConfig.Add(termToElem[cT]);
-                }
-                if (minimize && tempConfig != null)
-                {
-                    resultConfigs.Add(tempConfig);
-                    break;
                 }
                 if (!Configuration.containsBinaryConfiguration(resultConfigs, tempConfig))
                     resultConfigs.Add(tempConfig);
