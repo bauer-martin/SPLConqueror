@@ -14,17 +14,21 @@ namespace MachineLearning.Solver
         private StreamWriter _javaInput;
         private string _loadedVmName;
         private SolverType _selectedSolver;
+        private readonly string _pathToJar;
+
+        public JavaSolverAdapter(string pathToJar)
+        {
+            _pathToJar = pathToJar;
+        }
 
         private void Setup()
         {
-            string pathToJar = "/Users/martinbauer/Documents/Education/Master/Semester10/Masterarbeit/"
-                + "spl-conqueror-solvers-java/build/libs/spl-conqueror-solver-java-all-1.0-SNAPSHOT.jar";
             _javaProcess = new Process
             {
                 StartInfo =
                 {
                     FileName = "/usr/bin/java",
-                    Arguments = $"-jar {pathToJar}",
+                    Arguments = $"-jar {_pathToJar}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

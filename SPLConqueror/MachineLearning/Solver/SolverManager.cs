@@ -36,6 +36,7 @@ namespace MachineLearning.Solver
         private static readonly Dictionary<SolverType, ISolverFacade> _solverFacade;
 
         // java-based solvers need access to JVM
+        private static string _pathToJavaSolverJar;
         private static JavaSolverAdapter _javaSolverAdapter;
 
         static SolverManager()
@@ -51,12 +52,30 @@ namespace MachineLearning.Solver
             _solverFacade = new Dictionary<SolverType, ISolverFacade>();
         }
 
-        public static void SetSelectedSolver(string name)
+        public static void SetSelectedSolver(string str)
         {
+            string[] tokens = str.Split(new[] {' '}, 2);
+            string name = tokens[0];
             if (!_solverTypesByName.ContainsKey(name))
                 throw new ArgumentOutOfRangeException($"The solver '{name}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
             _selectedSolverType = _solverTypesByName[name];
+
+            // parse additional arguments
+            switch (_selectedSolverType)
+            {
+                case SolverType.MICROSOFT_SOLVER_FOUNDATION: break;
+                case SolverType.Z3: break;
+                case SolverType.CHOCO:
+                        if (tokens.Length < 2)
+                        {
+                            throw new ArgumentException("path to java solver jar must be specified");
+                        }
+                        _pathToJavaSolverJar = tokens[1];
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public static ISolverFacade DefaultSolverFacade
@@ -85,7 +104,7 @@ namespace MachineLearning.Solver
                     case SolverType.CHOCO:
                         if (_javaSolverAdapter == null)
                         {
-                            _javaSolverAdapter = new JavaSolverAdapter();
+                            _javaSolverAdapter = new JavaSolverAdapter(_pathToJavaSolverJar);
                         }
                         facade = new ChocoSolverFacade(_javaSolverAdapter);
                         break;
