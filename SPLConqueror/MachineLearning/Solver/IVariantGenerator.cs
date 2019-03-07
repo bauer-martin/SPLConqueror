@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
+﻿using System.Collections.Generic;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
@@ -37,7 +33,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Based on a given (partial) configuration and a variability, we aim at finding the smallest (or largest if minimize == false) valid configuration that has all options.
         /// </summary>
-        /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
+        /// <param name="config">The (partial) configuration which needs to be expanded to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
@@ -47,7 +43,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Based on a given (partial) configuration and a variability, we aim at finding all optimally maximal or minimal (in terms of selected binary options) configurations.
         /// </summary>
-        /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
+        /// <param name="config">The (partial) configuration which needs to be expanded to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="minimize">If true, we search for the smallest (in terms of selected options) valid configuration. If false, we search for the largest one.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
@@ -55,11 +51,11 @@ namespace MachineLearning.Solver
         List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, bool minimize, List<BinaryOption> unwantedOptions);
 
         /// <summary>
-        /// The method aims at finding a configuration which is similar to the given configuration, but does not contain the optionToBeRemoved. If further options need to be removed from the given configuration, they are outputed in removedElements.
+        /// The method aims at finding a configuration which is similar to the given configuration, but does not contain the optionToBeRemoved. If further options need to be removed from the given configuration, they are output in removedElements.
         /// </summary>
         /// <param name="optionToBeRemoved">The binary configuration option that must not be part of the new configuration.</param>
         /// <param name="originalConfig">The configuration for which we want to find a similar one.</param>
-        /// <param name="removedElements">If further options need to be removed from the given configuration to build a valid configuration, they are outputed in this list.</param>
+        /// <param name="removedElements">If further options need to be removed from the given configuration to build a valid configuration, they are output in this list.</param>
         /// <param name="vm">The variability model containing all options and their constraints.</param>
         /// <returns>A configuration that is valid, similar to the original configuration and does not contain the optionToBeRemoved.</returns>
         List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved, List<BinaryOption> originalConfig, out List<BinaryOption> removedElements, VariabilityModel vm);
