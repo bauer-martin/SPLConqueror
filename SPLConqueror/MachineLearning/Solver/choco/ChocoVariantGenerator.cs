@@ -32,12 +32,6 @@ namespace MachineLearning.Solver
             return str.Split(';').Select(s => ParseBinaryOptions(s, vm)).ToList();
         }
 
-        public List<List<BinaryOption>> DistanceMaximization(VariabilityModel vm,
-            List<BinaryOption> minimalConfiguration, int numberToSample, int optionWeight)
-        {
-            throw new NotImplementedException();
-        }
-
         public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)
         {
             _adapter.LoadVm(vm);

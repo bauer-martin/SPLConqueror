@@ -135,13 +135,6 @@ namespace MachineLearning.Sampling
                             }
                         }
                         break;
-                    case SamplingStrategies.DISTANCE_BASED:
-                        foreach (Dictionary<string, string> parameters in binaryParams.distanceMaxParameters)
-                        {
-                            DistanceBased distSampling = new DistanceBased(vm);
-                            binaryConfigs.AddRange(distSampling.getSample(parameters));
-                        }
-                        break;
 
                     //case SamplingStrategies.MINMAX:
                     //    {
