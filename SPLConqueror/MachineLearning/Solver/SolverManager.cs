@@ -7,7 +7,8 @@ namespace MachineLearning.Solver
     {
         MICROSOFT_SOLVER_FOUNDATION = 1,
         Z3 = 2,
-        CHOCO = 3
+        CHOCO = 3,
+        JACOP = 4
     }
 
     public static class SolverTypeMethods
@@ -22,6 +23,8 @@ namespace MachineLearning.Solver
                     return "z3";
                 case SolverType.CHOCO:
                     return "choco";
+                case SolverType.JACOP:
+                    return "jacop";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -71,6 +74,9 @@ namespace MachineLearning.Solver
                 case SolverType.CHOCO:
                     SetJavaSolverJarPath(tokens);
                     break;
+                case SolverType.JACOP:
+                    SetJavaSolverJarPath(tokens);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -109,6 +115,9 @@ namespace MachineLearning.Solver
                         facade = new Z3SolverFacade();
                         break;
                     case SolverType.CHOCO:
+                        facade = CreateJavaBasedSolverFacade(solverType);
+                        break;
+                    case SolverType.JACOP:
                         facade = CreateJavaBasedSolverFacade(solverType);
                         break;
                     default:
