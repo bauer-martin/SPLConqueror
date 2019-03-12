@@ -98,6 +98,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
+            IBucketSession bucketSession = vg.CreateBucketSession();
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
                 double randomDouble = rand.NextDouble();
@@ -130,18 +131,18 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 // Now select the configuration by using the solver
                 if (optimization == Optimization.NONE)
                 {
-                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, null, selectedConfigurationsFromBucket[currentBucket]);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
-                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, featureWeight[0], selectedConfigurationsFromBucket[currentBucket]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
-                    solution = vg.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
                         distanceOfBucket, featureWeight[currentBucket], selectedConfigurationsFromBucket[currentBucket]);
                 }
 
@@ -176,7 +177,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }
 
-            vg.ClearBucketCache();
+            bucketSession.ClearBucketCache();
 
             return selectedConfigurations;
         }

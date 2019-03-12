@@ -135,6 +135,8 @@
     <Compile Include="Sampling\Hybrid\Distributive\SelectionHeuristic\RandomSelection.cs" />
     <Compile Include="Sampling\Hybrid\Hybrid.cs" />
     <Compile Include="Sampling\SamplingStrategies.cs" />
+    <Compile Include="Solver\IBucketSession.cs" />
+    <Compile Include="Solver\choco\ChocoBucketSession.cs" />
     <Compile Include="Solver\choco\ChocoCheckConfigSAT.cs" />
     <Compile Include="Solver\choco\ChocoSolverFacade.cs" />
     <Compile Include="Solver\choco\ChocoVariantGenerator.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Learning\LinearProgramming\ISolverLP.cs" />
     <Compile Include="Solver\msf\ConstraintSystemCache.cs" />
     <Compile Include="Solver\msf\CSPsolver.cs" />
+    <Compile Include="Solver\msf\MSFBucketSession.cs" />
     <Compile Include="Solver\msf\MSFCheckConfigSAT.cs" />
     <Compile Include="Solver\msf\MSFSolverFacade.cs" />
     <Compile Include="Solver\msf\MSFVariantGenerator.cs" />
@@ -155,6 +158,7 @@
     <Compile Include="Sampling\Hybrid\Distributive\SelectionHeuristic\SolverSelection.cs" />
     <Compile Include="Solver\VariantGeneratorUtilities.cs" />
     <Compile Include="Solver\z3\CheckConfigSATZ3.cs" />
+    <Compile Include="Solver\z3\Z3BucketSession.cs" />
     <Compile Include="Solver\z3\Z3Cache.cs" />
     <Compile Include="Solver\z3\Z3Solver.cs" />
     <Compile Include="Solver\z3\WeightMinimizer.cs" />

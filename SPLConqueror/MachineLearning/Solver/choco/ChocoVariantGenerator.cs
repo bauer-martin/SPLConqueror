@@ -115,44 +115,6 @@ namespace MachineLearning.Solver
             return optimalConfig;
         }
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
-            Dictionary<List<BinaryOption>, int> featureWeight,
-            Configuration lastSampledConfiguration)
-        {
-            _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
-            string command;
-            if (featureWeight == null)
-            {
-                command = $"generate-config-from-bucket {numberSelectedFeatures}";
-            }
-            else
-            {
-                StringBuilder featureWeightString = new StringBuilder();
-                foreach (KeyValuePair<List<BinaryOption>, int> pair in featureWeight)
-                {
-                    featureWeightString.Append(String.Join(",", pair.Key.Select(o => o.Name)));
-                    featureWeightString.Append("=");
-                    featureWeightString.Append(pair.Value);
-                    featureWeightString.Append(";");
-                }
-                if (featureWeightString.Length > 0)
-                {
-                    featureWeightString.Remove(featureWeightString.Length - 1, 1);
-                }
-                command = $"generate-config-from-bucket {numberSelectedFeatures} {featureWeightString}";
-            }
-            string response = _adapter.Execute(command);
-            string[] tokens = response.Split(' ');
-            List<BinaryOption> config = ParseBinaryOptions(tokens[0], vm);
-            return config;
-        }
-
-        public void ClearBucketCache()
-        {
-            _adapter.SetSolver(SolverType.CHOCO);
-            string response = _adapter.Execute("clear-bucket-cache");
-            _adapter.ThrowExceptionIfError(response);
-        }
+        public IBucketSession CreateBucketSession() { return new ChocoBucketSession(_adapter); }
     }
 }
