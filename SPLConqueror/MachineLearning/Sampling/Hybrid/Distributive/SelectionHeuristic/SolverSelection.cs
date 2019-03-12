@@ -98,7 +98,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            IBucketSession bucketSession = vg.CreateBucketSession();
+            IBucketSession bucketSession = vg.CreateBucketSession(GlobalState.varModel);
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
                 double randomDouble = rand.NextDouble();
@@ -131,19 +131,16 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 // Now select the configuration by using the solver
                 if (optimization == Optimization.NONE)
                 {
-                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
-                        distanceOfBucket, null);
+                    solution = bucketSession.GenerateConfiguration(distanceOfBucket, null);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
-                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0]);
+                    solution = bucketSession.GenerateConfiguration(distanceOfBucket, featureWeight[0]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
-                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket]);
+                    solution = bucketSession.GenerateConfiguration(distanceOfBucket, featureWeight[currentBucket]);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure

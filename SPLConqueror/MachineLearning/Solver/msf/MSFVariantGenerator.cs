@@ -312,7 +312,7 @@ namespace MachineLearning.Solver
             return null;
         }
 
-        public IBucketSession CreateBucketSession() { return new MSFBucketSession(); }
+        public IBucketSession CreateBucketSession(VariabilityModel vm) { return new MSFBucketSession(vm); }
 
         //public List<List<BinaryOption>> generateTilSize(int i1, int size, int timeout, VariabilityModel vm)
         //{

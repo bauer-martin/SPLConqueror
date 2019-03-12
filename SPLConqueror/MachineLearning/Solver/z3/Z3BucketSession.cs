@@ -11,17 +11,19 @@ namespace MachineLearning.Solver
         private const string RANDOM_SEED = ":random-seed";
         private readonly uint _z3RandomSeed;
         private readonly bool _henard;
+        private readonly VariabilityModel _vm;
         private Dictionary<int, Z3Cache> _z3Cache;
         private readonly Dictionary<int, List<BinaryOption>> _lastSampledConfigs;
 
-        public Z3BucketSession(uint z3RandomSeed, bool henard)
+        public Z3BucketSession(VariabilityModel vm, uint z3RandomSeed, bool henard)
         {
+            _vm = vm;
             _z3RandomSeed = z3RandomSeed;
             _henard = henard;
             _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
         }
 
-        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             List<BinaryOption> lastSampledConfiguration;
@@ -63,7 +65,7 @@ namespace MachineLearning.Solver
                 if (lastSampledConfiguration != null)
                 {
                     // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, vm)));
+                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, _vm)));
 
                     // Create a new backtracking point for the next run
                     solver.Push();
@@ -72,7 +74,7 @@ namespace MachineLearning.Solver
             }
             else
             {
-                z3Tuple = Z3Solver.GetInitializedBooleanSolverSystem(out variables, out optionToTerm, out termToOption, vm, _henard);
+                z3Tuple = Z3Solver.GetInitializedBooleanSolverSystem(out variables, out optionToTerm, out termToOption, _vm, _henard);
                 z3Context = z3Tuple.Item1;
                 BoolExpr z3Constraints = z3Tuple.Item2;
                 solver = z3Context.MkSolver();
@@ -84,7 +86,7 @@ namespace MachineLearning.Solver
                 if (lastSampledConfiguration != null)
                 {
                     // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, vm)));
+                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, _vm)));
                 }
 
                 // The goal of this method is, to have an exact number of features selected
@@ -115,7 +117,7 @@ namespace MachineLearning.Solver
                 if (featureRanking.Count != 0)
                 {
                     approximateOptimal = WeightMinimizer
-                    .getSmallWeightConfig(featureRanking, this._z3Cache[numberSelectedFeatures], vm);
+                    .getSmallWeightConfig(featureRanking, this._z3Cache[numberSelectedFeatures], _vm);
                 }
 
                 if (approximateOptimal == null)

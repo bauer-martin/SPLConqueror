@@ -456,6 +456,9 @@ namespace MachineLearning.Solver
             return result;
         }
 
-        public IBucketSession CreateBucketSession() { return new Z3BucketSession(z3RandomSeed, henard); }
+        public IBucketSession CreateBucketSession(VariabilityModel vm)
+        {
+            return new Z3BucketSession(vm, z3RandomSeed, henard);
+        }
     }
 }

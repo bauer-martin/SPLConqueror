@@ -115,6 +115,6 @@ namespace MachineLearning.Solver
             return optimalConfig;
         }
 
-        public IBucketSession CreateBucketSession() { return new ChocoBucketSession(_adapter); }
+        public IBucketSession CreateBucketSession(VariabilityModel vm) { return new ChocoBucketSession(vm, _adapter); }
     }
 }

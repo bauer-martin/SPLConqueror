@@ -8,17 +8,19 @@ namespace MachineLearning.Solver
 {
     public class MSFBucketSession: IBucketSession
     {
+        private readonly VariabilityModel _vm;
         private Dictionary<int, ConstraintSystemCache> _constraintSystemCache;
         private Dictionary<int, List<BinaryOption>> _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
+
+        public MSFBucketSession(VariabilityModel vm) { _vm = vm; }
 
         /// <summary>
         /// This method has the objective to sample a configuration where n features are selected
         /// </summary>
         /// <returns>The first fitting configuration.</returns>
-        /// <param name="vm">The variability model.</param>
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of the features to minimize.</param>
-        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             List<BinaryOption> lastSampledConfiguration;
@@ -44,7 +46,7 @@ namespace MachineLearning.Solver
                 S.RemoveAllMinimizationGoals();
 
                 // Add the missing configurations
-                AddBinaryConfigurationsToConstraintSystem(vm, S, lastSampledConfiguration, elemToTerm);
+                AddBinaryConfigurationsToConstraintSystem(_vm, S, lastSampledConfiguration, elemToTerm);
 
             }
             else
@@ -54,7 +56,7 @@ namespace MachineLearning.Solver
                 termToElem = new Dictionary<CspTerm, BinaryOption>();
 
                 // Build the constraint system
-                S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+                S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
 
                 // The first goal of this method is, to have an exact number of features selected
                 S.AddConstraints(S.ExactlyMofN(numberSelectedFeatures, variables.ToArray()));
@@ -62,7 +64,7 @@ namespace MachineLearning.Solver
                 if (lastSampledConfiguration != null)
                 {
                     // Add the previous configurations as constraints
-                    AddBinaryConfigurationsToConstraintSystem(vm, S, lastSampledConfiguration, elemToTerm);
+                    AddBinaryConfigurationsToConstraintSystem(_vm, S, lastSampledConfiguration, elemToTerm);
                 }
 
                 this._constraintSystemCache.Add(numberSelectedFeatures, new ConstraintSystemCache(S, variables, elemToTerm, termToElem));

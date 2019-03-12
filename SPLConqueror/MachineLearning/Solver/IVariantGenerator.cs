@@ -51,6 +51,6 @@ namespace MachineLearning.Solver
         /// <returns>A configuration that is valid, similar to the original configuration and does not contain the optionToBeRemoved.</returns>
         List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved, List<BinaryOption> originalConfig, out List<BinaryOption> removedElements, VariabilityModel vm);
 
-        IBucketSession CreateBucketSession();
+        IBucketSession CreateBucketSession(VariabilityModel vm);
     }
 }

@@ -8,9 +8,14 @@ namespace MachineLearning.Solver
 {
     public class ChocoBucketSession : IBucketSession
     {
+        private readonly VariabilityModel _vm;
         private readonly JavaSolverAdapter _adapter;
 
-        public ChocoBucketSession(JavaSolverAdapter adapter) { _adapter = adapter; }
+        public ChocoBucketSession(VariabilityModel vm, JavaSolverAdapter adapter)
+        {
+            _vm = vm;
+            _adapter = adapter;
+        }
 
         ~ChocoBucketSession() => Reset();
 
@@ -29,10 +34,10 @@ namespace MachineLearning.Solver
             return result;
         }
 
-        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
-            _adapter.LoadVm(vm);
+            _adapter.LoadVm(_vm);
             _adapter.SetSolver(SolverType.CHOCO);
             string command;
             if (featureWeight == null)
@@ -57,7 +62,7 @@ namespace MachineLearning.Solver
             }
             string response = _adapter.Execute(command);
             string[] tokens = response.Split(' ');
-            List<BinaryOption> config = ParseBinaryOptions(tokens[0], vm);
+            List<BinaryOption> config = ParseBinaryOptions(tokens[0], _vm);
             return config;
         }
 
