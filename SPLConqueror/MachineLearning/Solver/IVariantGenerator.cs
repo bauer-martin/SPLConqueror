@@ -37,16 +37,16 @@ namespace MachineLearning.Solver
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
         /// <returns>The valid configuration (or null if there is none) that satisfies the VM and the goal.</returns>
-        List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unWantedOptions);
+        List<BinaryOption> FindMinimizedConfig(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unWantedOptions);
 
         /// <summary>
-        /// Based on a given (partial) configuration and variability model, we search for all smallest (in terms of selected binary options) valid configurations.
+        /// Based on a given (partial) configuration and variability model, we search for all largest (in terms of selected binary options) valid configurations.
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expanded to be valid.</param>
         /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
-        List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unwantedOptions);
+        List<List<BinaryOption>> FindAllMaximizedConfigs(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unwantedOptions);
 
         /// <summary>
         /// The method aims at finding a configuration which is similar to the given configuration, but does not contain the optionToBeRemoved. If further options need to be removed from the given configuration, they are output in removedElements.

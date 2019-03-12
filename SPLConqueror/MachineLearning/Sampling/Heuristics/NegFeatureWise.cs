@@ -119,7 +119,7 @@ namespace MachineLearning.Sampling.Heuristics
             Dictionary<BinaryOption, List<BinaryOption>> alternatives = new Dictionary<BinaryOption, List<BinaryOption>>();
             List<List<BinaryOption>> maxConfigurations = new List<List<BinaryOption>>();
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            maxConfigurations.AddRange(vg.FindAllConfigs(null, vm, null));
+            maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(null, vm, null));
             bool existAlternative = false;
 
             if (allAlternativeCombinations)
@@ -174,7 +174,7 @@ namespace MachineLearning.Sampling.Heuristics
                 if (!existAlternative)
                 {
                     List<BinaryOption> config = new List<BinaryOption>();
-                    maxConfigurations.AddRange(vg.FindAllConfigs(config, vm, null));
+                    maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(config, vm, null));
                 }
             }
 
@@ -196,11 +196,11 @@ namespace MachineLearning.Sampling.Heuristics
                     temp.Add(elem);
                     if (!allAlternativeCombinations)
                     {
-                        maxConfigurations.Add(vg.FindAllConfigs(temp, vm, null)[0]);
+                        maxConfigurations.Add(vg.FindAllMaximizedConfigs(temp, vm, null)[0]);
                     }
                     else
                     {
-                        maxConfigurations.AddRange(vg.FindAllConfigs(temp, vm, null));
+                        maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(temp, vm, null));
                     }
                 }
             }
@@ -241,7 +241,7 @@ namespace MachineLearning.Sampling.Heuristics
                     config.Add(toConfigure);
                     config.Add(k);
                     List<List<BinaryOption>> temp = new List<List<BinaryOption>>();
-                    temp = SolverManager.DefaultVariantGenerator.FindAllConfigs(config, vm, null);
+                    temp = SolverManager.DefaultVariantGenerator.FindAllMaximizedConfigs(config, vm, null);
                     if (temp == null || temp.Count == 0)
                         continue;
                     config = temp[0];

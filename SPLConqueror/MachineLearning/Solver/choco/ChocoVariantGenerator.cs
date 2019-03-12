@@ -56,7 +56,7 @@ namespace MachineLearning.Solver
             return optimalConfigs;
         }
 
-        public List<BinaryOption> FindConfig(List<BinaryOption> config, VariabilityModel vm,
+        public List<BinaryOption> FindMinimizedConfig(List<BinaryOption> config, VariabilityModel vm,
             List<BinaryOption> unWantedOptions)
         {
             _adapter.LoadVm(vm);
@@ -77,7 +77,7 @@ namespace MachineLearning.Solver
             return optimalConfig;
         }
 
-        public List<List<BinaryOption>> FindAllConfigs(List<BinaryOption> config, VariabilityModel vm,
+        public List<List<BinaryOption>> FindAllMaximizedConfigs(List<BinaryOption> config, VariabilityModel vm,
             List<BinaryOption> unwantedOptions)
         {
             _adapter.LoadVm(vm);

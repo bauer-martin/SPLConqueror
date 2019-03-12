@@ -60,7 +60,7 @@ namespace MachineLearning.Sampling.Heuristics
                     }
                     else
                     {
-                        tme = SolverManager.DefaultVariantGenerator.FindConfig(tme, vm, null);
+                        tme = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tme, vm, null);
                         if (tme != null && Configuration.containsBinaryConfiguration(this.configurations, tme) == false)
                             this.configurations.Add(tme);
                     }
@@ -87,7 +87,7 @@ namespace MachineLearning.Sampling.Heuristics
                     continue;
                 List<BinaryOption> temp = new List<BinaryOption>();
                 temp.Add(opt);
-                temp = vg.FindConfig(temp, vm, null);
+                temp = vg.FindMinimizedConfig(temp, vm, null);
                 if (temp != null && Configuration.containsBinaryConfiguration(this.configurations, temp) == false)
                     this.configurations.Add(temp);
 
@@ -98,7 +98,7 @@ namespace MachineLearning.Sampling.Heuristics
                 withoutOpt.Remove(opt);
                 List<BinaryOption> excluded = new List<BinaryOption>();
                 excluded.Add(opt);
-                withoutOpt = vg.FindConfig(withoutOpt, vm, excluded);
+                withoutOpt = vg.FindMinimizedConfig(withoutOpt, vm, excluded);
                 if (withoutOpt != null && Configuration.containsBinaryConfiguration(this.configurations, withoutOpt) == false)
                     this.configurations.Add(withoutOpt);
             }
