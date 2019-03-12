@@ -12,15 +12,21 @@ namespace MachineLearning.Solver
         private readonly uint _z3RandomSeed;
         private readonly bool _henard;
         private Dictionary<int, Z3Cache> _z3Cache;
+        private readonly Dictionary<int, List<BinaryOption>> _lastSampledConfigs;
 
         public Z3BucketSession(uint z3RandomSeed, bool henard)
         {
             _z3RandomSeed = z3RandomSeed;
             _henard = henard;
+            _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
         }
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, Configuration lastSampledConfiguration)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+            Dictionary<List<BinaryOption>, int> featureWeight)
         {
+            List<BinaryOption> lastSampledConfiguration;
+            _lastSampledConfigs.TryGetValue(numberSelectedFeatures, out lastSampledConfiguration);
+
             if (_z3Cache == null)
             {
                 _z3Cache = new Dictionary<int, Z3Cache>();
@@ -57,7 +63,7 @@ namespace MachineLearning.Solver
                 if (lastSampledConfiguration != null)
                 {
                     // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration.getBinaryOptions(BinaryOption.BinaryValue.Selected), optionToTerm, vm)));
+                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, vm)));
 
                     // Create a new backtracking point for the next run
                     solver.Push();
@@ -78,7 +84,7 @@ namespace MachineLearning.Solver
                 if (lastSampledConfiguration != null)
                 {
                     // Add the previous configurations as constraints
-                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration.getBinaryOptions(BinaryOption.BinaryValue.Selected), optionToTerm, vm)));
+                    solver.Assert(Z3Solver.NegateExpr(z3Context, Z3Solver.ConvertConfiguration(z3Context, lastSampledConfiguration, optionToTerm, vm)));
                 }
 
                 // The goal of this method is, to have an exact number of features selected
@@ -114,16 +120,19 @@ namespace MachineLearning.Solver
 
                 if (approximateOptimal == null)
                 {
+                    _lastSampledConfigs[numberSelectedFeatures] = possibleSolution;
                     return possibleSolution;
                 }
                 else
                 {
+                    _lastSampledConfigs[numberSelectedFeatures] = approximateOptimal;
                     return approximateOptimal;
                 }
 
             }
             else
             {
+                _lastSampledConfigs[numberSelectedFeatures] = null;
                 return null;
             }
         }

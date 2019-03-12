@@ -30,8 +30,7 @@ namespace MachineLearning.Solver
         }
 
         public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
-            Dictionary<List<BinaryOption>, int> featureWeight,
-            Configuration lastSampledConfiguration)
+            Dictionary<List<BinaryOption>, int> featureWeight)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(SolverType.CHOCO);

@@ -9,6 +9,7 @@ namespace MachineLearning.Solver
     public class MSFBucketSession: IBucketSession
     {
         private Dictionary<int, ConstraintSystemCache> _constraintSystemCache;
+        private Dictionary<int, List<BinaryOption>> _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
 
         /// <summary>
         /// This method has the objective to sample a configuration where n features are selected
@@ -17,9 +18,11 @@ namespace MachineLearning.Solver
         /// <param name="vm">The variability model.</param>
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of the features to minimize.</param>
-        /// <param name="sampledConfigurations">The sampled configurations until now.</param>
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures, Dictionary<List<BinaryOption>, int> featureWeight, Configuration lastSampledConfiguration)
+        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+            Dictionary<List<BinaryOption>, int> featureWeight)
         {
+            List<BinaryOption> lastSampledConfiguration;
+            _lastSampledConfigs.TryGetValue(numberSelectedFeatures, out lastSampledConfiguration);
             if (this._constraintSystemCache == null)
             {
                 this._constraintSystemCache = new Dictionary<int, ConstraintSystemCache>();
@@ -79,10 +82,12 @@ namespace MachineLearning.Solver
                     if (soln.GetIntegerValue(cT) == 1)
                         tempConfig.Add(termToElem[cT]);
                 }
+                _lastSampledConfigs[numberSelectedFeatures] = tempConfig;
 
             }
             else
             {
+                _lastSampledConfigs[numberSelectedFeatures] = null;
                 return null;
             }
 
@@ -97,7 +102,7 @@ namespace MachineLearning.Solver
             this._constraintSystemCache = null;
         }
 
-        private void AddBinaryConfigurationsToConstraintSystem(VariabilityModel vm, ConstraintSystem s, Configuration configurationToExclude, Dictionary<BinaryOption, CspTerm> elemToTerm)
+        private void AddBinaryConfigurationsToConstraintSystem(VariabilityModel vm, ConstraintSystem s, List<BinaryOption> configurationToExclude, Dictionary<BinaryOption, CspTerm> elemToTerm)
         {
             List<BinaryOption> allBinaryOptions = vm.BinaryOptions;
 
@@ -105,7 +110,7 @@ namespace MachineLearning.Solver
             List<CspTerm> negativeTerms = new List<CspTerm>();
             foreach (BinaryOption binOpt in allBinaryOptions)
             {
-                if (configurationToExclude.BinaryOptions.ContainsKey(binOpt) && configurationToExclude.BinaryOptions[binOpt] == BinaryOption.BinaryValue.Selected)
+                if (configurationToExclude.Contains(binOpt))
                 {
                     positiveTerms.Add(elemToTerm[binOpt]);
                 }

@@ -132,18 +132,18 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 if (optimization == Optimization.NONE)
                 {
                     solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, null, selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, null);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
                     solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[0], selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, featureWeight[0]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
                     solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
-                        distanceOfBucket, featureWeight[currentBucket], selectedConfigurationsFromBucket[currentBucket]);
+                        distanceOfBucket, featureWeight[currentBucket]);
                 }
 
                 // If a bucket was selected that now contains no more configurations, repeat the procedure
