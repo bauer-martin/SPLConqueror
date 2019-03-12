@@ -21,7 +21,7 @@ namespace MachineLearning.Solver
             _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
         }
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             List<BinaryOption> lastSampledConfiguration;
@@ -140,7 +140,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Clears the cache needed for an optimization.
         /// </summary>
-        public void ClearBucketCache()
+        public void Reset()
         {
             this._z3Cache = null;
         }

@@ -12,12 +12,12 @@ namespace MachineLearning.Solver
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of certain feature combinations.</param>
         /// <returns>A list of <see cref="BinaryOption"/>, which should be selected.</returns>
-        List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+        List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight);
 
         /// <summary>
         /// This method clears the cache if caches are used.
         /// </summary>
-        void ClearBucketCache();
+        void Reset();
     }
 }

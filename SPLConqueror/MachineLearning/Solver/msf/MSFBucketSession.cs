@@ -18,7 +18,7 @@ namespace MachineLearning.Solver
         /// <param name="vm">The variability model.</param>
         /// <param name="numberSelectedFeatures">The number of features that should be selected.</param>
         /// <param name="featureWeight">The weight of the features to minimize.</param>
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             List<BinaryOption> lastSampledConfiguration;
@@ -97,7 +97,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Clears the cache-object needed for an optimization.
         /// </summary>
-        public void ClearBucketCache()
+        public void Reset()
         {
             this._constraintSystemCache = null;
         }

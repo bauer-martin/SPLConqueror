@@ -12,7 +12,7 @@ namespace MachineLearning.Solver
 
         public ChocoBucketSession(JavaSolverAdapter adapter) { _adapter = adapter; }
 
-        ~ChocoBucketSession() => ClearBucketCache();
+        ~ChocoBucketSession() => Reset();
 
         private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
         {
@@ -29,7 +29,7 @@ namespace MachineLearning.Solver
             return result;
         }
 
-        public List<BinaryOption> GenerateConfigurationFromBucket(VariabilityModel vm, int numberSelectedFeatures,
+        public List<BinaryOption> GenerateConfiguration(VariabilityModel vm, int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             _adapter.LoadVm(vm);
@@ -61,7 +61,7 @@ namespace MachineLearning.Solver
             return config;
         }
 
-        public void ClearBucketCache()
+        public void Reset()
         {
             _adapter.SetSolver(SolverType.CHOCO);
             string response = _adapter.Execute("clear-bucket-cache");

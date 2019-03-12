@@ -131,18 +131,18 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 // Now select the configuration by using the solver
                 if (optimization == Optimization.NONE)
                 {
-                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
                         distanceOfBucket, null);
                 }
                 else if (optimization == Optimization.GLOBAL)
                 {
-                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
                         distanceOfBucket, featureWeight[0]);
 
                 }
                 else if (optimization == Optimization.LOCAL)
                 {
-                    solution = bucketSession.GenerateConfigurationFromBucket(GlobalState.varModel,
+                    solution = bucketSession.GenerateConfiguration(GlobalState.varModel,
                         distanceOfBucket, featureWeight[currentBucket]);
                 }
 
@@ -177,7 +177,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }
 
-            bucketSession.ClearBucketCache();
+            bucketSession.Reset();
 
             return selectedConfigurations;
         }
