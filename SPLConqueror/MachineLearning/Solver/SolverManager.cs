@@ -64,18 +64,25 @@ namespace MachineLearning.Solver
             // parse additional arguments
             switch (_selectedSolverType)
             {
-                case SolverType.MICROSOFT_SOLVER_FOUNDATION: break;
-                case SolverType.Z3: break;
+                case SolverType.MICROSOFT_SOLVER_FOUNDATION:
+                    break;
+                case SolverType.Z3:
+                    break;
                 case SolverType.CHOCO:
-                        if (tokens.Length < 2)
-                        {
-                            throw new ArgumentException("path to java solver jar must be specified");
-                        }
-                        _pathToJavaSolverJar = tokens[1];
+                    SetJavaSolverJarPath(tokens);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private static void SetJavaSolverJarPath(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException("path to java solver jar must be specified");
+            }
+            _pathToJavaSolverJar = args[1];
         }
 
         public static ISolverFacade DefaultSolverFacade
@@ -102,11 +109,7 @@ namespace MachineLearning.Solver
                         facade = new Z3SolverFacade();
                         break;
                     case SolverType.CHOCO:
-                        if (_javaSolverAdapter == null)
-                        {
-                            _javaSolverAdapter = new JavaSolverAdapter(_pathToJavaSolverJar);
-                        }
-                        facade = new ChocoSolverFacade(_javaSolverAdapter);
+                        facade = CreateJavaBasedSolverFacade(solverType);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -114,6 +117,15 @@ namespace MachineLearning.Solver
                 _solverFacade[solverType] = facade;
             }
             return _solverFacade[solverType];
+        }
+
+        private static JavaBasedSolverFacade CreateJavaBasedSolverFacade(SolverType solverType)
+        {
+            if (_javaSolverAdapter == null)
+            {
+                _javaSolverAdapter = new JavaSolverAdapter(_pathToJavaSolverJar);
+            }
+            return new JavaBasedSolverFacade(_javaSolverAdapter, solverType);
         }
 
         public static ICheckConfigSAT DefaultSatisfiabilityChecker

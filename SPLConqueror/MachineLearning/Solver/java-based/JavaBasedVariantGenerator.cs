@@ -6,11 +6,16 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ChocoVariantGenerator : IVariantGenerator
+    public class JavaBasedVariantGenerator : IVariantGenerator
     {
         private readonly JavaSolverAdapter _adapter;
+        private readonly SolverType _solverType;
 
-        public ChocoVariantGenerator(JavaSolverAdapter adapter) { _adapter = adapter; }
+        public JavaBasedVariantGenerator(JavaSolverAdapter adapter, SolverType solverType)
+        {
+            _adapter = adapter;
+            _solverType = solverType;
+        }
 
         private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
         {
@@ -35,7 +40,7 @@ namespace MachineLearning.Solver
         public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string optionsString = String.Join(",", optionsToConsider.Select(o => o.Name));
             string response = _adapter.Execute($"generate-all-variants {optionsString}");
             List<List<BinaryOption>> allVariants = ParseBinaryConfigs(response, vm);
@@ -45,7 +50,7 @@ namespace MachineLearning.Solver
         public List<List<BinaryOption>> GenerateUpToN(VariabilityModel vm, int n)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string response = _adapter.Execute($"generate-up-to {n}");
             List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
             return optimalConfigs;
@@ -55,7 +60,7 @@ namespace MachineLearning.Solver
             List<BinaryOption> unWantedOptions)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string optionsString = String.Join(",", config.Select(o => o.Name));
             string command;
             if (unWantedOptions == null)
@@ -76,7 +81,7 @@ namespace MachineLearning.Solver
             List<BinaryOption> unwantedOptions)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string command;
             if (config == null)
             {
@@ -105,7 +110,7 @@ namespace MachineLearning.Solver
             VariabilityModel vm)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string optionsString = String.Join(",", originalConfig.Select(o => o.Name));
             string response = _adapter.Execute(
                 $"generate-config-without-option {optionsString} {optionToBeRemoved.Name}");
@@ -115,6 +120,9 @@ namespace MachineLearning.Solver
             return optimalConfig;
         }
 
-        public IBucketSession CreateBucketSession(VariabilityModel vm) { return new ChocoBucketSession(vm, _adapter); }
+        public IBucketSession CreateBucketSession(VariabilityModel vm)
+        {
+            return new JavaBasedBucketSession(vm, _adapter, _solverType);
+        }
     }
 }

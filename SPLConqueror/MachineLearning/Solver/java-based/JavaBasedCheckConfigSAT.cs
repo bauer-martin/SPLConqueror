@@ -5,16 +5,21 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ChocoCheckConfigSAT : ICheckConfigSAT
+    public class JavaBasedCheckConfigSAT : ICheckConfigSAT
     {
         private readonly JavaSolverAdapter _adapter;
+        private readonly SolverType _solverType;
 
-        public ChocoCheckConfigSAT(JavaSolverAdapter adapter) { this._adapter = adapter; }
+        public JavaBasedCheckConfigSAT(JavaSolverAdapter adapter, SolverType solverType)
+        {
+            _adapter = adapter;
+            _solverType = solverType;
+        }
 
         public bool checkConfigurationSAT(List<BinaryOption> config, VariabilityModel vm, bool partialConfiguration)
         {
             _adapter.LoadVm(vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string optionsString = String.Join(",", config.Select(o => o.Name));
             string partialString = partialConfiguration ? "partial" : "complete";
             string response = _adapter.Execute($"check-sat {partialString} {optionsString}");

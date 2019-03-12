@@ -6,18 +6,20 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ChocoBucketSession : IBucketSession
+    public class JavaBasedBucketSession : IBucketSession
     {
         private readonly VariabilityModel _vm;
         private readonly JavaSolverAdapter _adapter;
+        private readonly SolverType _solverType;
 
-        public ChocoBucketSession(VariabilityModel vm, JavaSolverAdapter adapter)
+        public JavaBasedBucketSession(VariabilityModel vm, JavaSolverAdapter adapter, SolverType solverType)
         {
             _vm = vm;
             _adapter = adapter;
+            _solverType = solverType;
         }
 
-        ~ChocoBucketSession() => Reset();
+        ~JavaBasedBucketSession() => Reset();
 
         private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
         {
@@ -38,7 +40,7 @@ namespace MachineLearning.Solver
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             _adapter.LoadVm(_vm);
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string command;
             if (featureWeight == null)
             {
@@ -68,7 +70,7 @@ namespace MachineLearning.Solver
 
         private void Reset()
         {
-            _adapter.SetSolver(SolverType.CHOCO);
+            _adapter.SetSolver(_solverType);
             string response = _adapter.Execute("clear-bucket-cache");
             _adapter.ThrowExceptionIfError(response);
         }
