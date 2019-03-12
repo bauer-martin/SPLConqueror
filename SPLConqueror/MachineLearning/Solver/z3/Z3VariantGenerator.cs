@@ -444,7 +444,7 @@ namespace MachineLearning.Solver
 
             if (optimizer.Check() != Status.SATISFIABLE)
             {
-                return new List<BinaryOption>();
+                return null;
             }
             else
             {

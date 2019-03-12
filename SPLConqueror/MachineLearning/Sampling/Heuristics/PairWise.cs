@@ -65,7 +65,7 @@ namespace MachineLearning.Sampling.Heuristics
                         tempConfig.Add(pair);
                         tempConfig = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tempConfig, vm, null);
 
-                        if (tempConfig.Count > 0 && !Configuration.containsBinaryConfiguration(configurations, tempConfig))
+                        if (tempConfig != null && tempConfig.Count > 0 && !Configuration.containsBinaryConfiguration(configurations, tempConfig))
                             configurations.Add(tempConfig);
                     }
                 }

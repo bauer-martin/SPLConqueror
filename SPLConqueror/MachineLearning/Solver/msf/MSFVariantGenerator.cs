@@ -188,17 +188,17 @@ namespace MachineLearning.Solver
 
             ConstraintSolverSolution soln = S.Solve();
             List<string> erg2 = new List<string>();
-            List<BinaryOption> tempConfig = new List<BinaryOption>();
             if (soln.HasFoundSolution)
             {
-                tempConfig.Clear();
+                List<BinaryOption> tempConfig = new List<BinaryOption>();
                 foreach (CspTerm cT in variables)
                 {
                     if (soln.GetIntegerValue(cT) == 1)
                         tempConfig.Add(termToElem[cT]);
                 }
+                return tempConfig;
             }
-            return tempConfig;
+            return null;
         }
 
         /// <summary>
