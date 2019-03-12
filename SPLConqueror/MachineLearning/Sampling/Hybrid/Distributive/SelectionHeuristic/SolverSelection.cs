@@ -174,8 +174,6 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                 GlobalState.logError.logLine("Sampled only " + selectedConfigurations.Count + " configurations as there are no more configurations.");
             }
 
-            bucketSession.Reset();
-
             return selectedConfigurations;
         }
 

@@ -138,13 +138,5 @@ namespace MachineLearning.Solver
                 return null;
             }
         }
-
-        /// <summary>
-        /// Clears the cache needed for an optimization.
-        /// </summary>
-        public void Reset()
-        {
-            this._z3Cache = null;
-        }
     }
 }

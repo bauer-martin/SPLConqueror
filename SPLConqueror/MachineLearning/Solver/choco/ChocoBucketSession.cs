@@ -66,7 +66,7 @@ namespace MachineLearning.Solver
             return config;
         }
 
-        public void Reset()
+        private void Reset()
         {
             _adapter.SetSolver(SolverType.CHOCO);
             string response = _adapter.Execute("clear-bucket-cache");

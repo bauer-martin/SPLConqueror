@@ -96,14 +96,6 @@ namespace MachineLearning.Solver
             return tempConfig;
         }
 
-        /// <summary>
-        /// Clears the cache-object needed for an optimization.
-        /// </summary>
-        public void Reset()
-        {
-            this._constraintSystemCache = null;
-        }
-
         private void AddBinaryConfigurationsToConstraintSystem(VariabilityModel vm, ConstraintSystem s, List<BinaryOption> configurationToExclude, Dictionary<BinaryOption, CspTerm> elemToTerm)
         {
             List<BinaryOption> allBinaryOptions = vm.BinaryOptions;
