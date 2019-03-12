@@ -76,16 +76,6 @@ namespace MachineLearning.Solver
         }
 
         /// <summary>
-        /// Generates all valid configurations by using the given <see cref="VariabilityModel"/>.
-        /// </summary>
-        /// <param name="vm">The <see cref="VariabilityModel"/> that describes the software.</param>
-        /// <returns>A list of configurations. The configurations are represented by a list of <see cref="BinaryOption"/>.</returns>
-        public List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm)
-        {
-            return GenerateUpToNFast(vm, -1);
-        }
-
-        /// <summary>
         /// Generates up to n solutions of the given variability model. 
         /// Note that this method could also generate less than n solutions if the variability model does not contain sufficient solutions.
         /// Moreover, in the case that <code>n &lt; 0</code>, all solutions are generated.
@@ -93,7 +83,7 @@ namespace MachineLearning.Solver
         /// <param name="vm">The <see cref="VariabilityModel"/> to obtain solutions for.</param>
         /// <param name="n">The number of solutions to obtain.</param>
         /// <returns>A list of configurations, in which a configuration is a list of SELECTED binary options.</returns>
-        public List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel vm, int n)
+        public List<List<BinaryOption>> GenerateUpToN(VariabilityModel vm, int n)
         {
             // Use the random seed to produce new random seeds
             Random random = new Random(Convert.ToInt32(z3RandomSeed));
@@ -579,7 +569,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Clears the cache needed for an optimization.
         /// </summary>
-        public void ClearCache()
+        public void ClearBucketCache()
         {
             this._z3Cache = null;
         }

@@ -48,12 +48,12 @@ namespace MachineLearning.Sampling
                         if (optionsToConsider.ContainsKey(SamplingStrategies.ALLBINARY))
                         {
                             List<List<BinaryOption>> variants =
-                                vg.GenerateAllVariantsFast(vm.reduce(optionsToConsider[SamplingStrategies.ALLBINARY]));
+                                vg.GenerateUpToN(vm.reduce(optionsToConsider[SamplingStrategies.ALLBINARY]), -1);
                             binaryConfigs.AddRange(changeModel(vm, variants));
                         }
                         else
                         {
-                            binaryConfigs.AddRange(vg.GenerateAllVariantsFast(vm));
+                            binaryConfigs.AddRange(vg.GenerateUpToN(vm, -1));
                         }
                         break;
                     case SamplingStrategies.SAT:
@@ -94,12 +94,12 @@ namespace MachineLearning.Sampling
                             if (optionsToConsider.ContainsKey(SamplingStrategies.SAT))
                             {
                                 List<List<BinaryOption>> variants =
-                                    vg.GenerateUpToNFast(vm.reduce(optionsToConsider[SamplingStrategies.SAT]), numberSamples);
+                                    vg.GenerateUpToN(vm.reduce(optionsToConsider[SamplingStrategies.SAT]), numberSamples);
                                 binaryConfigs.AddRange(changeModel(vm, variants));
                             }
                             else
                             {
-                                binaryConfigs.AddRange(vg.GenerateUpToNFast(vm, numberSamples));
+                                binaryConfigs.AddRange(vg.GenerateUpToN(vm, numberSamples));
                             }
                             numberSamples = 2;
                         }

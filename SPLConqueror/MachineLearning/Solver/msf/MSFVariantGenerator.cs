@@ -79,23 +79,13 @@ namespace MachineLearning.Solver
         }
 
         /// <summary>
-        /// Generates all valid binary combinations of all binary configurations options in the given model
-        /// </summary>
-        /// <param name="vm">The variability model containing the binary options and their constraints.</param>
-        /// <returns>Returns a list of configurations, in which a configuration is a list of SELECTED binary options (deselected options are not present)</returns>
-        public List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm)
-        {
-            return GenerateUpToNFast(vm, -1);
-        }
-
-        /// <summary>
         /// Generates up to n valid binary combinations of all binary configuration options in the given model.
         /// In case n < 0 all valid binary combinations will be generated. 
         /// </summary>
         /// <param name="m">The variability model containing the binary options and their constraints.</param>
         /// <param name="n">The maximum number of samples that will be generated.</param>
         /// <returns>Returns a list of configurations, in which a configuration is a list of SELECTED binary options (deselected options are not present)</returns>
-        public List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel m, int n)
+        public List<List<BinaryOption>> GenerateUpToN(VariabilityModel m, int n)
         {
             List<List<BinaryOption>> configurations = new List<List<BinaryOption>>();
             List<CspTerm> variables = new List<CspTerm>();
@@ -246,7 +236,7 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Clears the cache-object needed for an optimization.
         /// </summary>
-        public void ClearCache()
+        public void ClearBucketCache()
         {
             this._constraintSystemCache = null;
         }

@@ -461,7 +461,7 @@ namespace SPLConqueror_GUI
             occuranceOfOptions.Clear();
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            foreach (List<BinaryOption> variant in vg.GenerateAllVariantsFast(currentModel))
+            foreach (List<BinaryOption> variant in vg.GenerateUpToN(currentModel, -1))
             {
                 foreach (BinaryOption opt in variant)
                 {
@@ -1878,7 +1878,7 @@ namespace SPLConqueror_GUI
 
             populatePlot(constantChartRepl, constantValues, constantLabels);
 
-            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateAllVariantsFast(currentModel).Count;
+            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateUpToN(currentModel, -1).Count;
 
             // Update max and max occurance chart
             foreach (KeyValuePair<string, double> entry in constantMaxInfluences)

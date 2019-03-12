@@ -83,7 +83,7 @@ namespace MachineLearning.Sampling.Heuristics
             }
             else
             {
-                allConfigs = SolverManager.DefaultVariantGenerator.GenerateAllVariantsFast(varModel);
+                allConfigs = SolverManager.DefaultVariantGenerator.GenerateUpToN(varModel, -1);
             }
 
             //repair wrong parameters

@@ -14,13 +14,6 @@ namespace MachineLearning.Solver
         List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider);
 
         /// <summary>
-        /// Generates all valid binary combinations of all binary configurations options in the given model
-        /// </summary>
-        /// <param name="vm">The variability model containing the binary options and their constraints.</param>
-        /// <returns>Returns a list of configurations, in which a configuration is a list of SELECTED binary options (deselected options are not present)</returns>
-        List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm);
-
-        /// <summary>
         /// Generates up to n solutions of the given variability model. 
         /// Note that this method could also generate less than n solutions if the variability model does not contain sufficient solutions.
         /// Moreover, in the case that <code>n &lt; 0</code>, all solutions are generated.
@@ -28,7 +21,7 @@ namespace MachineLearning.Solver
         /// <param name="vm">The <see cref="VariabilityModel"/> to obtain solutions for.</param>
         /// <param name="n">The number of solutions to obtain.</param>
         /// <returns>A list of configurations, in which a configuration is a list of SELECTED binary options.</returns>
-        List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel vm, int n);
+        List<List<BinaryOption>> GenerateUpToN(VariabilityModel vm, int n);
 
         /// <summary>
         /// Based on a given (partial) configuration and variability model, we search for the smallest (in terms of selected options) valid configuration.
@@ -71,6 +64,6 @@ namespace MachineLearning.Solver
         /// <summary>
         /// This method clears the cache if caches are used.
         /// </summary>
-        void ClearCache();
+        void ClearBucketCache();
     }
 }

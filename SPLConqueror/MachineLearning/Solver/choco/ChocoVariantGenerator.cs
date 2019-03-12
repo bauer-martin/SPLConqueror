@@ -42,12 +42,7 @@ namespace MachineLearning.Solver
             return allVariants.Select(binarySelection => new Configuration(binarySelection)).ToList();
         }
 
-        public List<List<BinaryOption>> GenerateAllVariantsFast(VariabilityModel vm)
-        {
-            return GenerateUpToNFast(vm, -1);
-        }
-
-        public List<List<BinaryOption>> GenerateUpToNFast(VariabilityModel vm, int n)
+        public List<List<BinaryOption>> GenerateUpToN(VariabilityModel vm, int n)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(SolverType.CHOCO);
@@ -153,7 +148,7 @@ namespace MachineLearning.Solver
             return config;
         }
 
-        public void ClearCache()
+        public void ClearBucketCache()
         {
             _adapter.SetSolver(SolverType.CHOCO);
             string response = _adapter.Execute("clear-bucket-cache");
