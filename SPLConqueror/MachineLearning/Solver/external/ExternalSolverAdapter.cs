@@ -5,66 +5,65 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class JavaSolverAdapter
+    public class ExternalSolverAdapter
     {
         private const string ERROR_PREFIX = "error: ";
-        private Process _javaProcess;
-        private StreamReader _javaOutput;
-        private StreamReader _javaError;
-        private StreamWriter _javaInput;
+        private Process _process;
+        private StreamReader _processOutput;
+        private StreamReader _processError;
+        private StreamWriter _processInput;
         private string _loadedVmName;
         private SolverType _selectedSolver;
-        private readonly string _pathToJar;
+        private readonly string _pathToExecutable;
 
-        public JavaSolverAdapter(string pathToJar)
+        public ExternalSolverAdapter(string pathToExecutable)
         {
-            _pathToJar = pathToJar;
+            _pathToExecutable = pathToExecutable;
         }
 
         private void Setup()
         {
-            _javaProcess = new Process
+            _process = new Process
             {
                 StartInfo =
                 {
-                    FileName = "/usr/bin/java",
-                    Arguments = $"-jar {_pathToJar}",
+                    FileName = _pathToExecutable,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     RedirectStandardInput = true
                 }
             };
-            _javaProcess.Start();
-            _javaOutput = _javaProcess.StandardOutput;
-            _javaError = _javaProcess.StandardError;
-            _javaInput = _javaProcess.StandardInput;
+            _process.Start();
+            _processOutput = _process.StandardOutput;
+            _processError = _process.StandardError;
+            _processInput = _process.StandardInput;
         }
 
         internal string Execute(String command)
         {
-            if (_javaProcess == null) Setup();
-            _javaInput.WriteLine(command);
-            string response = _javaOutput.ReadLine();
+            if (_process == null) Setup();
+            _processInput.WriteLine(command);
+            string response = _processOutput.ReadLine();
             if (response == null)
             {
-                string errorMessage = _javaError.ReadToEnd();
+                string errorMessage = _processError.ReadToEnd();
                 GlobalState.logError.logLine(errorMessage);
-                throw new JavaException("Jar execution terminated; see error log.");
+                throw new ExternalSolverException("external solver execution terminated -> see error log");
             }
             ThrowExceptionIfError(response);
             return response;
         }
 
-        public void TerminateJavaProcess()
+        public void TerminateProcess()
         {
-            if (_javaProcess == null || _javaProcess.HasExited) return;
-            _javaInput.WriteLine("exit");
-            _javaProcess.WaitForExit();
-            _javaProcess = null;
-            _javaOutput = null;
-            _javaError = null;
-            _javaInput = null;
+            if (_process == null || _process.HasExited) return;
+            _processInput.WriteLine("exit");
+            _process.WaitForExit();
+            _process = null;
+            _processOutput = null;
+            _processError = null;
+            _processInput = null;
             _loadedVmName = null;
             _selectedSolver = 0;
         }
@@ -93,7 +92,7 @@ namespace MachineLearning.Solver
         public void ThrowExceptionIfError(String response)
         {
             if (response.StartsWith(ERROR_PREFIX))
-                throw new JavaException(response);
+                throw new ExternalSolverException(response);
         }
     }
 }

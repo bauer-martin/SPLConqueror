@@ -5,12 +5,12 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class JavaBasedCheckConfigSAT : ICheckConfigSAT
+    public class ExternalCheckConfigSAT : ICheckConfigSAT
     {
-        private readonly JavaSolverAdapter _adapter;
+        private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
 
-        public JavaBasedCheckConfigSAT(JavaSolverAdapter adapter, SolverType solverType)
+        public ExternalCheckConfigSAT(ExternalSolverAdapter adapter, SolverType solverType)
         {
             _adapter = adapter;
             _solverType = solverType;

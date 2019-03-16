@@ -8,10 +8,10 @@ namespace MachineLearning.Solver
 {
     public class JavaBasedVariantGenerator : IVariantGenerator
     {
-        private readonly JavaSolverAdapter _adapter;
+        private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
 
-        public JavaBasedVariantGenerator(JavaSolverAdapter adapter, SolverType solverType)
+        public JavaBasedVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType)
         {
             _adapter = adapter;
             _solverType = solverType;
@@ -122,7 +122,7 @@ namespace MachineLearning.Solver
 
         public IBucketSession CreateBucketSession(VariabilityModel vm)
         {
-            return new JavaBasedBucketSession(vm, _adapter, _solverType);
+            return new ExternalBucketSession(vm, _adapter, _solverType);
         }
     }
 }

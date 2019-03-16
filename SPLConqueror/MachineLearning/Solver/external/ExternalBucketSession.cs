@@ -6,20 +6,20 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class JavaBasedBucketSession : IBucketSession
+    public class ExternalBucketSession : IBucketSession
     {
         private readonly VariabilityModel _vm;
-        private readonly JavaSolverAdapter _adapter;
+        private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
 
-        public JavaBasedBucketSession(VariabilityModel vm, JavaSolverAdapter adapter, SolverType solverType)
+        public ExternalBucketSession(VariabilityModel vm, ExternalSolverAdapter adapter, SolverType solverType)
         {
             _vm = vm;
             _adapter = adapter;
             _solverType = solverType;
         }
 
-        ~JavaBasedBucketSession() => Reset();
+        ~ExternalBucketSession() => Reset();
 
         private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
         {

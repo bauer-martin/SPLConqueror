@@ -41,9 +41,8 @@ namespace MachineLearning.Solver
         private static SolverType _selectedSolverType;
         private static readonly Dictionary<SolverType, ISolverFacade> _solverFacade;
 
-        // java-based solvers need access to JVM
-        private static string _pathToJavaSolverJar;
-        private static JavaSolverAdapter _javaSolverAdapter;
+        private static string _pathToExternalSolverExecutable;
+        private static ExternalSolverAdapter _externalSolverAdapter;
 
         static SolverManager()
         {
@@ -75,26 +74,26 @@ namespace MachineLearning.Solver
                 case SolverType.Z3:
                     break;
                 case SolverType.CHOCO:
-                    SetJavaSolverJarPath(tokens);
+                    SetExternalSolverExecutablePath(tokens);
                     break;
                 case SolverType.JACOP:
-                    SetJavaSolverJarPath(tokens);
+                    SetExternalSolverExecutablePath(tokens);
                     break;
                 case SolverType.OR_TOOLS:
-                    SetJavaSolverJarPath(tokens);
+                    SetExternalSolverExecutablePath(tokens);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private static void SetJavaSolverJarPath(string[] args)
+        private static void SetExternalSolverExecutablePath(string[] args)
         {
             if (args.Length < 2)
             {
-                throw new ArgumentException("path to java solver jar must be specified");
+                throw new ArgumentException("path to external solver executable must be specified");
             }
-            _pathToJavaSolverJar = args[1];
+            _pathToExternalSolverExecutable = args[1];
         }
 
         public static ISolverFacade DefaultSolverFacade
@@ -121,13 +120,13 @@ namespace MachineLearning.Solver
                         facade = new Z3SolverFacade();
                         break;
                     case SolverType.CHOCO:
-                        facade = CreateJavaBasedSolverFacade(solverType);
+                        facade = CreateExternalSolverFacade(solverType);
                         break;
                     case SolverType.JACOP:
-                        facade = CreateJavaBasedSolverFacade(solverType);
+                        facade = CreateExternalSolverFacade(solverType);
                         break;
                     case SolverType.OR_TOOLS:
-                        facade = CreateJavaBasedSolverFacade(solverType);
+                        facade = CreateExternalSolverFacade(solverType);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -137,13 +136,13 @@ namespace MachineLearning.Solver
             return _solverFacade[solverType];
         }
 
-        private static JavaBasedSolverFacade CreateJavaBasedSolverFacade(SolverType solverType)
+        private static ExternalSolverFacade CreateExternalSolverFacade(SolverType solverType)
         {
-            if (_javaSolverAdapter == null)
+            if (_externalSolverAdapter == null)
             {
-                _javaSolverAdapter = new JavaSolverAdapter(_pathToJavaSolverJar);
+                _externalSolverAdapter = new ExternalSolverAdapter(_pathToExternalSolverExecutable);
             }
-            return new JavaBasedSolverFacade(_javaSolverAdapter, solverType);
+            return new ExternalSolverFacade(_externalSolverAdapter, solverType);
         }
 
         public static ICheckConfigSAT DefaultSatisfiabilityChecker
