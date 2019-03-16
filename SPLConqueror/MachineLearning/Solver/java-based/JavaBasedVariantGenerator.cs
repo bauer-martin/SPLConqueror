@@ -65,12 +65,12 @@ namespace MachineLearning.Solver
             string command;
             if (unWantedOptions == null)
             {
-                command = $"find-optimal-config {optionsString}";
+                command = $"find-minimized-config {optionsString}";
             }
             else
             {
                 string unwantedOptionsString = String.Join(",", unWantedOptions.Select(o => o.Name));
-                command = $"find-optimal-config {optionsString} {unwantedOptionsString}";
+                command = $"find-minimized-config {optionsString} {unwantedOptionsString}";
             }
             string response = _adapter.Execute(command);
             List<BinaryOption> optimalConfig = ParseBinaryOptions(response, vm);
@@ -85,19 +85,19 @@ namespace MachineLearning.Solver
             string command;
             if (config == null)
             {
-                command = $"find-all-optimal-configs";
+                command = $"find-all-maximized-configs";
             }
             else
             {
                 string optionsString = String.Join(",", config.Select(o => o.Name));
                 if (unwantedOptions == null)
                 {
-                    command = $"find-all-optimal-configs {optionsString}";
+                    command = $"find-all-maximized-configs {optionsString}";
                 }
                 else
                 {
                     string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
-                    command = $"find-all-optimal-configs {optionsString} {unwantedOptionsString}";
+                    command = $"find-all-maximized-configs {optionsString} {unwantedOptionsString}";
                 }
             }
             string response = _adapter.Execute(command);
