@@ -39,10 +39,8 @@ namespace MachineLearning.Solver
         private static readonly Dictionary<string, SolverType> _solverTypesByName;
 
         private static SolverType _selectedSolverType;
-        private static readonly Dictionary<SolverType, ISolverFacade> _solverFacade;
-
-        private static string _pathToExternalSolverExecutable;
-        private static ExternalSolverAdapter _externalSolverAdapter;
+        private static readonly Dictionary<SolverType, ISolverFacade> _solverFacades;
+        private static readonly Dictionary<string, ExternalSolverAdapter> _externalSolverAdapters;
 
         static SolverManager()
         {
@@ -54,7 +52,8 @@ namespace MachineLearning.Solver
             _solverTypesByName["smt"] = SolverType.Z3;
             _solverTypesByName["csp"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
             _solverTypesByName["microsoft solver foundation"] = SolverType.MICROSOFT_SOLVER_FOUNDATION;
-            _solverFacade = new Dictionary<SolverType, ISolverFacade>();
+            _solverFacades = new Dictionary<SolverType, ISolverFacade>();
+            _externalSolverAdapters = new Dictionary<string, ExternalSolverAdapter>();
         }
 
         public static void SetSelectedSolver(string str)
@@ -65,35 +64,47 @@ namespace MachineLearning.Solver
                 throw new ArgumentOutOfRangeException($"The solver '{name}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
             _selectedSolverType = _solverTypesByName[name];
+            SetupSolverFacade(_selectedSolverType, tokens);
+        }
 
-            // parse additional arguments
-            switch (_selectedSolverType)
+        private static void SetupSolverFacade(SolverType solverType, string[] tokens)
+        {
+            if (_solverFacades.ContainsKey(solverType)) return;
+            ISolverFacade facade;
+            switch (solverType)
             {
                 case SolverType.MICROSOFT_SOLVER_FOUNDATION:
+                    facade = new MSFSolverFacade();
                     break;
                 case SolverType.Z3:
+                    facade = new Z3SolverFacade();
                     break;
                 case SolverType.CHOCO:
-                    SetExternalSolverExecutablePath(tokens);
+                {
+                    if (tokens.Length < 2)
+                    {
+                        throw new ArgumentException("path to external solver executable must be specified");
+                    }
+                    string executablePath = tokens[1];
+                    ExternalSolverAdapter adapter;
+                    if (_externalSolverAdapters.ContainsKey(executablePath))
+                    {
+                        adapter = _externalSolverAdapters[executablePath];
+                    }
+                    else
+                    {
+                        adapter = new ExternalSolverAdapter(executablePath);
+                        _externalSolverAdapters[executablePath] = adapter;
+                    }
+                    facade = new ExternalSolverFacade(adapter, solverType);
                     break;
-                case SolverType.JACOP:
-                    SetExternalSolverExecutablePath(tokens);
-                    break;
-                case SolverType.OR_TOOLS:
-                    SetExternalSolverExecutablePath(tokens);
-                    break;
+                }
+                case SolverType.JACOP: goto case SolverType.CHOCO;
+                case SolverType.OR_TOOLS: goto case SolverType.CHOCO;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private static void SetExternalSolverExecutablePath(string[] args)
-        {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("path to external solver executable must be specified");
-            }
-            _pathToExternalSolverExecutable = args[1];
+            _solverFacades[solverType] = facade;
         }
 
         public static ISolverFacade DefaultSolverFacade
@@ -106,44 +117,7 @@ namespace MachineLearning.Solver
             }
         }
 
-        public static ISolverFacade GetSolverFacade(SolverType solverType)
-        {
-            if (!_solverFacade.ContainsKey(solverType))
-            {
-                ISolverFacade facade;
-                switch (solverType)
-                {
-                    case SolverType.MICROSOFT_SOLVER_FOUNDATION:
-                        facade = new MSFSolverFacade();
-                        break;
-                    case SolverType.Z3:
-                        facade = new Z3SolverFacade();
-                        break;
-                    case SolverType.CHOCO:
-                        facade = CreateExternalSolverFacade(solverType);
-                        break;
-                    case SolverType.JACOP:
-                        facade = CreateExternalSolverFacade(solverType);
-                        break;
-                    case SolverType.OR_TOOLS:
-                        facade = CreateExternalSolverFacade(solverType);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                _solverFacade[solverType] = facade;
-            }
-            return _solverFacade[solverType];
-        }
-
-        private static ExternalSolverFacade CreateExternalSolverFacade(SolverType solverType)
-        {
-            if (_externalSolverAdapter == null)
-            {
-                _externalSolverAdapter = new ExternalSolverAdapter(_pathToExternalSolverExecutable);
-            }
-            return new ExternalSolverFacade(_externalSolverAdapter, solverType);
-        }
+        public static ISolverFacade GetSolverFacade(SolverType solverType) { return _solverFacades[solverType]; }
 
         public static ICheckConfigSAT DefaultSatisfiabilityChecker
         {
