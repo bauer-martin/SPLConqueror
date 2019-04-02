@@ -9,7 +9,8 @@ namespace MachineLearning.Solver
         Z3 = 2,
         CHOCO = 3,
         JACOP = 4,
-        OR_TOOLS = 5
+        OR_TOOLS = 5,
+        OPTI_MATH_SAT = 6
     }
 
     public static class SolverTypeMethods
@@ -28,6 +29,8 @@ namespace MachineLearning.Solver
                     return "jacop";
                 case SolverType.OR_TOOLS:
                     return "or-tools";
+                case SolverType.OPTI_MATH_SAT:
+                    return "opti-math-sat";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -101,6 +104,7 @@ namespace MachineLearning.Solver
                 }
                 case SolverType.JACOP: goto case SolverType.CHOCO;
                 case SolverType.OR_TOOLS: goto case SolverType.CHOCO;
+                case SolverType.OPTI_MATH_SAT: goto case SolverType.CHOCO;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
