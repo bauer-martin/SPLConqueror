@@ -138,6 +138,7 @@
     <Compile Include="Solver\external\AbstractOptionCoding.cs" />
     <Compile Include="Solver\external\IOptionCoding.cs" />
     <Compile Include="Solver\external\OptionNameOptionCoding.cs" />
+    <Compile Include="Solver\external\VariabilityModelIndexOptionCoding.cs" />
     <Compile Include="Solver\IBucketSession.cs" />
     <Compile Include="Solver\external\ExternalBucketSession.cs" />
     <Compile Include="Solver\external\ExternalCheckConfigSAT.cs" />

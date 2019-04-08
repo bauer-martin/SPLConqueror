@@ -12,7 +12,7 @@ namespace MachineLearning.Solver
         {
             _externalSolverAdapter = externalSolverAdapter;
             _solverType = solverType;
-            _optionCoding = new OptionNameOptionCoding();
+            _optionCoding = new VariabilityModelIndexOptionCoding();
         }
 
         public ICheckConfigSAT SatisfiabilityChecker
