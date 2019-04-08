@@ -57,7 +57,6 @@ namespace MachineLearning.Solver
 
         private void Reset()
         {
-            _adapter.SetSolver(_solverType);
             string response = _adapter.Execute("clear-bucket-cache");
             _adapter.ThrowExceptionIfError(response);
         }
