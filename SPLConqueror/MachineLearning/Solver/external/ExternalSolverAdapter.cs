@@ -14,6 +14,7 @@ namespace MachineLearning.Solver
         private StreamWriter _processInput;
         private string _loadedVmName;
         private SolverType _selectedSolver;
+        private string _selectedOptionCodingName;
         private readonly string _pathToExecutable;
 
         public ExternalSolverAdapter(string pathToExecutable)
@@ -87,6 +88,14 @@ namespace MachineLearning.Solver
             string response = Execute($"select-solver {solverType.GetName()}");
             ThrowExceptionIfError(response);
             _selectedSolver = solverType;
+        }
+
+        public void SetOptionCoding(IOptionCoding optionCoding)
+        {
+            if (optionCoding.GetName() == _selectedOptionCodingName) return;
+            string response = Execute($"select-option-coding {optionCoding.GetName()}");
+            ThrowExceptionIfError(response);
+            _selectedOptionCodingName = optionCoding.GetName();
         }
 
         public void ThrowExceptionIfError(String response)

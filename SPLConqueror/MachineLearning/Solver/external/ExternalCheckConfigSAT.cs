@@ -9,18 +9,21 @@ namespace MachineLearning.Solver
     {
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
+        private readonly IOptionCoding _optionCoding;
 
-        public ExternalCheckConfigSAT(ExternalSolverAdapter adapter, SolverType solverType)
+        public ExternalCheckConfigSAT(ExternalSolverAdapter adapter, SolverType solverType, IOptionCoding optionCoding)
         {
             _adapter = adapter;
             _solverType = solverType;
+            _optionCoding = optionCoding;
         }
 
         public bool checkConfigurationSAT(List<BinaryOption> config, VariabilityModel vm, bool partialConfiguration)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
-            string optionsString = String.Join(",", config.Select(o => o.Name));
+            _adapter.SetOptionCoding(_optionCoding);
+            string optionsString = _optionCoding.EncodeOptions(config, vm);
             string partialString = partialConfiguration ? "partial" : "complete";
             string response = _adapter.Execute($"check-sat {partialString} {optionsString}");
             return response.Equals("true");

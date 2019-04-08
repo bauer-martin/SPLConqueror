@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
@@ -10,40 +8,24 @@ namespace MachineLearning.Solver
     {
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
+        private readonly IOptionCoding _optionCoding;
 
-        public JavaBasedVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType)
+        public JavaBasedVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType,
+            IOptionCoding optionCoding)
         {
             _adapter = adapter;
             _solverType = solverType;
-        }
-
-        private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
-        {
-            List<BinaryOption> result;
-            if (str.Equals("none"))
-            {
-                result = null;
-            }
-            else
-            {
-                string[] tokens = str.Split(',');
-                result = tokens.Select(vm.getBinaryOption).ToList();
-            }
-            return result;
-        }
-
-        private static List<List<BinaryOption>> ParseBinaryConfigs(string str, VariabilityModel vm)
-        {
-            return str.Split(';').Select(s => ParseBinaryOptions(s, vm)).ToList();
+            _optionCoding = optionCoding;
         }
 
         public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
-            string optionsString = String.Join(",", optionsToConsider.Select(o => o.Name));
+            _adapter.SetOptionCoding(_optionCoding);
+            string optionsString = _optionCoding.EncodeOptions(optionsToConsider, vm);
             string response = _adapter.Execute($"generate-all-variants {optionsString}");
-            List<List<BinaryOption>> allVariants = ParseBinaryConfigs(response, vm);
+            List<List<BinaryOption>> allVariants = _optionCoding.DecodeBinaryOptionsList(response, vm);
             return allVariants.Select(binarySelection => new Configuration(binarySelection)).ToList();
         }
 
@@ -51,8 +33,9 @@ namespace MachineLearning.Solver
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
+            _adapter.SetOptionCoding(_optionCoding);
             string response = _adapter.Execute($"generate-up-to {n}");
-            List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
+            List<List<BinaryOption>> optimalConfigs = _optionCoding.DecodeBinaryOptionsList(response, vm);
             return optimalConfigs;
         }
 
@@ -61,7 +44,8 @@ namespace MachineLearning.Solver
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
-            string optionsString = String.Join(",", config.Select(o => o.Name));
+            _adapter.SetOptionCoding(_optionCoding);
+            string optionsString = _optionCoding.EncodeOptions(config, vm);
             string command;
             if (unWantedOptions == null)
             {
@@ -69,11 +53,11 @@ namespace MachineLearning.Solver
             }
             else
             {
-                string unwantedOptionsString = String.Join(",", unWantedOptions.Select(o => o.Name));
+                string unwantedOptionsString = _optionCoding.EncodeOptions(unWantedOptions, vm);
                 command = $"find-minimized-config {optionsString} {unwantedOptionsString}";
             }
             string response = _adapter.Execute(command);
-            List<BinaryOption> optimalConfig = ParseBinaryOptions(response, vm);
+            List<BinaryOption> optimalConfig = _optionCoding.DecodeBinaryOptions(response, vm);
             return optimalConfig;
         }
 
@@ -82,6 +66,7 @@ namespace MachineLearning.Solver
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
+            _adapter.SetOptionCoding(_optionCoding);
             string command;
             if (config == null)
             {
@@ -89,19 +74,19 @@ namespace MachineLearning.Solver
             }
             else
             {
-                string optionsString = String.Join(",", config.Select(o => o.Name));
+                string optionsString = _optionCoding.EncodeOptions(config, vm);
                 if (unwantedOptions == null)
                 {
                     command = $"find-all-maximized-configs {optionsString}";
                 }
                 else
                 {
-                    string unwantedOptionsString = String.Join(",", unwantedOptions.Select(o => o.Name));
+                    string unwantedOptionsString = _optionCoding.EncodeOptions(unwantedOptions, vm);
                     command = $"find-all-maximized-configs {optionsString} {unwantedOptionsString}";
                 }
             }
             string response = _adapter.Execute(command);
-            List<List<BinaryOption>> optimalConfigs = ParseBinaryConfigs(response, vm);
+            List<List<BinaryOption>> optimalConfigs = _optionCoding.DecodeBinaryOptionsList(response, vm);
             return optimalConfigs;
         }
 
@@ -111,18 +96,19 @@ namespace MachineLearning.Solver
         {
             _adapter.LoadVm(vm);
             _adapter.SetSolver(_solverType);
-            string optionsString = String.Join(",", originalConfig.Select(o => o.Name));
+            _adapter.SetOptionCoding(_optionCoding);
+            string optionsString = _optionCoding.EncodeOptions(originalConfig, vm);
             string response = _adapter.Execute(
                 $"generate-config-without-option {optionsString} {optionToBeRemoved.Name}");
             string[] tokens = response.Split(' ');
-            List<BinaryOption> optimalConfig = ParseBinaryOptions(tokens[0], vm);
-            removedElements = ParseBinaryOptions(tokens[1], vm);
+            List<BinaryOption> optimalConfig = _optionCoding.DecodeBinaryOptions(tokens[0], vm);
+            removedElements = _optionCoding.DecodeBinaryOptions(tokens[1], vm);
             return optimalConfig;
         }
 
         public IBucketSession CreateBucketSession(VariabilityModel vm)
         {
-            return new ExternalBucketSession(vm, _adapter, _solverType);
+            return new ExternalBucketSession(vm, _adapter, _solverType, _optionCoding);
         }
     }
 }

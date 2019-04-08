@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using SPLConqueror_Core;
 
@@ -11,36 +9,25 @@ namespace MachineLearning.Solver
         private readonly VariabilityModel _vm;
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
+        private readonly IOptionCoding _optionCoding;
 
-        public ExternalBucketSession(VariabilityModel vm, ExternalSolverAdapter adapter, SolverType solverType)
+        public ExternalBucketSession(VariabilityModel vm, ExternalSolverAdapter adapter, SolverType solverType,
+            IOptionCoding optionCoding)
         {
             _vm = vm;
             _adapter = adapter;
             _solverType = solverType;
+            _optionCoding = optionCoding;
         }
 
         ~ExternalBucketSession() => Reset();
-
-        private static List<BinaryOption> ParseBinaryOptions(string str, VariabilityModel vm)
-        {
-            List<BinaryOption> result;
-            if (str.Equals("none"))
-            {
-                result = null;
-            }
-            else
-            {
-                string[] tokens = str.Split(',');
-                result = tokens.Select(vm.getBinaryOption).ToList();
-            }
-            return result;
-        }
 
         public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
             _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
+            _adapter.SetOptionCoding(_optionCoding);
             string command;
             if (featureWeight == null)
             {
@@ -51,7 +38,7 @@ namespace MachineLearning.Solver
                 StringBuilder featureWeightString = new StringBuilder();
                 foreach (KeyValuePair<List<BinaryOption>, int> pair in featureWeight)
                 {
-                    featureWeightString.Append(String.Join(",", pair.Key.Select(o => o.Name)));
+                    featureWeightString.Append(_optionCoding.EncodeOptions(pair.Key, _vm));
                     featureWeightString.Append("=");
                     featureWeightString.Append(pair.Value);
                     featureWeightString.Append(";");
@@ -64,7 +51,7 @@ namespace MachineLearning.Solver
             }
             string response = _adapter.Execute(command);
             string[] tokens = response.Split(' ');
-            List<BinaryOption> config = ParseBinaryOptions(tokens[0], _vm);
+            List<BinaryOption> config = _optionCoding.DecodeBinaryOptions(tokens[0], _vm);
             return config;
         }
 
