@@ -62,7 +62,7 @@ namespace MachineLearning.Solver
         public static void SetSelectedSolver(string str)
         {
             string solverName;
-            string[] parameters;
+            Dictionary<string, string> parameters;
             InterpretCommand(str, out solverName, out parameters);
             if (!_solverTypesByName.ContainsKey(solverName))
                 throw new ArgumentOutOfRangeException($"The solver '{solverName}' was not found. "
@@ -71,21 +71,42 @@ namespace MachineLearning.Solver
             SetupSolverFacade(_selectedSolverType, parameters);
         }
 
-        private static void InterpretCommand(string str, out string solverName, out string[] parameters)
+        private static void InterpretCommand(string str, out string solverName,
+            out Dictionary<string, string> parameters)
         {
             string[] tokens = str.Split(new[] {' '}, 2);
             solverName = tokens[0];
+            parameters = new Dictionary<string, string>();
             if (tokens.Length > 1)
             {
-                parameters = tokens[1].Split(' ');
-            }
-            else
-            {
-                parameters = new string[0];
+                string parameterString = tokens[1];
+                List<string> parameterTokens = Tokenize(parameterString, new HashSet<char> {' ', ':'});
+                if (parameterTokens.Count % 2 != 0) throw new InvalidOperationException();
+                for (int i = 0; i < parameterTokens.Count; i += 2)
+                {
+                    parameters[parameterTokens[i]] = parameterTokens[i + 1];
+                }
             }
         }
 
-        private static void SetupSolverFacade(SolverType solverType, string[] tokens)
+        private static List<string> Tokenize(string str, ICollection<char> delimiters)
+        {
+            int startIndex = 0;
+            List<string> tokens = new List<string>();
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                if (delimiters.Contains(c))
+                {
+                    tokens.Add(str.Substring(startIndex, i - startIndex));
+                    startIndex = i + 1;
+                }
+            }
+            tokens.Add(str.Substring(startIndex, str.Length - startIndex));
+            return tokens;
+        }
+
+        private static void SetupSolverFacade(SolverType solverType, Dictionary<string, string> parameters)
         {
             if (_solverFacades.ContainsKey(solverType)) return;
             ISolverFacade facade;
@@ -99,11 +120,11 @@ namespace MachineLearning.Solver
                     break;
                 case SolverType.CHOCO:
                 {
-                    if (tokens.Length < 2)
+                    if (!parameters.ContainsKey("executablePath"))
                     {
                         throw new ArgumentException("path to external solver executable must be specified");
                     }
-                    string executablePath = tokens[1];
+                    string executablePath = parameters["executablePath"];
                     ExternalSolverAdapter adapter;
                     if (_externalSolverAdapters.ContainsKey(executablePath))
                     {
