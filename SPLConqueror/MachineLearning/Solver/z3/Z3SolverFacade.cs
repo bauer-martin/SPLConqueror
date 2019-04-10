@@ -8,6 +8,7 @@ namespace MachineLearning.Solver
         private CheckConfigSATZ3 _satisfiabilityChecker;
         private Z3VariantGenerator _variantGenerator;
         private uint _seed = 1;
+        private bool _henard = false;
 
         public ICheckConfigSAT SatisfiabilityChecker
         {
@@ -33,12 +34,17 @@ namespace MachineLearning.Solver
             {
                 _seed = UInt32.Parse(parameters[SolverParameterKeys.RANDOM_SEED]);
             }
+            if (parameters.ContainsKey(SolverParameterKeys.HENARD))
+            {
+                _henard = Boolean.Parse(parameters[SolverParameterKeys.HENARD]);
+            }
             if (_variantGenerator != null) ApplyParameters();
         }
 
         private void ApplyParameters()
         {
             _variantGenerator.setSeed(_seed);
+            _variantGenerator.henard = _henard;
         }
     }
 }

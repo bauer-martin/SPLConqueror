@@ -18,7 +18,7 @@ namespace MachineLearning.Solver
         private uint z3RandomSeed = 1;
         private const string RANDOM_SEED = ":random-seed";
 
-        public bool henard = false;
+        internal bool henard = false;
 
         /// <summary>
         /// This method sets the random seed for the z3 solver.

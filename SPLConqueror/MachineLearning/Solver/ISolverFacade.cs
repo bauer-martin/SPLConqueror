@@ -5,6 +5,7 @@ namespace MachineLearning.Solver
     public static class SolverParameterKeys
     {
         public const string RANDOM_SEED = "seed";
+        public const string HENARD = "henard";
     }
 
     public interface ISolverFacade
