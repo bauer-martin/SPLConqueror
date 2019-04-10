@@ -5,7 +5,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class OptionNameOptionCoding : AbstractOptionCoding
+    class OptionNameOptionCoding : AbstractOptionCoding
     {
         public override string GetName() { return "option-name"; }
 

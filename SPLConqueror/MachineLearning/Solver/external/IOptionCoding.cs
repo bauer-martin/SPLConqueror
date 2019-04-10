@@ -3,7 +3,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public interface IOptionCoding
+    interface IOptionCoding
     {
         string GetName();
 

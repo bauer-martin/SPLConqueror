@@ -2,13 +2,13 @@ using System;
 
 namespace MachineLearning.Solver
 {
-    public class ExternalSolverException : Exception
+    class ExternalSolverException : Exception
     {
-        public ExternalSolverException()
+        internal ExternalSolverException()
         {
         }
 
-        public ExternalSolverException(string message) : base(message)
+        internal ExternalSolverException(string message) : base(message)
         {
         }
     }

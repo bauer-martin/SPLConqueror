@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MachineLearning.Solver
 {
-    public class Z3SolverFacade : ISolverFacade
+    class Z3SolverFacade : ISolverFacade
     {
         private CheckConfigSATZ3 _satisfiabilityChecker;
         private Z3VariantGenerator _variantGenerator;

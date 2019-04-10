@@ -4,7 +4,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public abstract class AbstractOptionCoding : IOptionCoding
+    abstract class AbstractOptionCoding : IOptionCoding
     {
         public abstract string GetName();
 

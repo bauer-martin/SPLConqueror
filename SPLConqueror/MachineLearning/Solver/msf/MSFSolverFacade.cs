@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MachineLearning.Solver
 {
-    public class MSFSolverFacade : ISolverFacade
+    class MSFSolverFacade : ISolverFacade
     {
         private MSFCheckConfigSAT _satisfiabilityChecker;
         private MSFVariantGenerator _variantGenerator;

@@ -11,7 +11,7 @@ namespace MachineLearning.Solver
     /// This class represents the variant generator for the z3 solver and is responsible for
     /// using the z3 solver to generate different kinds of solutions.
     /// </summary>
-    public class Z3VariantGenerator : IVariantGenerator
+    class Z3VariantGenerator : IVariantGenerator
     {
         private Dictionary<int, Z3Cache> _z3Cache;
 
@@ -24,7 +24,7 @@ namespace MachineLearning.Solver
         /// This method sets the random seed for the z3 solver.
         /// </summary>
         /// <param name="seed">The random seed for the z3 solver.</param>
-        public void setSeed(uint seed)
+        internal void setSeed(uint seed)
         {
             this.z3RandomSeed = seed;
         }

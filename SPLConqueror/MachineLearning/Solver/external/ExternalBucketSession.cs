@@ -4,14 +4,14 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ExternalBucketSession : IBucketSession
+    class ExternalBucketSession : IBucketSession
     {
         private readonly VariabilityModel _vm;
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
 
-        public ExternalBucketSession(VariabilityModel vm, ExternalSolverAdapter adapter, SolverType solverType,
+        internal ExternalBucketSession(VariabilityModel vm, ExternalSolverAdapter adapter, SolverType solverType,
             IOptionCoding optionCoding)
         {
             _vm = vm;

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MachineLearning.Solver
 {
-    public class ExternalSolverFacade : ISolverFacade
+    class ExternalSolverFacade : ISolverFacade
     {
         private readonly ExternalSolverAdapter _externalSolverAdapter;
         private ExternalCheckConfigSAT _satisfiabilityChecker;
@@ -12,7 +12,7 @@ namespace MachineLearning.Solver
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
 
-        public ExternalSolverFacade(ExternalSolverAdapter externalSolverAdapter, SolverType solverType)
+        internal ExternalSolverFacade(ExternalSolverAdapter externalSolverAdapter, SolverType solverType)
         {
             _externalSolverAdapter = externalSolverAdapter;
             _solverType = solverType;

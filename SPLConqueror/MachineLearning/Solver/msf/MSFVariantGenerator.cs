@@ -14,7 +14,7 @@ namespace MachineLearning.Solver
     /// <summary>
     /// This class provides methods for generating all configurations of a given variability model.
     /// </summary>
-    public class MSFVariantGenerator : IVariantGenerator
+    class MSFVariantGenerator : IVariantGenerator
     {
 
         /// <summary>

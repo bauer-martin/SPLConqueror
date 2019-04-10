@@ -5,13 +5,13 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ExternalCheckConfigSAT : ICheckConfigSAT
+    class ExternalCheckConfigSAT : ICheckConfigSAT
     {
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
 
-        public ExternalCheckConfigSAT(ExternalSolverAdapter adapter, SolverType solverType, IOptionCoding optionCoding)
+        internal ExternalCheckConfigSAT(ExternalSolverAdapter adapter, SolverType solverType, IOptionCoding optionCoding)
         {
             _adapter = adapter;
             _solverType = solverType;

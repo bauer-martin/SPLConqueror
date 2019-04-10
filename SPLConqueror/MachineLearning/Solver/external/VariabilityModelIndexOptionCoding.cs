@@ -5,7 +5,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class VariabilityModelIndexOptionCoding : AbstractOptionCoding
+    class VariabilityModelIndexOptionCoding : AbstractOptionCoding
     {
         private string _variabilityModelName;
         private Dictionary<string, string> _encodingSubstitutions;

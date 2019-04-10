@@ -76,7 +76,7 @@ namespace SPLConqueror_GUI
         protected Dictionary<NumericOption, float> numericSettings = new Dictionary<NumericOption, float>();
         private Dictionary<ConfigurationOption, double> factorizationPriorities =
             new Dictionary<ConfigurationOption, double>();
-        private MachineLearning.Solver.ICheckConfigSAT sat = new MachineLearning.Solver.MSFCheckConfigSAT();
+        private MachineLearning.Solver.ICheckConfigSAT sat;
 
         // Everything for the measurements
         private bool measurementsLoaded = false;
@@ -107,6 +107,8 @@ namespace SPLConqueror_GUI
             featureLimitComboBox.Enabled = false;
 
             initializeHelp();
+            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
+            sat = SolverManager.GetSolverFacade(SolverType.MICROSOFT_SOLVER_FOUNDATION).SatisfiabilityChecker;
         }
 
         private void initDataTextBox()

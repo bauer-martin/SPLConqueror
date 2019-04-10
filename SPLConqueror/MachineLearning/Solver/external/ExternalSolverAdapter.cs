@@ -5,7 +5,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class ExternalSolverAdapter
+    class ExternalSolverAdapter
     {
         private const string ERROR_PREFIX = "error: ";
         private Process _process;
@@ -17,7 +17,7 @@ namespace MachineLearning.Solver
         private string _selectedOptionCodingName;
         private readonly string _pathToExecutable;
 
-        public ExternalSolverAdapter(string pathToExecutable)
+        internal ExternalSolverAdapter(string pathToExecutable)
         {
             _pathToExecutable = pathToExecutable;
         }

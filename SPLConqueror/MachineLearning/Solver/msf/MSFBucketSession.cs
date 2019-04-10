@@ -6,13 +6,13 @@ using MicrosoftSolverFoundation;
 
 namespace MachineLearning.Solver
 {
-    public class MSFBucketSession: IBucketSession
+    class MSFBucketSession: IBucketSession
     {
         private readonly VariabilityModel _vm;
         private Dictionary<int, ConstraintSystemCache> _constraintSystemCache;
         private Dictionary<int, List<BinaryOption>> _lastSampledConfigs = new Dictionary<int, List<BinaryOption>>();
 
-        public MSFBucketSession(VariabilityModel vm) { _vm = vm; }
+        internal MSFBucketSession(VariabilityModel vm) { _vm = vm; }
 
         /// <summary>
         /// This method has the objective to sample a configuration where n features are selected

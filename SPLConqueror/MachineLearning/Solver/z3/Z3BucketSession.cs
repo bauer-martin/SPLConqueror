@@ -6,7 +6,7 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class Z3BucketSession : IBucketSession
+    class Z3BucketSession : IBucketSession
     {
         private const string RANDOM_SEED = ":random-seed";
         private readonly uint _z3RandomSeed;
@@ -15,7 +15,7 @@ namespace MachineLearning.Solver
         private Dictionary<int, Z3Cache> _z3Cache;
         private readonly Dictionary<int, List<BinaryOption>> _lastSampledConfigs;
 
-        public Z3BucketSession(VariabilityModel vm, uint z3RandomSeed, bool henard)
+        internal Z3BucketSession(VariabilityModel vm, uint z3RandomSeed, bool henard)
         {
             _vm = vm;
             _z3RandomSeed = z3RandomSeed;
