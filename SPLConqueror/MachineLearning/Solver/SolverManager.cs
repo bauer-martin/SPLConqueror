@@ -61,13 +61,28 @@ namespace MachineLearning.Solver
 
         public static void SetSelectedSolver(string str)
         {
-            string[] tokens = str.Split(new[] {' '}, 2);
-            string name = tokens[0];
-            if (!_solverTypesByName.ContainsKey(name))
-                throw new ArgumentOutOfRangeException($"The solver '{name}' was not found. "
+            string solverName;
+            string[] parameters;
+            InterpretCommand(str, out solverName, out parameters);
+            if (!_solverTypesByName.ContainsKey(solverName))
+                throw new ArgumentOutOfRangeException($"The solver '{solverName}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
-            _selectedSolverType = _solverTypesByName[name];
-            SetupSolverFacade(_selectedSolverType, tokens);
+            _selectedSolverType = _solverTypesByName[solverName];
+            SetupSolverFacade(_selectedSolverType, parameters);
+        }
+
+        private static void InterpretCommand(string str, out string solverName, out string[] parameters)
+        {
+            string[] tokens = str.Split(new[] {' '}, 2);
+            solverName = tokens[0];
+            if (tokens.Length > 1)
+            {
+                parameters = tokens[1].Split(' ');
+            }
+            else
+            {
+                parameters = new string[0];
+            }
         }
 
         private static void SetupSolverFacade(SolverType solverType, string[] tokens)
