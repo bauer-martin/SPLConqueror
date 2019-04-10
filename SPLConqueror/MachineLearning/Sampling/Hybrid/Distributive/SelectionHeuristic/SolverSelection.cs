@@ -122,11 +122,6 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
                     throw new InvalidProgramException("A bucket was selected that already contains no more samples! This shouldn't happen.");
                 }
 
-                if (vg is Solver.Z3VariantGenerator)
-                {
-                    ((Solver.Z3VariantGenerator)vg).setSeed(Convert.ToUInt32(this.seed));
-                }
-
                 List<BinaryOption> solution = null;
                 // Now select the configuration by using the solver
                 if (optimization == Optimization.NONE)
