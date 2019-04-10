@@ -4,7 +4,7 @@ namespace MachineLearning.Solver
     {
         private readonly ExternalSolverAdapter _externalSolverAdapter;
         private ExternalCheckConfigSAT _satisfiabilityChecker;
-        private JavaBasedVariantGenerator _variantGenerator;
+        private ExternalVariantGenerator _variantGenerator;
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
 
@@ -31,7 +31,7 @@ namespace MachineLearning.Solver
             {
                 return _variantGenerator
                     ?? (_variantGenerator =
-                        new JavaBasedVariantGenerator(_externalSolverAdapter, _solverType, _optionCoding));
+                        new ExternalVariantGenerator(_externalSolverAdapter, _solverType, _optionCoding));
             }
         }
     }

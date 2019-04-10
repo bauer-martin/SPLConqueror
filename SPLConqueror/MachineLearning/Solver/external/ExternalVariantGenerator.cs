@@ -4,13 +4,13 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
-    public class JavaBasedVariantGenerator : IVariantGenerator
+    public class ExternalVariantGenerator : IVariantGenerator
     {
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
 
-        public JavaBasedVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType,
+        public ExternalVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType,
             IOptionCoding optionCoding)
         {
             _adapter = adapter;
