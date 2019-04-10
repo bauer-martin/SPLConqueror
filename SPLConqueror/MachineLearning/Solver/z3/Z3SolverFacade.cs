@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace MachineLearning.Solver
 {
     public class Z3SolverFacade : ISolverFacade
@@ -14,5 +17,7 @@ namespace MachineLearning.Solver
         {
             get { return _variantGenerator ?? (_variantGenerator = new Z3VariantGenerator()); }
         }
+
+        public void SetParameters(Dictionary<string, string> parameters) { }
     }
 }

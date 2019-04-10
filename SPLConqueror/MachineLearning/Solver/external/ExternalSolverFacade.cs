@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace MachineLearning.Solver
 {
     public class ExternalSolverFacade : ISolverFacade
@@ -33,6 +37,15 @@ namespace MachineLearning.Solver
                     ?? (_variantGenerator =
                         new ExternalVariantGenerator(_externalSolverAdapter, _solverType, _optionCoding));
             }
+        }
+
+        public void SetParameters(Dictionary<string, string> parameters)
+        {
+            List<string> tokens = parameters.Where(pair => !pair.Key.Equals(SolverParameterKeys.EXECUTABLE_PATH))
+                .Select(pair => $"{pair.Key}={pair.Value}")
+                .ToList();
+            string response = _externalSolverAdapter.Execute($"set-solver-parameters {String.Join(";", tokens)}");
+            _externalSolverAdapter.ThrowExceptionIfError(response);
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MachineLearning.Solver
 {
     public class MSFSolverFacade : ISolverFacade
@@ -14,5 +16,7 @@ namespace MachineLearning.Solver
         {
             get { return _variantGenerator ?? (_variantGenerator = new MSFVariantGenerator()); }
         }
+
+        public void SetParameters(Dictionary<string, string> parameters) { }
     }
 }

@@ -153,6 +153,7 @@ namespace MachineLearning.Solver
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            facade.SetParameters(parameters);
             _solverFacades[solverType] = facade;
         }
 
