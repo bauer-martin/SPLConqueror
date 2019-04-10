@@ -6,6 +6,7 @@ namespace MachineLearning.Solver
     {
         public const string RANDOM_SEED = "seed";
         public const string HENARD = "henard";
+        public const string EXECUTABLE_PATH = "executable-path";
     }
 
     public interface ISolverFacade

@@ -129,11 +129,11 @@ namespace MachineLearning.Solver
                     break;
                 case SolverType.CHOCO:
                 {
-                    if (!parameters.ContainsKey("executablePath"))
+                    if (!parameters.ContainsKey(SolverParameterKeys.EXECUTABLE_PATH))
                     {
                         throw new ArgumentException("path to external solver executable must be specified");
                     }
-                    string executablePath = parameters["executablePath"];
+                    string executablePath = parameters[SolverParameterKeys.EXECUTABLE_PATH];
                     ExternalSolverAdapter adapter;
                     if (_externalSolverAdapters.ContainsKey(executablePath))
                     {
