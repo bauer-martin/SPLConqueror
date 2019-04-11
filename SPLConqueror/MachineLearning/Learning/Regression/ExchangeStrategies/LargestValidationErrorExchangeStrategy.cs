@@ -5,6 +5,10 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
+    /// <summary>
+    /// From validation set to learning set: select configurations with the largest error rate
+    /// From learning set to validation set: subclass responsibility
+    /// </summary>
     public abstract class LargestValidationErrorExchangeStrategy: ConfigurationExchangeStrategy
     {
         protected readonly ML_Settings mlSettings;

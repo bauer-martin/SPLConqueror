@@ -4,6 +4,11 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
+    /// <summary>
+    /// Randomly select one configuration from the pair of options with the smallest distance to each other.
+    /// The distance of two configurations is the size of the set of options being only used in one of the
+    /// configurations.
+    /// </summary>
     public class PairwiseDistanceExchangeStrategy : LargestValidationErrorExchangeStrategy
     {
         public struct Triple<T1, T2, T3>

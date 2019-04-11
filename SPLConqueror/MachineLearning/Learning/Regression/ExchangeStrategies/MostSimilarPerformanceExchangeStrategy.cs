@@ -6,6 +6,12 @@ using static MachineLearning.Learning.Regression.ExchangeStrategies.PerformanceV
 
 namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
+    /// <summary>
+    /// Combination of PerformanceValueExchangeStrategy and PairwiseDistanceExchangeStrategy.
+    /// Select configurations that have the same performance value as many other configurations (ordering in buckets).
+    /// Randomly select one configuration from the pair of options with the smallest distance to each other within
+    /// the bucket with the largest number of configurations.
+    /// </summary>
     public class MostSimilarPerformanceExchangeStrategy : LargestValidationErrorExchangeStrategy
     {
         public MostSimilarPerformanceExchangeStrategy(ML_Settings mlSettings) : base(mlSettings, 0.1) { }

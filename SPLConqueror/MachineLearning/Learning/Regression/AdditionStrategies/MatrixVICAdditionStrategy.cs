@@ -7,7 +7,12 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.AdditionStrategies
 {
-    class MatrixVICAdditionStrategy : DistributionBasedAdditionStrategy
+    /// <summary>
+    /// Select configurations containing options that are selected in configurations with a high error rate and
+    /// deselected in configurations with a low error rate.
+    /// 'VIC' stands for 'Very Important Configurations'
+    /// </summary>
+    class MatrixVICAdditionStrategy : SamplingBasedAdditionStrategy
     {
         public MatrixVICAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
             string sampleTask) : base(mlSettings, configBuilder, sampleTask)
@@ -17,6 +22,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
         protected override List<Configuration> FindNewConfigurationsImpl(List<Configuration> learningSet,
             List<Configuration> validationSet, List<Feature> currentModel)
         {
+            // exclude configurations from learning set and validation set
             List<Configuration> existingConfigurations = new List<Configuration>(learningSet);
             foreach (Configuration config in validationSet)
             {
@@ -27,7 +33,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             }
             configBuilder.existingConfigurations = existingConfigurations;
 
-            // find configurations that can be predicted good/bad
+            // find configurations with high and low error rates
             int maxNumberOfConfigs = (int) Math.Round(0.1 * validationSet.Count);
             List<Configuration> sortedConfigs = SortedConfigsByError(validationSet, currentModel).ToList();
             List<Configuration> badConfigs = sortedConfigs.Take(maxNumberOfConfigs).ToList();
@@ -35,9 +41,9 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             List<Configuration> goodConfigs = sortedConfigs.Take(maxNumberOfConfigs).ToList();
 
             // extract relevant influences
-            OptionOccurrenceMatrix matrix = new OptionOccurrenceMatrix(badConfigs);
-            matrix.Subtract(goodConfigs);
-            List<List<BinaryOption>> influences = matrix.GetMaximalInfluences();
+            OptionOccurrence optionOccurrence = new OptionOccurrence(badConfigs);
+            optionOccurrence.Subtract(goodConfigs);
+            List<List<BinaryOption>> influences = optionOccurrence.GetMostCommonInfluences();
             influences = FilterForSmallDegreeAndNotInModel(influences, currentModel);
 
             // for every influence: find n configurations which includes the very influence
@@ -48,7 +54,6 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 {
                     List<BinaryOption> desiredOptions = new List<BinaryOption>(influence);
                     List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, desiredOptions);
-                    Console.WriteLine("(" + i + ") wanted " + string.Join(",", desiredOptions) + " got " + string.Join(",", newConfigs));
                     configBuilder.existingConfigurations.AddRange(newConfigs);
                     result.AddRange(newConfigs);
                 }
@@ -81,6 +86,10 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             return list.OrderByDescending(tuple => tuple.Item2).Select(tuple => tuple.Item1);
         }
 
+        /// <summary>
+        /// Filters the given influences such that only those influences with the fewest options are return.
+        /// Influences that are already known by the given model are excluded as well.
+        /// </summary>
         private List<List<BinaryOption>> FilterForSmallDegreeAndNotInModel(List<List<BinaryOption>> influences,
             List<Feature> currentModel)
         {
@@ -107,12 +116,23 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
         }
     }
 
-    public class OptionOccurrenceMatrix
+    /// <summary>
+    /// Example for the configurations [option1,option2], [option1,option3]
+    ///
+    /// option1 | option2 | option3 | option1,option2 | option1,option3
+    /// ---------------------------------------------------------------
+    ///    1    |    1    |    0    |        1        |        0
+    ///    +    |    +    |    +    |        +        |        +
+    ///    1    |    0    |    1    |        0        |        1
+    /// ---------------------------------------------------------------
+    ///    2    |    1    |    1    |        1        |        1
+    /// </summary>
+    public class OptionOccurrence
     {
-        private readonly Dictionary<UnorderedSet<BinaryOption>, int> matrixData =
+        private readonly Dictionary<UnorderedSet<BinaryOption>, int> data =
             new Dictionary<UnorderedSet<BinaryOption>, int>();
 
-        public OptionOccurrenceMatrix(List<Configuration> configs)
+        public OptionOccurrence(List<Configuration> configs)
         {
             foreach (Configuration config in configs)
             {
@@ -122,19 +142,22 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 {
                     if (combination.All(o => selectedOptions.Contains(o)))
                     {
-                        if (matrixData.ContainsKey(combination))
+                        if (data.ContainsKey(combination))
                         {
-                            matrixData[combination] += 1;
+                            data[combination] += 1;
                         }
                         else
                         {
-                            matrixData[combination] = 1;
+                            data[combination] = 1;
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Return the power set (up to degree 4) of all options selected in the given configurations.
+        /// </summary>
         private static List<UnorderedSet<BinaryOption>> GetCombinations(Configuration config)
         {
             List<BinaryOption> options = config.getBinaryOptions(BinaryOption.BinaryValue.Selected)
@@ -164,23 +187,23 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                 List<UnorderedSet<BinaryOption>> combinations = GetCombinations(config);
                 foreach (UnorderedSet<BinaryOption> combination in combinations)
                 {
-                    if (matrixData.ContainsKey(combination))
+                    if (data.ContainsKey(combination))
                     {
-                        matrixData[combination] -= 1;
+                        data[combination] -= 1;
                     }
                     else
                     {
-                        matrixData[combination] = -1;
+                        data[combination] = -1;
                     }
                 }
             }
         }
 
-        public List<List<BinaryOption>> GetMaximalInfluences()
+        public List<List<BinaryOption>> GetMostCommonInfluences()
         {
             List<List<BinaryOption>> maximalOptions = new List<List<BinaryOption>>();
             int maxOccurrence = Int32.MinValue;
-            foreach (KeyValuePair<UnorderedSet<BinaryOption>, int> keyValuePair in matrixData)
+            foreach (KeyValuePair<UnorderedSet<BinaryOption>, int> keyValuePair in data)
             {
                 if (keyValuePair.Value > maxOccurrence)
                 {

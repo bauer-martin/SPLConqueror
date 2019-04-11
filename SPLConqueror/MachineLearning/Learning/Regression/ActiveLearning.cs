@@ -91,7 +91,7 @@ namespace MachineLearning.Learning.Regression
                                     additionStrategy = new NoOpAdditionStrategy();
                                     break;
                                 case ConfigurationAdditionStrategies.SIMPLE:
-                                    additionStrategy = new SimpleDistributionBasedAdditionStrategy(mlSettings,
+                                    additionStrategy = new SimpleSamplingBasedAdditionStrategy(mlSettings,
                                         configBuilder, string.Join(" ", taskParameters, 1, taskParameters.Length - 1));
                                     break;
                                 case ConfigurationAdditionStrategies.MATRIX_MAX:

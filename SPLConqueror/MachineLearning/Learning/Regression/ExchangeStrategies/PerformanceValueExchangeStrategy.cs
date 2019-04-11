@@ -5,6 +5,10 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.ExchangeStrategies
 {
+    /// <summary>
+    /// Select configurations that have the same performance value as many other configurations (ordering in buckets).
+    /// Select one (random) configuration from the bucket with the largest number of configurations.
+    /// </summary>
     public class PerformanceValueExchangeStrategy : LargestValidationErrorExchangeStrategy
     {
         public class Distribution

@@ -104,7 +104,7 @@
     <Compile Include="Learning\ML_Settings.cs" />
     <Compile Include="Learning\ML_SettingsGenerator.cs" />
     <Compile Include="Learning\Regression\ActiveLearning.cs" />
-    <Compile Include="Learning\Regression\AdditionStrategies\DistributionBasedAdditionStrategy.cs" />
+    <Compile Include="Learning\Regression\AdditionStrategies\SamplingBasedAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\ConfigurationAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\MatrixVICAdditionStrategy.cs" />
     <Compile Include="Learning\Regression\AdditionStrategies\MatrixMaxAdditionStrategy.cs" />

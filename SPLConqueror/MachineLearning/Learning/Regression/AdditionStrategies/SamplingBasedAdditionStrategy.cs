@@ -4,14 +4,17 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.AdditionStrategies
 {
-    public abstract class DistributionBasedAdditionStrategy : ConfigurationAdditionStrategy
+    /// <summary>
+    /// Base class for strategies that rely on sampling.
+    /// </summary>
+    public abstract class SamplingBasedAdditionStrategy : ConfigurationAdditionStrategy
     {
         protected readonly ML_Settings mlSettings;
         protected readonly ConfigurationBuilder configBuilder;
         private readonly string sampleTask;
         private bool didPerformSampleCommand = false;
 
-        protected DistributionBasedAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
+        protected SamplingBasedAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
             string sampleTask)
         {
             this.configBuilder = configBuilder;
@@ -24,6 +27,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
         {
             if (!didPerformSampleCommand)
             {
+                // reset configuration builder such that another sampling can be performed
                 configBuilder.clear();
                 configBuilder.performOneCommand(sampleTask);
                 didPerformSampleCommand = true;

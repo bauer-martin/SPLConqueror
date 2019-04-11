@@ -4,9 +4,12 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.AdditionStrategies
 {
-    class SimpleDistributionBasedAdditionStrategy : DistributionBasedAdditionStrategy
+    /// <summary>
+    /// Select new configurations by a standard sampling method.
+    /// </summary>
+    class SimpleSamplingBasedAdditionStrategy : SamplingBasedAdditionStrategy
     {
-        public SimpleDistributionBasedAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
+        public SimpleSamplingBasedAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
             string sampleTask) : base(mlSettings, configBuilder, sampleTask)
         {
         }

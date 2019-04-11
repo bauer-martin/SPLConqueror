@@ -6,7 +6,10 @@ using SPLConqueror_Core;
 
 namespace MachineLearning.Learning.Regression.AdditionStrategies
 {
-    class MatrixMaxAdditionStrategy : DistributionBasedAdditionStrategy
+    /// <summary>
+    /// Select configurations with options leading to a high error rate.
+    /// </summary>
+    class MatrixMaxAdditionStrategy : SamplingBasedAdditionStrategy
     {
         public MatrixMaxAdditionStrategy(ML_Settings mlSettings, ConfigurationBuilder configBuilder,
             string sampleTask) : base(mlSettings, configBuilder, sampleTask)
@@ -16,6 +19,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
         protected override List<Configuration> FindNewConfigurationsImpl(List<Configuration> learningSet,
             List<Configuration> validationSet, List<Feature> currentModel)
         {
+            // exclude configurations from learning set and validation set
             List<Configuration> existingConfigurations = new List<Configuration>(learningSet);
             foreach (Configuration config in validationSet)
             {
@@ -26,19 +30,21 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             }
             configBuilder.existingConfigurations = existingConfigurations;
 
-            // find configurations that can not be predicted
+            // find configurations with high error rates
             int maxNumberOfConfigs = (int) Math.Round(0.1 * validationSet.Count);
             List<Configuration> badConfigs = SortedConfigsByError(validationSet, currentModel)
                 .Take(maxNumberOfConfigs).ToList();
 
+            // arrange configurations in a table
             Dictionary<BinaryOption, List<int>> matrix = CreateMatrix(badConfigs);
             List<Configuration> result = new List<Configuration>();
             do
             {
-                List<BinaryOption> maximalOptions = GetMaximalOptions(matrix);
-                foreach (BinaryOption maximalOption in maximalOptions)
+                // the most common options selected in the matrix
+                List<BinaryOption> mostCommonOptions = GetMostCommonOptions(matrix);
+                foreach (BinaryOption mostCommonOption in mostCommonOptions)
                 {
-                    List<BinaryOption> desiredOptions = new List<BinaryOption> {maximalOption};
+                    List<BinaryOption> desiredOptions = new List<BinaryOption> {mostCommonOption};
                     List<Configuration> newConfigs = configBuilder.buildConfigs(GlobalState.varModel, desiredOptions);
                     if (newConfigs.Count > 0)
                     {
@@ -47,7 +53,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
                     }
                     else
                     {
-                        matrix.Remove(maximalOption);
+                        matrix.Remove(mostCommonOption);
                     }
                 }
             } while (result.Count == 0 && matrix.Count > 0);
@@ -79,6 +85,20 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             return list.OrderByDescending(tuple => tuple.Item2).Select(tuple => tuple.Item1);
         }
 
+        /// <summary>
+        /// Creates a table from the given configurations.
+        /// The header (keys of the dictionary) contains all occurring options.
+        /// The columns are stored as values.
+        /// A cell contains 1 iff the appropriate configuration contains the option; otherwise 0.
+        ///
+        /// Example for the configurations [option1], [option1,option2], [option2,option3]
+        ///
+        /// option1 | option2 | option3
+        /// ---------------------------
+        ///    1    |    0    |    0
+        ///    1    |    1    |    0
+        ///    0    |    1    |    1
+        /// </summary>
         private static Dictionary<BinaryOption, List<int>> CreateMatrix(List<Configuration> badConfigs)
         {
             Dictionary<BinaryOption, List<int>> matrix = new Dictionary<BinaryOption, List<int>>();
@@ -104,7 +124,7 @@ namespace MachineLearning.Learning.Regression.AdditionStrategies
             return matrix;
         }
 
-        private static List<BinaryOption> GetMaximalOptions(Dictionary<BinaryOption, List<int>> matrix)
+        private static List<BinaryOption> GetMostCommonOptions(Dictionary<BinaryOption, List<int>> matrix)
         {
             List<BinaryOption> maximalOptions = new List<BinaryOption>();
             int maxOccurrence = Int32.MinValue;
