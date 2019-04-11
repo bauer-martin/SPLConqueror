@@ -21,9 +21,7 @@ namespace MachineLearning.Solver
 
         public bool checkConfigurationSAT(List<BinaryOption> config, bool partialConfiguration)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string optionsString = _optionCoding.EncodeOptions(config, _vm);
             string partialString = partialConfiguration ? "partial" : "complete";
             string response = _adapter.Execute($"check-sat {partialString} {optionsString}");

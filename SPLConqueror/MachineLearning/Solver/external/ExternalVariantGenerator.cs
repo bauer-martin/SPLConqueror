@@ -22,9 +22,7 @@ namespace MachineLearning.Solver
 
         public List<Configuration> GenerateAllVariants(List<ConfigurationOption> optionsToConsider)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string optionsString = _optionCoding.EncodeOptions(optionsToConsider, _vm);
             string response = _adapter.Execute($"generate-all-variants {optionsString}");
             List<List<BinaryOption>> allVariants = _optionCoding.DecodeBinaryOptionsList(response, _vm);
@@ -33,9 +31,7 @@ namespace MachineLearning.Solver
 
         public List<List<BinaryOption>> GenerateUpToN(int n)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string response = _adapter.Execute($"generate-up-to {n}");
             List<List<BinaryOption>> optimalConfigs = _optionCoding.DecodeBinaryOptionsList(response, _vm);
             return optimalConfigs;
@@ -43,9 +39,7 @@ namespace MachineLearning.Solver
 
         public List<BinaryOption> FindMinimizedConfig(List<BinaryOption> config, List<BinaryOption> unWantedOptions)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string optionsString = _optionCoding.EncodeOptions(config, _vm);
             string command;
             if (unWantedOptions == null)
@@ -65,9 +59,7 @@ namespace MachineLearning.Solver
         public List<List<BinaryOption>> FindAllMaximizedConfigs(List<BinaryOption> config,
             List<BinaryOption> unwantedOptions)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string command;
             if (config == null)
             {
@@ -94,9 +86,7 @@ namespace MachineLearning.Solver
         public List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved,
             List<BinaryOption> originalConfig, out List<BinaryOption> removedElements)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string optionsString = _optionCoding.EncodeOptions(originalConfig, _vm);
             string encodedOption = _optionCoding.EncodeOption(optionToBeRemoved, _vm);
             string response = _adapter.Execute(

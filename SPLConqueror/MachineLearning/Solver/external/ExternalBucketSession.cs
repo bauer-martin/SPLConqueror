@@ -25,9 +25,7 @@ namespace MachineLearning.Solver
         public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
         {
-            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
-            _adapter.SetOptionCoding(_optionCoding);
             string command;
             if (featureWeight == null)
             {

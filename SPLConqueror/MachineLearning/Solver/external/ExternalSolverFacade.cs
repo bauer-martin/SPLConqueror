@@ -21,6 +21,9 @@ namespace MachineLearning.Solver
             _solverType = solverType;
             _optionCoding = new VariabilityModelIndexOptionCoding();
             _vm = vm;
+            _externalSolverAdapter.LoadVm(_vm);
+            _externalSolverAdapter.SetSolver(_solverType);
+            _externalSolverAdapter.SetOptionCoding(_optionCoding);
         }
 
         public ICheckConfigSAT SatisfiabilityChecker
