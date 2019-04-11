@@ -19,6 +19,10 @@ namespace MachineLearning.Solver
 
         internal ExternalSolverAdapter(string pathToExecutable)
         {
+            if (!File.Exists(pathToExecutable))
+            {
+                throw new InvalidOperationException("'" + pathToExecutable + "' does not exist");
+            }
             _pathToExecutable = pathToExecutable;
         }
 
