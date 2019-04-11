@@ -93,13 +93,22 @@ namespace MachineLearning.Solver
         {
             int startIndex = 0;
             List<string> tokens = new List<string>();
+            bool isQuoted = false;
             for (int i = 0; i < str.Length; i++)
             {
                 char c = str[i];
-                if (delimiters.Contains(c))
+                if (delimiters.Contains(c) && !isQuoted)
                 {
-                    tokens.Add(str.Substring(startIndex, i - startIndex));
+                    // remove quotation marks if necessary
+                    string token = str[startIndex] == '"'
+                        ? str.Substring(startIndex + 1, i - startIndex - 2)
+                        : str.Substring(startIndex, i - startIndex);
+                    tokens.Add(token);
                     startIndex = i + 1;
+                }
+                else if (c == '"')
+                {
+                    isQuoted = !isQuoted;
                 }
             }
             tokens.Add(str.Substring(startIndex, str.Length - startIndex));
