@@ -177,11 +177,6 @@ namespace MachineLearning.Learning.Regression
         public void learn(string[] parameters)
         {
             if (!PrepareActiveLearning(parameters)) return;
-            Console.WriteLine("initial learning set");
-            foreach (string s in currentLearningSet.Select(config => config.ToString()).OrderBy(config => config))
-            {
-                Console.WriteLine(s);
-            }
 
             // learn initial model
             currentRound = 1;
