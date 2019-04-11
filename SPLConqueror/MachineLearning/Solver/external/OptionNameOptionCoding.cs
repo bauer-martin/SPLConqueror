@@ -9,9 +9,9 @@ namespace MachineLearning.Solver
     {
         public override string GetName() { return "option-name"; }
 
-        public override string EncodeOptions<T>(List<T> options, VariabilityModel vm)
+        public override string EncodeOption<T>(T option, VariabilityModel vm)
         {
-            return String.Join(",", options.Select(o => o.Name));
+            return option.Name;
         }
 
         public override List<BinaryOption> DecodeBinaryOptions(string str, VariabilityModel vm)

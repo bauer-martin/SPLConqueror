@@ -98,8 +98,9 @@ namespace MachineLearning.Solver
             _adapter.SetSolver(_solverType);
             _adapter.SetOptionCoding(_optionCoding);
             string optionsString = _optionCoding.EncodeOptions(originalConfig, vm);
+            string encodedOption = _optionCoding.EncodeOption(optionToBeRemoved, vm);
             string response = _adapter.Execute(
-                $"generate-config-without-option {optionsString} {optionToBeRemoved.Name}");
+                $"generate-config-without-option {optionsString} {encodedOption}");
             string[] tokens = response.Split(' ');
             List<BinaryOption> optimalConfig = _optionCoding.DecodeBinaryOptions(tokens[0], vm);
             removedElements = _optionCoding.DecodeBinaryOptions(tokens[1], vm);

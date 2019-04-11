@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SPLConqueror_Core;
@@ -8,7 +9,12 @@ namespace MachineLearning.Solver
     {
         public abstract string GetName();
 
-        public abstract string EncodeOptions<T>(List<T> options, VariabilityModel vm) where T : ConfigurationOption;
+        public abstract string EncodeOption<T>(T option, VariabilityModel vm) where T : ConfigurationOption;
+
+        public string EncodeOptions<T>(List<T> options, VariabilityModel vm) where T : ConfigurationOption
+        {
+            return String.Join(",", options.Select(o => EncodeOption(o, vm)));
+        }
 
         public abstract List<BinaryOption> DecodeBinaryOptions(string str, VariabilityModel vm);
 
