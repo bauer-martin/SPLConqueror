@@ -6,6 +6,7 @@ using SPLConqueror_Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using MachineLearning.Solver;
 
 namespace SamplingUnitTest
 {
@@ -51,6 +52,7 @@ namespace SamplingUnitTest
             model = new VariabilityModel("test");
             bool wasSuccessful = model.loadXML(modelPath);
             GlobalState.varModel = model;
+            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
             return wasSuccessful;
         }
 

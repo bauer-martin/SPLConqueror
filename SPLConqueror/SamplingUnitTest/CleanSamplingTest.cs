@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using NUnit.Framework;
 using System.IO;
+using MachineLearning.Solver;
 
 namespace SamplingUnitTest
 {
@@ -10,6 +11,7 @@ namespace SamplingUnitTest
         [Test]
         public void TestCleanSampling()
         {
+            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
             string modelPath = Path.GetFullPath(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..//..//..."))
             + Path.DirectorySeparatorChar + "ExampleFiles"
             + Path.DirectorySeparatorChar + "VariabilityModelSampling.xml";
