@@ -16,6 +16,14 @@ namespace MachineLearning.Learning.Regression
         MATRIX_VIC
     }
 
+    public enum ConfigurationExchangeStrategies
+    {
+        NONE,
+        PERFORMANCE,
+        PAIRWISE_DISTANCE,
+        MOST_SIMILAR_PERFORMANCE
+    }
+
     public class ActiveLearning
     {
         private const string ADD_NEW_CONFIGS_COMMAND = "addNewConfigs";
@@ -28,6 +36,15 @@ namespace MachineLearning.Learning.Regression
                 {"simple", ConfigurationAdditionStrategies.SIMPLE},
                 {"matrixMax", ConfigurationAdditionStrategies.MATRIX_MAX},
                 {"matrixVIC", ConfigurationAdditionStrategies.MATRIX_VIC}
+            };
+
+        private static readonly Dictionary<string, ConfigurationExchangeStrategies> exchangeStrategiesByName =
+            new Dictionary<string, ConfigurationExchangeStrategies>
+            {
+                {"none", ConfigurationExchangeStrategies.NONE},
+                {"performance", ConfigurationExchangeStrategies.PERFORMANCE},
+                {"pairwiseDistance", ConfigurationExchangeStrategies.PAIRWISE_DISTANCE},
+                {"mostSimilarPerformance", ConfigurationExchangeStrategies.MOST_SIMILAR_PERFORMANCE}
             };
 
         private readonly ML_Settings mlSettings = null;
@@ -63,6 +80,11 @@ namespace MachineLearning.Learning.Regression
         /// The strategy to add new configurations after an active learning round.
         /// </summary>
         private ConfigurationAdditionStrategy additionStrategy = new NoOpAdditionStrategy();
+
+        /// <summary>
+        /// The strategy to exchange configurations after an active learning round.
+        /// </summary>
+        private ConfigurationExchangeStrategy exchangeStrategy = new NoOpExchangeStrategy();
 
         public ActiveLearning(ML_Settings mlSettings, InfluenceModel influenceModel, ConfigurationBuilder configBuilder)
         {
@@ -113,8 +135,33 @@ namespace MachineLearning.Learning.Regression
                         }
                         break;
                     case EXCHANGE_CONFIGS_COMMAND:
-                        GlobalState.logError.logLine("Exchanging configurations is not supported at the moment!");
-                        return false;
+                        string exchangeStrategyName = taskParameters[0];
+                        if (exchangeStrategiesByName.ContainsKey(exchangeStrategyName))
+                        {
+                            switch (exchangeStrategiesByName[exchangeStrategyName])
+                            {
+                                case ConfigurationExchangeStrategies.NONE:
+                                    exchangeStrategy = new NoOpExchangeStrategy();
+                                    break;
+                                case ConfigurationExchangeStrategies.PERFORMANCE:
+                                    exchangeStrategy = new PerformanceValueExchangeStrategy(mlSettings);
+                                    break;
+                                case ConfigurationExchangeStrategies.PAIRWISE_DISTANCE:
+                                    exchangeStrategy = new PairwiseDistanceExchangeStrategy(mlSettings);
+                                    break;
+                                case ConfigurationExchangeStrategies.MOST_SIMILAR_PERFORMANCE:
+                                    exchangeStrategy = new MostSimilarPerformanceExchangeStrategy(mlSettings);
+                                    break;
+                                default:
+                                    return false;
+                            }
+                        }
+                        else
+                        {
+                            GlobalState.logError.logLine("Invalid exchange strategy: " + tokens[1]);
+                            return false;
+                        }
+                        break;
                     default:
                         GlobalState.logError.logLine("Invalid parameter for active learning: " + parameter);
                         return false;
@@ -141,6 +188,7 @@ namespace MachineLearning.Learning.Regression
             LearnInitialModel();
 
             bool shouldAddNewConfigurations = !(additionStrategy is NoOpAdditionStrategy);
+            bool shouldExchangeConfigurations = !(exchangeStrategy is NoOpExchangeStrategy);
 
             while (!shouldAbortActiveLearning())
             {
@@ -158,6 +206,15 @@ namespace MachineLearning.Learning.Regression
                         return;
                     }
                     currentLearningSet.AddRange(configsForNextRun);
+                }
+                if (shouldAddNewConfigurations && shouldExchangeConfigurations)
+                {
+                    LearnNewModel();
+                    if (shouldAbortActiveLearning()) break;
+                }
+                if (shouldExchangeConfigurations)
+                {
+                    exchangeStrategy.exchangeConfigurations(currentLearningSet, currentValidationSet, currentModel);
                 }
                 LearnNewModel();
             }
