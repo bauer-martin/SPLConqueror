@@ -230,7 +230,7 @@ namespace MachineLearning.Solver
                 if (unwantedOptions != null && (unwantedOptions.Contains(termToElem[variables[r]]) && !config.Contains(termToElem[variables[r]])))
                     finalGoals[r] = variables[r] * 10000;
                 else
-                    finalGoals[r] = variables[r] * 1;
+                    finalGoals[r] = variables[r] * -1;
             }
             S.TryAddMinimizationGoals(S.Sum(finalGoals));
 
