@@ -11,7 +11,6 @@ namespace SamplingUnitTest
         [Test]
         public void TestPrintConfigs()
         {
-            SolverManager.SetDefaultSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
             string modelPath = Path.GetFullPath(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..//..//.."))
             + Path.DirectorySeparatorChar + "ExampleFiles"
             + Path.DirectorySeparatorChar + "VariabilityModelSampling.xml";
@@ -24,6 +23,7 @@ namespace SamplingUnitTest
 
             Commands cmd = new Commands();
             cmd.performOneCommand(Commands.COMMAND_VARIABILITYMODEL + " " + modelPath);
+            cmd.performOneCommand(Commands.COMMAND_SET_SOLVER + " msf");
             cmd.performOneCommand(Commands.COMMAND_BINARY_SAMPLING + " " + Commands.COMMAND_SAMPLE_FEATUREWISE);
             cmd.performOneCommand(Commands.COMMAND_NUMERIC_SAMPLING + " " + Commands.COMMAND_EXPDESIGN_BOXBEHNKEN);
             cmd.performOneCommand(Commands.COMMAND_PRINT_CONFIGURATIONS + " "

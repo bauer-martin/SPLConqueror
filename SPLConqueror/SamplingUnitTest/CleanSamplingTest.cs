@@ -11,7 +11,6 @@ namespace SamplingUnitTest
         [Test]
         public void TestCleanSampling()
         {
-            SolverManager.SetDefaultSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
             string modelPath = Path.GetFullPath(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..//..//.."))
             + Path.DirectorySeparatorChar + "ExampleFiles"
             + Path.DirectorySeparatorChar + "VariabilityModelSampling.xml";
@@ -23,6 +22,7 @@ namespace SamplingUnitTest
             Commands cmd = new Commands();
             assertNoSamplingStrategies(cmd);
             cmd.performOneCommand(Commands.COMMAND_VARIABILITYMODEL + " " + modelPath);
+            cmd.performOneCommand(Commands.COMMAND_SET_SOLVER + " msf");
             cmd.performOneCommand(Commands.COMMAND_SAMPLE_FEATUREWISE);
             cmd.performOneCommand(Commands.COMMAND_SAMPLE_BINARY_TWISE + " " + Commands.COMMAND_VALIDATION);
             cmd.performOneCommand(Commands.COMMAND_EXPERIMENTALDESIGN + " " + Commands.COMMAND_EXPDESIGN_FULLFACTORIAL);

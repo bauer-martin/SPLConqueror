@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MachineLearning.Sampling.ExperimentalDesigns;
 using MachineLearning.Sampling.Hybrid;
 using MachineLearning.Sampling.Hybrid.Distributive;
+using MachineLearning.Solver;
 
 namespace SamplingUnitTest
 {
@@ -35,6 +36,7 @@ namespace SamplingUnitTest
         public void TestLoadingTestVM()
         {
             Assert.IsTrue(SampleUtil.loadVM());
+            SolverManager.SetDefaultSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
         }
 
         [Test, Order(2)]
