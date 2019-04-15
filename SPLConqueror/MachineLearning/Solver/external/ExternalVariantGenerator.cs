@@ -9,13 +9,15 @@ namespace MachineLearning.Solver
         private readonly ExternalSolverAdapter _adapter;
         private readonly SolverType _solverType;
         private readonly IOptionCoding _optionCoding;
+        private readonly VariabilityModel _vm;
 
         internal ExternalVariantGenerator(ExternalSolverAdapter adapter, SolverType solverType,
-            IOptionCoding optionCoding)
+            IOptionCoding optionCoding, VariabilityModel vm)
         {
             _adapter = adapter;
             _solverType = solverType;
             _optionCoding = optionCoding;
+            _vm = vm;
         }
 
         public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)

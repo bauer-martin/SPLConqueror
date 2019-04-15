@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
 {
@@ -126,14 +127,19 @@ namespace MachineLearning.Solver
         public static void SetupSolver(SolverType solverType, Dictionary<string, string> parameters = null)
         {
             if (_solverFacades.ContainsKey(solverType)) return;
+            VariabilityModel vm = GlobalState.varModel;
+            if (vm == null)
+            {
+                throw new InvalidOperationException("variability model has to be loaded before a solver");
+            }
             ISolverFacade facade;
             switch (solverType)
             {
                 case SolverType.MICROSOFT_SOLVER_FOUNDATION:
-                    facade = new MSFSolverFacade();
+                    facade = new MSFSolverFacade(vm);
                     break;
                 case SolverType.Z3:
-                    facade = new Z3SolverFacade();
+                    facade = new Z3SolverFacade(vm);
                     break;
                 case SolverType.CHOCO:
                 {
@@ -152,7 +158,7 @@ namespace MachineLearning.Solver
                         adapter = new ExternalSolverAdapter(executablePath);
                         _externalSolverAdapters[executablePath] = adapter;
                     }
-                    facade = new ExternalSolverFacade(adapter, solverType);
+                    facade = new ExternalSolverFacade(adapter, solverType, vm);
                     break;
                 }
                 case SolverType.JACOP: goto case SolverType.CHOCO;

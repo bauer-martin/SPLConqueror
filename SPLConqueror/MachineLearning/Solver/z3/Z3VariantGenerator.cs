@@ -20,6 +20,10 @@ namespace MachineLearning.Solver
 
         internal bool henard = false;
 
+        private readonly VariabilityModel _vm;
+
+        public Z3VariantGenerator(VariabilityModel vm) { _vm = vm; }
+
         /// <summary>
         /// This method sets the random seed for the z3 solver.
         /// </summary>

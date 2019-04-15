@@ -10,6 +10,10 @@ namespace MachineLearning.Solver
 {
     class CheckConfigSATZ3 : ICheckConfigSAT
     {
+        private readonly VariabilityModel _vm;
+
+        public CheckConfigSATZ3(VariabilityModel vm) { _vm = vm; }
+
         public bool checkConfigurationSAT(List<BinaryOption> config, VariabilityModel vm, bool partialConfiguration)
         {
             List<BoolExpr> variables;

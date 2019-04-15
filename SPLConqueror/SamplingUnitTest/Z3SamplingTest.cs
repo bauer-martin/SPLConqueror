@@ -152,7 +152,7 @@ namespace SamplingUnitTest
             
             List<Configuration> configurations = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binaryToSample, numericToSample, hybridToSample);
             
-            CheckConfigSATZ3 configurationChecker = new CheckConfigSATZ3();
+            CheckConfigSATZ3 configurationChecker = new CheckConfigSATZ3(GlobalState.varModel);
             foreach (Configuration config in configurations)
             {
                 Assert.True(configurationChecker.checkConfigurationSAT(config, GlobalState.varModel));
@@ -182,7 +182,7 @@ namespace SamplingUnitTest
             this.file = null;
             
             // Do #SAT and count all variants of the reduced variability model of HiPacc
-            Z3VariantGenerator variantGenerator = new Z3VariantGenerator();
+            Z3VariantGenerator variantGenerator = new Z3VariantGenerator(GlobalState.varModel);
             List<Configuration> configs = variantGenerator.GenerateAllVariants(GlobalState.varModel, GlobalState.varModel.getOptions());
             Console.WriteLine(configs.Count);
             Assert.AreEqual(configs.Count(), 8060);

@@ -12,6 +12,9 @@ namespace MachineLearning.Solver
 {
     class MSFCheckConfigSAT : ICheckConfigSAT
     {
+        private readonly VariabilityModel _vm;
+
+        public MSFCheckConfigSAT(VariabilityModel vm) { _vm = vm; }
 
         /// <summary>
         /// Checks whether the boolean selection is valid w.r.t. the variability model. Does not check for numeric options' correctness.
@@ -96,11 +99,5 @@ namespace MachineLearning.Solver
             else
                 return false;
         }
-
-        public static MSFCheckConfigSAT execute()
-        {
-            return ccs;
-        }
-        private static MSFCheckConfigSAT ccs = new MSFCheckConfigSAT();
     }
 }

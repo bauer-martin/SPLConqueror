@@ -16,6 +16,9 @@ namespace MachineLearning.Solver
     /// </summary>
     class MSFVariantGenerator : IVariantGenerator
     {
+        private readonly VariabilityModel _vm;
+
+        public MSFVariantGenerator(VariabilityModel vm) { _vm = vm; }
 
         /// <summary>
         /// Generates all valid combinations of all configuration options in the given model.
