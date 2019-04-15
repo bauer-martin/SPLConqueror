@@ -354,7 +354,22 @@ namespace SPLConqueror_Core
         /// <returns>True if both options are the same.</returns>
         public bool Equals(ConfigurationOption other)
         {
-            return this.name.Equals(other.name);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(name, other.name);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ConfigurationOption) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return name == null ? 0 : name.GetHashCode();
         }
 
         /// <summary>
