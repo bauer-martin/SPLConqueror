@@ -607,8 +607,9 @@ namespace CommandLine
                     ostrm.Close();
                     break;
                 case COMMAND_SET_SOLVER:
-                    string solverName = task.Trim();
-                    SolverManager.SetSelectedSolver(solverName);
+                    string solverCommand = task.Trim();
+                    SolverType defaultSolverType = SolverManager.SetupSolver(solverCommand);
+                    SolverManager.SetDefaultSolver(defaultSolverType);
                     break;
                 case COMMAND_PREDICT_ALL_CONFIGURATIONS_SPLC:
                     {

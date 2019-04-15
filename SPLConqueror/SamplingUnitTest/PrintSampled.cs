@@ -11,7 +11,7 @@ namespace SamplingUnitTest
         [Test]
         public void TestPrintConfigs()
         {
-            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
+            SolverManager.SetDefaultSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
             string modelPath = Path.GetFullPath(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..//..//.."))
             + Path.DirectorySeparatorChar + "ExampleFiles"
             + Path.DirectorySeparatorChar + "VariabilityModelSampling.xml";

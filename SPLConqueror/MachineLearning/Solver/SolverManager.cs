@@ -59,7 +59,7 @@ namespace MachineLearning.Solver
             _externalSolverAdapters = new Dictionary<string, ExternalSolverAdapter>();
         }
 
-        public static void SetSelectedSolver(string str)
+        public static SolverType SetupSolver(string str)
         {
             string solverName;
             Dictionary<string, string> parameters;
@@ -67,13 +67,18 @@ namespace MachineLearning.Solver
             if (!_solverTypesByName.ContainsKey(solverName))
                 throw new ArgumentOutOfRangeException($"The solver '{solverName}' was not found. "
                     + $"Please specify one of the following: {String.Join(", ", _solverTypesByName.Keys)}");
-            _selectedSolverType = _solverTypesByName[solverName];
-            SetupSolverFacade(_selectedSolverType, parameters);
+            SolverType solverType = _solverTypesByName[solverName];
+            SetupSolver(solverType, parameters);
+            return solverType;
         }
 
         private static void InterpretCommand(string str, out string solverName,
             out Dictionary<string, string> parameters)
         {
+            if (str.Length == 0)
+            {
+                throw new InvalidOperationException("solver name is missing");
+            }
             string[] tokens = str.Split(new[] {' '}, 2);
             solverName = tokens[0];
             parameters = new Dictionary<string, string>();
@@ -81,7 +86,10 @@ namespace MachineLearning.Solver
             {
                 string parameterString = tokens[1];
                 List<string> parameterTokens = Tokenize(parameterString, new HashSet<char> {' ', ':'});
-                if (parameterTokens.Count % 2 != 0) throw new InvalidOperationException();
+                if (parameterTokens.Count % 2 != 0)
+                {
+                    throw new InvalidOperationException("all solver parameters have to be named (key:value)");
+                }
                 for (int i = 0; i < parameterTokens.Count; i += 2)
                 {
                     parameters[parameterTokens[i]] = parameterTokens[i + 1];
@@ -115,7 +123,7 @@ namespace MachineLearning.Solver
             return tokens;
         }
 
-        private static void SetupSolverFacade(SolverType solverType, Dictionary<string, string> parameters)
+        public static void SetupSolver(SolverType solverType, Dictionary<string, string> parameters = null)
         {
             if (_solverFacades.ContainsKey(solverType)) return;
             ISolverFacade facade;
@@ -129,7 +137,7 @@ namespace MachineLearning.Solver
                     break;
                 case SolverType.CHOCO:
                 {
-                    if (!parameters.ContainsKey(SolverParameterKeys.EXECUTABLE_PATH))
+                    if (parameters == null || !parameters.ContainsKey(SolverParameterKeys.EXECUTABLE_PATH))
                     {
                         throw new ArgumentException("path to external solver executable must be specified");
                     }
@@ -157,6 +165,12 @@ namespace MachineLearning.Solver
             _solverFacades[solverType] = facade;
         }
 
+        public static void SetDefaultSolver(SolverType solverType, Dictionary<string, string> parameters = null)
+        {
+            if (!_solverFacades.ContainsKey(solverType)) SetupSolver(solverType, parameters);
+            _selectedSolverType = solverType;
+        }
+
         public static ISolverFacade DefaultSolverFacade
         {
             get
@@ -174,9 +188,6 @@ namespace MachineLearning.Solver
             get { return DefaultSolverFacade.SatisfiabilityChecker; }
         }
 
-        public static IVariantGenerator DefaultVariantGenerator
-        {
-            get { return DefaultSolverFacade.VariantGenerator; }
-        }
+        public static IVariantGenerator DefaultVariantGenerator { get { return DefaultSolverFacade.VariantGenerator; } }
     }
 }

@@ -30,6 +30,7 @@ namespace MachineLearning.Solver
 
         public void SetParameters(Dictionary<string, string> parameters)
         {
+            if (parameters == null) return;
             if (parameters.ContainsKey(SolverParameterKeys.RANDOM_SEED))
             {
                 _seed = UInt32.Parse(parameters[SolverParameterKeys.RANDOM_SEED]);

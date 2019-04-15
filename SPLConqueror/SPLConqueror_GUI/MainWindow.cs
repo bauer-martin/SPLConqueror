@@ -107,7 +107,7 @@ namespace SPLConqueror_GUI
             featureLimitComboBox.Enabled = false;
 
             initializeHelp();
-            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
+            SolverManager.SetupSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
             sat = SolverManager.GetSolverFacade(SolverType.MICROSOFT_SOLVER_FOUNDATION).SatisfiabilityChecker;
         }
 

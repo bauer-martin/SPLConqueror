@@ -52,7 +52,7 @@ namespace SamplingUnitTest
             model = new VariabilityModel("test");
             bool wasSuccessful = model.loadXML(modelPath);
             GlobalState.varModel = model;
-            SolverManager.SetSelectedSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION.GetName());
+            SolverManager.SetDefaultSolver(SolverType.MICROSOFT_SOLVER_FOUNDATION);
             return wasSuccessful;
         }
 

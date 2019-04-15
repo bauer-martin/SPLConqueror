@@ -41,6 +41,7 @@ namespace MachineLearning.Solver
 
         public void SetParameters(Dictionary<string, string> parameters)
         {
+            if (parameters == null) return;
             List<string> tokens = parameters.Where(pair => !pair.Key.Equals(SolverParameterKeys.EXECUTABLE_PATH))
                 .Select(pair => $"{pair.Key}={pair.Value}")
                 .ToList();

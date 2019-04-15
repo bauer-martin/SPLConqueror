@@ -37,7 +37,7 @@ namespace SamplingUnitTest
                 SampleUtil.loadVM();
             }
 
-            SolverManager.SetSelectedSolver(SolverType.Z3.GetName());
+            SolverManager.SetDefaultSolver(SolverType.Z3);
         }
 
         [Test, Order(1)]
