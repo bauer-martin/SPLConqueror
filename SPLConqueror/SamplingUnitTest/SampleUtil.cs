@@ -19,8 +19,6 @@ namespace SamplingUnitTest
             + Path.DirectorySeparatorChar + "ExampleFiles"
             + Path.DirectorySeparatorChar + "VariabilityModelSampling.xml";
 
-        private static VariabilityModel model = null;
-
         public static bool containsAllMeasurements(List<Configuration> result, List<Configuration> expected)
         {
             bool allExist = true;
@@ -49,7 +47,7 @@ namespace SamplingUnitTest
                 modelPath = SampleUtil.modelPath;
             }
 
-            model = new VariabilityModel("test");
+            VariabilityModel model = new VariabilityModel("test");
             bool wasSuccessful = model.loadXML(modelPath);
             GlobalState.varModel = model;
             return wasSuccessful;
@@ -68,7 +66,7 @@ namespace SamplingUnitTest
             List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
             numericStrat.Add(new CentralCompositeInscribedDesign());
             List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            List<Configuration> result = ConfigurationBuilder.buildConfigs(binaryStrat, numericStrat, hybridStrat);
 
             return result;
         }
@@ -88,7 +86,7 @@ namespace SamplingUnitTest
             List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
             numericStrat.Add(design);
             List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            List<Configuration> result = ConfigurationBuilder.buildConfigs(binaryStrat, numericStrat, hybridStrat);
             return result;
         }
 
@@ -175,7 +173,7 @@ namespace SamplingUnitTest
             numericStrat.Add(new CentralCompositeInscribedDesign());
             List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
             ConfigurationBuilder.binaryParams.tWiseParameters.Add(parameters);
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            List<Configuration> result = ConfigurationBuilder.buildConfigs(binaryStrat, numericStrat, hybridStrat);
             List<Configuration> expectedSample = ConfigurationReader.readConfigurations_Header_CSV(loc, GlobalState.varModel);
             ConfigurationBuilder.binaryParams.tWiseParameters.Clear();
             return containsAllMeasurements(result, expectedSample) && result.Count == expected;
@@ -193,7 +191,7 @@ namespace SamplingUnitTest
             List<ExperimentalDesign> numericStrat = new List<ExperimentalDesign>();
             numericStrat.Add(new CentralCompositeInscribedDesign());
             List<HybridStrategy> hybridStrat = new List<HybridStrategy>();
-            List<Configuration> result = ConfigurationBuilder.buildConfigs(model, binaryStrat, numericStrat, hybridStrat);
+            List<Configuration> result = ConfigurationBuilder.buildConfigs(binaryStrat, numericStrat, hybridStrat);
             List<Configuration> expectedSample = ConfigurationReader.readConfigurations_Header_CSV(loc, GlobalState.varModel);
             return containsAllMeasurements(result, expectedSample) && result.Count == expected;
         }
@@ -242,7 +240,7 @@ namespace SamplingUnitTest
             List<HybridStrategy> hybridStrategies = new List<HybridStrategy>();
             design.SetSamplingParameters(parameters);
             hybridStrategies.Add(design);
-            return ConfigurationBuilder.buildConfigs(model, new List<SamplingStrategies>(),
+            return ConfigurationBuilder.buildConfigs(new List<SamplingStrategies>(),
                 new List<ExperimentalDesign>(), hybridStrategies);
         }
 

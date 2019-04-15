@@ -160,7 +160,7 @@ namespace SamplingUnitTest
             List<ExperimentalDesign> exps = new List<ExperimentalDesign>();
             exps.Add(exp);
             List<Configuration> confs = ConfigurationBuilder
-                .buildConfigs(GlobalState.varModel, binaryStrat, exps, new List<HybridStrategy>());
+                .buildConfigs(binaryStrat, exps, new List<HybridStrategy>());
             Assert.AreEqual(6, confs.Count);
 
             // Due to how the space is modeled valid options can only contain root or in sampling 

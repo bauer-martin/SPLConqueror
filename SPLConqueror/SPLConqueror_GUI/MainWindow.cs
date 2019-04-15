@@ -4019,7 +4019,7 @@ namespace SPLConqueror_GUI
                 binStrat.Add(SamplingStrategies.ALLBINARY);
                 List<ExperimentalDesign> expDesigns = new List<ExperimentalDesign>();
                 expDesigns.Add(new FullFactorialDesign());
-                List<Configuration> configs = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binStrat, expDesigns,
+                List<Configuration> configs = ConfigurationBuilder.buildConfigs(binStrat, expDesigns,
                     new List<MachineLearning.Sampling.Hybrid.HybridStrategy>());
 
                 foreach (Configuration config in configs)

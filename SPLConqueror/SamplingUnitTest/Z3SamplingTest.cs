@@ -150,7 +150,7 @@ namespace SamplingUnitTest
             numericToSample.Add(new FullFactorialDesign());
             List<HybridStrategy> hybridToSample = new List<HybridStrategy>();
             
-            List<Configuration> configurations = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binaryToSample, numericToSample, hybridToSample);
+            List<Configuration> configurations = ConfigurationBuilder.buildConfigs(binaryToSample, numericToSample, hybridToSample);
             
             CheckConfigSATZ3 configurationChecker = new CheckConfigSATZ3(GlobalState.varModel);
             foreach (Configuration config in configurations)

@@ -769,7 +769,7 @@ namespace CommandLine
                             ConfigurationPrinter printer = null;
 
                             ConfigurationBuilder.setBlacklisted(this.mlSettings.blacklisted);
-                            List<Configuration> configs = ConfigurationBuilder.buildConfigs(GlobalState.varModel, this.binaryToSample, this.numericToSample, this.hybridToSample);
+                            List<Configuration> configs = ConfigurationBuilder.buildConfigs(this.binaryToSample, this.numericToSample, this.hybridToSample);
 
                             // Clear the content of the file
                             File.WriteAllText(para[0], string.Empty);
@@ -1306,7 +1306,7 @@ namespace CommandLine
         private List<Configuration> buildSet(List<SamplingStrategies> binaryStrats, List<ExperimentalDesign> numericStrats, List<HybridStrategy> hybridStrats)
         {
             ConfigurationBuilder.setBlacklisted(mlSettings.blacklisted);
-            List<Configuration> configurationsTest = ConfigurationBuilder.buildConfigs(GlobalState.varModel, binaryStrats, numericStrats, hybridStrats);
+            List<Configuration> configurationsTest = ConfigurationBuilder.buildConfigs(binaryStrats, numericStrats, hybridStrats);
             //Construct configurations and compute the synthetic value if we have a given function that simulates the options' influences
             if (trueModel != null)
             {

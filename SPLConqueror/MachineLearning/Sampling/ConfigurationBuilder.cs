@@ -31,7 +31,7 @@ namespace MachineLearning.Sampling
             binaryParams = new BinaryParameters();
         }
 
-        public static List<Configuration> buildConfigs(VariabilityModel vm, List<SamplingStrategies> binaryStrategies,
+        public static List<Configuration> buildConfigs(List<SamplingStrategies> binaryStrategies,
             List<ExperimentalDesign> experimentalDesigns, List<HybridStrategy> hybridStrategies)
         {
             List<Configuration> result = new List<Configuration>();
@@ -127,7 +127,7 @@ namespace MachineLearning.Sampling
             //Experimental designs for numeric options
             if (experimentalDesigns.Count != 0)
             {
-                handleDesigns(experimentalDesigns, numericConfigs, vm);
+                handleDesigns(experimentalDesigns, numericConfigs);
             }
 
 
@@ -150,7 +150,7 @@ namespace MachineLearning.Sampling
             foreach (Configuration conf in result)
             {
                 bool isValid = true;
-                foreach (NonBooleanConstraint nbc in vm.NonBooleanConstraints)
+                foreach (NonBooleanConstraint nbc in GlobalState.varModel.NonBooleanConstraints)
                 {
                     if (!nbc.configIsValid(conf))
                     {
@@ -168,7 +168,7 @@ namespace MachineLearning.Sampling
             // Hybrid designs
             if (hybridStrategies.Count != 0)
             {
-                List<Configuration> configurations = ExecuteHybridStrategy(hybridStrategies, vm);
+                List<Configuration> configurations = ExecuteHybridStrategy(hybridStrategies);
 
                 if (experimentalDesigns.Count == 0 && binaryStrategies.Count == 0)
                 {
@@ -215,7 +215,7 @@ namespace MachineLearning.Sampling
                 }
             }
 
-            if (vm.MixedConstraints.Count == 0)
+            if (GlobalState.varModel.MixedConstraints.Count == 0)
             {
                 if (binaryStrategies.Count == 1 && binaryStrategies.Last().Equals(SamplingStrategies.ALLBINARY) && experimentalDesigns.Count == 1 && experimentalDesigns.Last() is FullFactorialDesign)
                 {
@@ -233,7 +233,7 @@ namespace MachineLearning.Sampling
                 foreach (Configuration toTest in unfilteredList)
                 {
                     bool isValid = true;
-                    foreach (MixedConstraint constr in vm.MixedConstraints)
+                    foreach (MixedConstraint constr in GlobalState.varModel.MixedConstraints)
                     {
                         if (!constr.requirementsFulfilled(toTest))
                         {
@@ -260,7 +260,7 @@ namespace MachineLearning.Sampling
             return measured.Concat(notMeasured).ToList();
         }
 
-        private static List<Configuration> ExecuteHybridStrategy(List<HybridStrategy> hybridStrategies, VariabilityModel vm)
+        private static List<Configuration> ExecuteHybridStrategy(List<HybridStrategy> hybridStrategies)
         {
             List<Configuration> allSampledConfigurations = new List<Configuration>();
             foreach (HybridStrategy hybrid in hybridStrategies)
@@ -271,19 +271,18 @@ namespace MachineLearning.Sampling
             return allSampledConfigurations;
         }
 
-        private static void handleDesigns(List<ExperimentalDesign> samplingDesigns, List<Dictionary<NumericOption, Double>> numericOptions,
-            VariabilityModel vm)
+        private static void handleDesigns(List<ExperimentalDesign> samplingDesigns, List<Dictionary<NumericOption, Double>> numericOptions)
         {
             foreach (ExperimentalDesign samplingDesign in samplingDesigns)
             {
                 if (samplingDesign.getSamplingDomain() == null ||
                     samplingDesign.getSamplingDomain().Count == 0)
                 {
-                    samplingDesign.setSamplingDomain(vm.getNonBlacklistedNumericOptions(blacklisted));
+                    samplingDesign.setSamplingDomain(GlobalState.varModel.getNonBlacklistedNumericOptions(blacklisted));
                 }
                 else
                 {
-                    samplingDesign.setSamplingDomain(vm.getNonBlacklistedNumericOptions(blacklisted)
+                    samplingDesign.setSamplingDomain(GlobalState.varModel.getNonBlacklistedNumericOptions(blacklisted)
                         .Intersect(samplingDesign.getSamplingDomain()).ToList());
                 }
 
