@@ -463,7 +463,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive
                 int t;
                 int.TryParse(numConfigsValue, out t);
                 TWise tw = new TWise();
-                numberConfigs = tw.generateT_WiseVariants_new(GlobalState.varModel, t).Count;
+                numberConfigs = tw.generateT_WiseVariants_new(t).Count;
             }
             else
             {

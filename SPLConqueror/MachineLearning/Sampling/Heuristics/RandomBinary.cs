@@ -15,17 +15,6 @@ namespace MachineLearning.Sampling.Heuristics
         private List<List<BinaryOption>> configurations = new List<List<BinaryOption>>();
         private Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-        private VariabilityModel varModel;
-
-        /// <summary>
-        /// The constructror of this class.
-        /// </summary>
-        /// <param name="varModel">The variability model defining the configuration space.</param>
-        public RandomBinary(VariabilityModel varModel)
-        {
-            this.varModel = varModel;
-        }
-
         /// <summary>
         /// Returns a set of random binary partial configurations. 
         /// </summary>
@@ -42,6 +31,7 @@ namespace MachineLearning.Sampling.Heuristics
         {
             configurations.Clear();
 
+            VariabilityModel varModel = GlobalState.varModel;
             int seed = 0;
             int numConfigs = varModel.BinaryOptions.Count;
 
@@ -62,7 +52,7 @@ namespace MachineLearning.Sampling.Heuristics
                         numConfigsValue = numConfigsValue.Replace("asTW", "").Trim();
                         int.TryParse(numConfigsValue, out numConfigs);
                         TWise tw = new TWise();
-                        numConfigs = tw.generateT_WiseVariants_new(varModel, numConfigs).Count;
+                        numConfigs = tw.generateT_WiseVariants_new(numConfigs).Count;
                     }
                 }
             }

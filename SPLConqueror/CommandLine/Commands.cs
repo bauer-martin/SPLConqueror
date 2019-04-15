@@ -541,7 +541,7 @@ namespace CommandLine
                     invalid = invalid.Union(GlobalState.allMeasurements.Configurations
                         .Where(conf => !satChecker.checkConfigurationSAT(conf.BinaryOptions.ToList()
                         .Where(kv => kv.Value == BinaryOption.BinaryValue.Selected).ToList()
-                        .Select(kv => kv.Key).ToList(), GlobalState.varModel, false))).ToList();
+                        .Select(kv => kv.Key).ToList(), false))).ToList();
                     invalid.ForEach(conf => GlobalState.logError.logLine("Invalid configuration:" + conf.ToString()));
 
                     GlobalState.measurementSource = task.TrimEnd();

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using SPLConqueror_Core;
 
 namespace MachineLearning.Solver
@@ -21,21 +19,21 @@ namespace MachineLearning.Solver
             _vm = vm;
         }
 
-        public bool checkConfigurationSAT(List<BinaryOption> config, VariabilityModel vm, bool partialConfiguration)
+        public bool checkConfigurationSAT(List<BinaryOption> config, bool partialConfiguration)
         {
-            _adapter.LoadVm(vm);
+            _adapter.LoadVm(_vm);
             _adapter.SetSolver(_solverType);
             _adapter.SetOptionCoding(_optionCoding);
-            string optionsString = _optionCoding.EncodeOptions(config, vm);
+            string optionsString = _optionCoding.EncodeOptions(config, _vm);
             string partialString = partialConfiguration ? "partial" : "complete";
             string response = _adapter.Execute($"check-sat {partialString} {optionsString}");
             return response.Equals("true");
         }
 
-        public bool checkConfigurationSAT(Configuration c, VariabilityModel vm, bool partialConfiguration)
+        public bool checkConfigurationSAT(Configuration c, bool partialConfiguration)
         {
             List<BinaryOption> selectionOptions = c.getBinaryOptions(BinaryOption.BinaryValue.Selected);
-            return checkConfigurationSAT(selectionOptions, vm, partialConfiguration);
+            return checkConfigurationSAT(selectionOptions, partialConfiguration);
         }
     }
 }

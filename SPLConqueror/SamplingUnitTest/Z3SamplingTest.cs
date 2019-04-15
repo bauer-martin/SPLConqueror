@@ -155,7 +155,7 @@ namespace SamplingUnitTest
             CheckConfigSATZ3 configurationChecker = new CheckConfigSATZ3(GlobalState.varModel);
             foreach (Configuration config in configurations)
             {
-                Assert.True(configurationChecker.checkConfigurationSAT(config, GlobalState.varModel));
+                Assert.True(configurationChecker.checkConfigurationSAT(config));
             }
             
             foreach (Configuration config in configurations)
@@ -165,11 +165,11 @@ namespace SamplingUnitTest
                 // Suppress error output. These are intended here.
                 Console.SetOut(new StreamWriter(Stream.Null));
                 Configuration newBooleanPartialConfiguration = new Configuration(config.BinaryOptions, new Dictionary<NumericOption, double>());
-                Assert.True(configurationChecker.checkConfigurationSAT(newBooleanPartialConfiguration, GlobalState.varModel, true));
+                Assert.True(configurationChecker.checkConfigurationSAT(newBooleanPartialConfiguration, true));
                 Console.SetOut(errorWriter);
                 
                 Configuration newNumericPartialConfiguration = new Configuration(new List<BinaryOption>(), config.NumericOptions);
-                Assert.True(configurationChecker.checkConfigurationSAT(newNumericPartialConfiguration, GlobalState.varModel, true));
+                Assert.True(configurationChecker.checkConfigurationSAT(newNumericPartialConfiguration, true));
             }
 
         }

@@ -16,10 +16,10 @@ namespace MachineLearning.Sampling.Heuristics
         /// In each iteration, it starts from this set of options (partial configuration) and adds a single option to this partial configurations. 
         /// It then checks whether configuration is valid and if not calls a CSP solver to make this configuration valid with as few selected options as possible.
         /// </summary>
-        /// <param name="vm">The variability model for which the feature-wise configurations should be generated.</param>
         /// <returns>A list of configurations, in which each configuration is a list of binary options that represent the SELECTED options.</returns>
-        public List<List<BinaryOption>> generateFeatureWiseConfigurations(VariabilityModel vm)
+        public List<List<BinaryOption>> generateFeatureWiseConfigurations()
         {
+            VariabilityModel vm = GlobalState.varModel;
             configurations.Clear();
             List<BinaryOption> optionalFirstLevelElements = new List<BinaryOption>();
             List<BinaryOption> binOptions = vm.BinaryOptions;
@@ -43,7 +43,7 @@ namespace MachineLearning.Sampling.Heuristics
             }
             Solver.ICheckConfigSAT satChecker = Solver.SolverManager.DefaultSatisfiabilityChecker;
             //Generating new configurations: one per option
-            if (satChecker.checkConfigurationSAT(firstLevelMandatoryFeatures, vm, false))
+            if (satChecker.checkConfigurationSAT(firstLevelMandatoryFeatures, false))
                 this.configurations.Add(firstLevelMandatoryFeatures);
             foreach (BinaryOption e in binOptions)
             {
@@ -53,7 +53,7 @@ namespace MachineLearning.Sampling.Heuristics
                 if (!tme.Contains(e))
                 {
                     tme.Add(e);
-                    if (satChecker.checkConfigurationSAT(tme, vm, false))
+                    if (satChecker.checkConfigurationSAT(tme, false))
                     {
                         if (!this.configurations.Contains(tme))
                             this.configurations.Add(tme);

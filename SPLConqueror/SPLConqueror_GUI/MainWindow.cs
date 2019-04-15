@@ -359,7 +359,6 @@ namespace SPLConqueror_GUI
             try
             {
                 GlobalState.clear();
-                GlobalState.varModel = currentModel;
 
                 Commands co = new Commands();
                 co.performOneCommand(Commands.COMMAND_LOAD_CONFIGURATIONS + " " + filePath);
@@ -408,7 +407,7 @@ namespace SPLConqueror_GUI
 
             modelLoaded = model != null;
             originalFunction = modelLoaded ? new InfluenceFunction(optExpression, model) : new InfluenceFunction(optExpression);
-            currentModel = originalFunction.getVariabilityModel();
+            GlobalState.varModel = originalFunction.getVariabilityModel();
 
             adjustedExpressionTree = originalFunction.getExpressionTree();
 
@@ -463,7 +462,7 @@ namespace SPLConqueror_GUI
             occuranceOfOptions.Clear();
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            foreach (List<BinaryOption> variant in vg.GenerateUpToN(currentModel, -1))
+            foreach (List<BinaryOption> variant in vg.GenerateUpToN(GlobalState.varModel, -1))
             {
                 foreach (BinaryOption opt in variant)
                 {
@@ -551,7 +550,7 @@ namespace SPLConqueror_GUI
 
             try
             {
-                foreach (NumericOption option in currentModel.NumericOptions)
+                foreach (NumericOption option in GlobalState.varModel.NumericOptions)
                     numericSettings.Add(option, (float)option.getCenterValue());
             }
             catch
@@ -581,7 +580,7 @@ namespace SPLConqueror_GUI
 
             int i = 0;
 
-            foreach (NumericOption option in currentModel.NumericOptions)
+            foreach (NumericOption option in GlobalState.varModel.NumericOptions)
             {
                 float val = 0;
                 numericSettings.TryGetValue(option, out val);
@@ -640,25 +639,25 @@ namespace SPLConqueror_GUI
         {
             constraintTextbox.Clear();
 
-            if (currentModel.BinaryConstraints.Count != 0)
+            if (GlobalState.varModel.BinaryConstraints.Count != 0)
             {
                 constraintTextbox.SelectionFont = new Font(constraintTextbox.Font, FontStyle.Bold);
                 constraintTextbox.AppendText("Boolean constraints:\n\n");
                 constraintTextbox.SelectionFont = new Font(constraintTextbox.Font, FontStyle.Regular);
 
-                foreach (string constraint in currentModel.BinaryConstraints)
+                foreach (string constraint in GlobalState.varModel.BinaryConstraints)
                     constraintTextbox.AppendText(constraint + "\n");
 
                 constraintTextbox.AppendText("\n");
             }
 
-            if (currentModel.NonBooleanConstraints.Count != 0)
+            if (GlobalState.varModel.NonBooleanConstraints.Count != 0)
             {
                 constraintTextbox.SelectionFont = new Font(constraintTextbox.Font, FontStyle.Bold);
                 constraintTextbox.AppendText("Non-Boolean constraints:\n\n");
                 constraintTextbox.SelectionFont = new Font(constraintTextbox.Font, FontStyle.Regular);
 
-                foreach (NonBooleanConstraint constraint in currentModel.NonBooleanConstraints)
+                foreach (NonBooleanConstraint constraint in GlobalState.varModel.NonBooleanConstraints)
                     constraintTextbox.AppendText(constraint.ToString() + "\n");
 
                 constraintTextbox.AppendText("\n");
@@ -714,7 +713,7 @@ namespace SPLConqueror_GUI
             variableTreeView.Enabled = false;
             variableTreeView.Nodes.Clear();
 
-            variableTreeView.Nodes.Add(insertIntoTreeView(currentModel.Root));
+            variableTreeView.Nodes.Add(insertIntoTreeView(GlobalState.varModel.Root));
 
             // Initializing regex filtering
             filterRegexCheckBox.Checked = false;
@@ -735,7 +734,7 @@ namespace SPLConqueror_GUI
             setChildrenChecked(e.Node);
             updateTreeView();
 
-            if (currentModel.getOption(e.Node.Text) is NumericOption)
+            if (GlobalState.varModel.getOption(e.Node.Text) is NumericOption)
                 updateEvaluationConfiguration();
 
             updateAdjustedFunction();
@@ -760,20 +759,20 @@ namespace SPLConqueror_GUI
             List<TreeNode> functionChildren = new List<TreeNode>();
 
             // Creating all nodes of the children
-            foreach (ConfigurationOption child in currentModel.getOptions()
+            foreach (ConfigurationOption child in GlobalState.varModel.getOptions()
                 .Where(x => x.Parent != null && x.Parent.Equals(val)))
                 functionChildren.Add(insertIntoTreeView(child));
 
             // Creating this node and setting the correct state of this node
             TreeNode current = new TreeNode(val.Name, functionChildren.ToArray());
 
-            if (currentModel.BinaryOptions.Contains(val) && !((BinaryOption)val).Optional
+            if (GlobalState.varModel.BinaryOptions.Contains(val) && !((BinaryOption)val).Optional
                 && !((BinaryOption)val).hasAlternatives())
             {
                 current.Checked = true;
                 current.BackColor = deactivatedColor;
             }
-            else if (currentModel.NumericOptions.Contains(val))
+            else if (GlobalState.varModel.NumericOptions.Contains(val))
                 current.Checked = true;
 
             return current;
@@ -792,7 +791,7 @@ namespace SPLConqueror_GUI
 
             foreach (TreeNode child in parent.Nodes)
             {
-                BinaryOption opt = currentModel.getBinaryOption(child.Name);
+                BinaryOption opt = GlobalState.varModel.getBinaryOption(child.Name);
 
                 if (opt != null && !opt.Optional && !opt.hasAlternatives())
                 {
@@ -912,7 +911,7 @@ namespace SPLConqueror_GUI
 
                 foreach (string part in component.Item1.Split(' '))
                 {
-                    ConfigurationOption option = currentModel.getOption(part);
+                    ConfigurationOption option = GlobalState.varModel.getOption(part);
 
                     if (option != null && !componentOptions.Contains(option))
                     {
@@ -982,7 +981,7 @@ namespace SPLConqueror_GUI
             // Variables filtering
             if (!filterVariablesCheckbox.Checked)
             {
-                foreach (ConfigurationOption opt in currentModel.getOptions())
+                foreach (ConfigurationOption opt in GlobalState.varModel.getOptions())
                     legalOptions.Add(opt.ToString());
             }
             else
@@ -1179,15 +1178,15 @@ namespace SPLConqueror_GUI
         /// <param name="e">Event</param>
         private void generateFunctionButton_Click(object sender, EventArgs e)
         {
-            chosenOptions = Tuple.Create(currentModel.getNumericOption(firstAxisCombobox.SelectedItem.ToString()),
-                currentModel.getNumericOption(secondAxisCombobox.SelectedItem.ToString()));
+            chosenOptions = Tuple.Create(GlobalState.varModel.getNumericOption(firstAxisCombobox.SelectedItem.ToString()),
+                GlobalState.varModel.getNumericOption(secondAxisCombobox.SelectedItem.ToString()));
 
             List<BinaryOption> bins = new List<BinaryOption>();
             Dictionary<NumericOption, double> usedNumericOptions = new Dictionary<NumericOption, double>();
 
             foreach (string s in getLegalOptions())
             {
-                BinaryOption opt = currentModel.getBinaryOption(s);
+                BinaryOption opt = GlobalState.varModel.getBinaryOption(s);
 
                 if (opt != null)
                     bins.Add(opt);
@@ -1345,7 +1344,7 @@ namespace SPLConqueror_GUI
         /// <param name="e">Event</param>
         private void variableListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (currentModel.getOption(variableListBox.SelectedItem.ToString()) is NumericOption)
+            if (GlobalState.varModel.getOption(variableListBox.SelectedItem.ToString()) is NumericOption)
                 updateEvaluationConfiguration();
 
             updateAdjustedFunction();
@@ -1615,7 +1614,7 @@ namespace SPLConqueror_GUI
             {
                 TreeNode node = stack.Pop();
 
-                if (currentModel.getBinaryOption(node.Text) != null)
+                if (GlobalState.varModel.getBinaryOption(node.Text) != null)
                 {
                     allBinaryNodes.Add(node);
 
@@ -1627,7 +1626,7 @@ namespace SPLConqueror_GUI
             // Numeric options will be ignored for now.
             foreach (TreeNode node in allBinaryNodes)
             {
-                BinaryOption opt = currentModel.getBinaryOption(node.Text);
+                BinaryOption opt = GlobalState.varModel.getBinaryOption(node.Text);
 
                 if (opt != null)
                 {
@@ -1650,7 +1649,7 @@ namespace SPLConqueror_GUI
                         while (nodes.Count != 0 && !done)
                         {
                             TreeNode temp = nodes.Pop();
-                            BinaryOption tempOption = currentModel.getBinaryOption(temp.Text);
+                            BinaryOption tempOption = GlobalState.varModel.getBinaryOption(temp.Text);
 
                             if (temp.Checked && tempOption != null)
                             {
@@ -1677,7 +1676,7 @@ namespace SPLConqueror_GUI
                 if (!currentConfiguration.Remove(t.Item1))
                     currentConfiguration.Add(t.Item1);
 
-                if (sat.checkConfigurationSAT(currentConfiguration, currentModel, true))
+                if (sat.checkConfigurationSAT(currentConfiguration, true))
                     t.Item2.BackColor = normalColor;
                 else
                     t.Item2.BackColor = deactivatedColor;
@@ -1833,7 +1832,7 @@ namespace SPLConqueror_GUI
                     constantInfluences.Add(var, oldValue + Math.Abs(constant));
 
                     // Calculating max influences
-                    NumericOption opt = currentModel.getNumericOption(var);
+                    NumericOption opt = GlobalState.varModel.getNumericOption(var);
 
                     if (opt != null)
                         currConstantRange = currConstantRange * opt.Max_value;
@@ -1880,7 +1879,7 @@ namespace SPLConqueror_GUI
 
             populatePlot(constantChartRepl, constantValues, constantLabels);
 
-            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateUpToN(currentModel, -1).Count;
+            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateUpToN(GlobalState.varModel, -1).Count;
 
             // Update max and max occurance chart
             foreach (KeyValuePair<string, double> entry in constantMaxInfluences)
@@ -1891,7 +1890,7 @@ namespace SPLConqueror_GUI
                     maxLabels.Add(entry.Key);
                     maxOccLabels.Add(entry.Key);
 
-                    if (currentModel.getNumericOption(entry.Key) != null)
+                    if (GlobalState.varModel.getNumericOption(entry.Key) != null)
                     {
                         maxOccValues.Add(new ColumnItem(entry.Value));
                     }
@@ -1940,7 +1939,7 @@ namespace SPLConqueror_GUI
             // Remove all binary options and remember all numeric options
             for (int i = 0; i < currExpression.Length; i++)
             {
-                if (currentModel.getOption(currExpression[i]) != null && !optionList.Contains(currExpression[i]))
+                if (GlobalState.varModel.getOption(currExpression[i]) != null && !optionList.Contains(currExpression[i]))
                     optionList.Add(currExpression[i]);
             }
 
@@ -1974,7 +1973,7 @@ namespace SPLConqueror_GUI
                 // Calculate all possible combinations of expressions
                 foreach (string innerOption in optionList)
                 {
-                    ConfigurationOption opt = currentModel.getOption(innerOption);
+                    ConfigurationOption opt = GlobalState.varModel.getOption(innerOption);
                     List<string> insertedExpressions = new List<string>();
 
                     foreach (string exp in expressions)
@@ -2161,7 +2160,7 @@ namespace SPLConqueror_GUI
 
             for (int i = 0; i < parts.Length; i++)
             {
-                if (currentModel.getOption(parts[i]) != null
+                if (GlobalState.varModel.getOption(parts[i]) != null
                     && !legalOptions.Contains(parts[i]))
                     parts[i] = "0.0";
             }
@@ -2345,7 +2344,7 @@ namespace SPLConqueror_GUI
             }
 
             // Check if the current configuration is possible
-            if (!sat.checkConfigurationSAT(configurationForCalculation.BinaryOptions.Keys.ToList(), currentModel, true))
+            if (!sat.checkConfigurationSAT(configurationForCalculation.BinaryOptions.Keys.ToList(), true))
             {
                 overviewPanel.Visible = false;
                 bothGraphsPanel.Visible = false;
@@ -2989,13 +2988,13 @@ namespace SPLConqueror_GUI
             for (int i = 0; i < polishAdjusted.Length; i++)
                 polishAdjusted[i] = String.Copy(adjustedExpressionTree[i]);
 
-            NumericOption option = currentModel
+            NumericOption option = GlobalState.varModel
                     .getNumericOption(firstAxisCombobox.SelectedItem.ToString());
 
             // Replace remaining options with variables and actual values
             for (int i = 0; i < polishAdjusted.Length; i++)
             {
-                if (currentModel.getNumericOption(polishAdjusted[i]) != null)
+                if (GlobalState.varModel.getNumericOption(polishAdjusted[i]) != null)
                 {
                     if (polishAdjusted[i].Equals(option.Name))
                         polishAdjusted[i] = "XY";
@@ -3004,7 +3003,7 @@ namespace SPLConqueror_GUI
                         // All other options will be set on the value they have been set in the
                         // settings option.
                         float value = 0;
-                        numericSettings.TryGetValue(currentModel.getNumericOption(polishAdjusted[i]), out value);
+                        numericSettings.TryGetValue(GlobalState.varModel.getNumericOption(polishAdjusted[i]), out value);
 
                         string[] parts = value.ToString().Split(new char[] { '.', ',' });
 
@@ -3016,7 +3015,7 @@ namespace SPLConqueror_GUI
                             throw new Exception("An illegal number was found!");
                     }
                 }
-                else if (currentModel.getBinaryOption(polishAdjusted[i]) != null)
+                else if (GlobalState.varModel.getBinaryOption(polishAdjusted[i]) != null)
                     polishAdjusted[i] = "1.0";
             }
 
@@ -3095,13 +3094,13 @@ namespace SPLConqueror_GUI
                 polishAdjusted[i] = String.Copy(adjustedExpressionTree[i]);
 
             // Getting selected options for axes
-            NumericOption firstOption = currentModel.getNumericOption(firstAxisCombobox.SelectedItem.ToString());
-            NumericOption secondOption = currentModel.getNumericOption(secondAxisCombobox.SelectedItem.ToString());
+            NumericOption firstOption = GlobalState.varModel.getNumericOption(firstAxisCombobox.SelectedItem.ToString());
+            NumericOption secondOption = GlobalState.varModel.getNumericOption(secondAxisCombobox.SelectedItem.ToString());
 
             // Replace remaining options with variables and actual values
             for (int i = 0; i < polishAdjusted.Length; i++)
             {
-                if (currentModel.getNumericOption(polishAdjusted[i]) != null)
+                if (GlobalState.varModel.getNumericOption(polishAdjusted[i]) != null)
                 {
                     if (polishAdjusted[i].Equals(firstOption.Name))
                         polishAdjusted[i] = "XMat";
@@ -3111,7 +3110,7 @@ namespace SPLConqueror_GUI
                     {
                         // All other options will be set on the value they have been set in the
                         // settings option.
-                        NumericOption option = currentModel.getNumericOption(polishAdjusted[i]);
+                        NumericOption option = GlobalState.varModel.getNumericOption(polishAdjusted[i]);
 
                         float value = 0;
                         numericSettings.TryGetValue(option, out value);
@@ -3126,7 +3125,7 @@ namespace SPLConqueror_GUI
                             throw new Exception("An illegal number was found!");
                     }
                 }
-                else if (currentModel.getBinaryOption(polishAdjusted[i]) != null)
+                else if (GlobalState.varModel.getBinaryOption(polishAdjusted[i]) != null)
                     polishAdjusted[i] = "1.0";
             }
 
@@ -3442,7 +3441,7 @@ namespace SPLConqueror_GUI
                 // Calculate a list of all found options sorted by their priorities
                 foreach (KeyValuePair<string, int> pair in counting)
                 {
-                    ConfigurationOption option = currentModel.getOption(pair.Key);
+                    ConfigurationOption option = GlobalState.varModel.getOption(pair.Key);
                     List<ConfigurationOption> list;
                     double val;
 

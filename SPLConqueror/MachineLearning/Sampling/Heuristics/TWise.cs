@@ -20,21 +20,20 @@ namespace MachineLearning.Sampling.Heuristics
         /// <summary>
         /// Creates the t-wise sampling according to the given t-value.
         /// </summary>
-        /// <param name="vm">The variability model containing the binary options for which we want to generate the pair-wise configurations.</param>
         /// <param name="t"> The t of the t-wise</param>
         /// <returns>A list of configurations in which each configuration is represented by a list of SELECTED binary options</returns>
-        public List<List<BinaryOption>> generateT_WiseVariants_new(VariabilityModel vm, int t)
+        public List<List<BinaryOption>> generateT_WiseVariants_new(int t)
         {
             // dirty fix for twise issue
             if (t == 1)
             {
                 FeatureWise fw = new FeatureWise();
-                return fw.generateFeatureWiseConfigurations(vm);
+                return fw.generateFeatureWiseConfigurations();
             }
 
             List<BinaryOption> candidate = new List<BinaryOption>();
             List<List<BinaryOption>> result = new List<List<BinaryOption>>();
-            generatePowerSet(vm, candidate, t, result, 0);
+            generatePowerSet(GlobalState.varModel, candidate, t, result, 0);
 
             //remove double entries...
             List<List<BinaryOption>> resultCleaned = new List<List<BinaryOption>>();
