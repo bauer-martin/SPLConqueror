@@ -12,22 +12,17 @@ namespace MachineLearning.Sampling.Heuristics
         private List<List<BinaryOption>> configurations = new List<List<BinaryOption>>();
 
         //get one variant per feature multiplied with alternative combinations; the variant tries to maximize the number of selected features, but without the feature in question
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vm"></param>
-        /// <returns></returns>
-        public List<List<BinaryOption>> generateNegativeFW(VariabilityModel vm)
+        public List<List<BinaryOption>> generateNegativeFW()
         {
             this.configurations.Clear();
             List<List<BinaryOption>> maxConfigs = new List<List<BinaryOption>>();
 
-            maxConfigs = getMaxConfigurations(vm, false);
+            maxConfigs = getMaxConfigurations(false);
             configurations.AddRange(maxConfigs);
             //Idea try to vary only the first maximum configuration by removing only a single feature 
             //If a feature is not present in this maximum configuration, find a maximum configuration in which it is present and then remove the feature
             //Challenges: alternative features or mandatory features cannot be removed
-            foreach (BinaryOption binOpt in vm.BinaryOptions)
+            foreach (BinaryOption binOpt in GlobalState.varModel.BinaryOptions)
             {
                 if (binOpt.Optional == false || binOpt.hasAlternatives())
                     continue;
@@ -39,7 +34,7 @@ namespace MachineLearning.Sampling.Heuristics
                     List<BinaryOption> removedElements = null;
                     //Get a configuration without the feature based on the maximum configuration: config
                     List<BinaryOption> configToMeasure = SolverManager.DefaultVariantGenerator
-                        .GenerateConfigWithoutOption(binOpt, config, out removedElements, vm);
+                        .GenerateConfigWithoutOption(binOpt, config, out removedElements);
 
                     if (configToMeasure == null)
                     {//This didn't work, let us try to use another maximum configuration
@@ -57,17 +52,12 @@ namespace MachineLearning.Sampling.Heuristics
             return this.configurations;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vm"></param>
-        /// <returns></returns>
-        public List<List<BinaryOption>> generateNegativeFWAllCombinations(VariabilityModel vm)
+        public List<List<BinaryOption>> generateNegativeFWAllCombinations()
         {
             this.configurations.Clear();
             List<List<BinaryOption>> maxConfigs = new List<List<BinaryOption>>();
 
-            maxConfigs = getMaxConfigurations(vm, true);
+            maxConfigs = getMaxConfigurations(true);
             configurations.AddRange(maxConfigs);
 
             //Compute negative feature-wise for all maximum configurations
@@ -90,7 +80,7 @@ namespace MachineLearning.Sampling.Heuristics
                         //Constructing new Configuration without the current element
                         List<BinaryOption> configToMeasure = new List<BinaryOption>();
                         configToMeasure = SolverManager.DefaultVariantGenerator
-                            .GenerateConfigWithoutOption(e, currentConfig, out removedElements, vm);
+                            .GenerateConfigWithoutOption(e, currentConfig, out removedElements);
 
                         if (configToMeasure == null)
                         {
@@ -114,17 +104,17 @@ namespace MachineLearning.Sampling.Heuristics
         /// <param name="vm"></param>
         /// <param name="allAlternativeCombinations"></param>
         /// <returns></returns>
-        internal List<List<BinaryOption>> getMaxConfigurations(VariabilityModel vm, bool allAlternativeCombinations)
+        internal List<List<BinaryOption>> getMaxConfigurations(bool allAlternativeCombinations)
         {
             Dictionary<BinaryOption, List<BinaryOption>> alternatives = new Dictionary<BinaryOption, List<BinaryOption>>();
             List<List<BinaryOption>> maxConfigurations = new List<List<BinaryOption>>();
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(null, vm, null));
+            maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(null, null));
             bool existAlternative = false;
 
             if (allAlternativeCombinations)
             {
-                foreach (BinaryOption elem in vm.BinaryOptions)
+                foreach (BinaryOption elem in GlobalState.varModel.BinaryOptions)
                 {
                     if (elem.hasAlternatives())
                     {
@@ -162,7 +152,7 @@ namespace MachineLearning.Sampling.Heuristics
                 {
                     foreach (BinaryOption alter in alternatives[e])
                     {
-                        List<List<BinaryOption>> foundConfigs = generateConfig(alter, alternatives, alreadyComputedConfigs, vm);
+                        List<List<BinaryOption>> foundConfigs = generateConfig(alter, alternatives, alreadyComputedConfigs);
                         foreach (var conf in foundConfigs)
                         {
                             if (!Configuration.containsBinaryConfiguration(maxConfigurations, conf))
@@ -174,12 +164,12 @@ namespace MachineLearning.Sampling.Heuristics
                 if (!existAlternative)
                 {
                     List<BinaryOption> config = new List<BinaryOption>();
-                    maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(config, vm, null));
+                    maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(config, null));
                 }
             }
 
             //Verify whether each option is at least in one maximum configuration
-            foreach (BinaryOption elem in vm.BinaryOptions)
+            foreach (BinaryOption elem in GlobalState.varModel.BinaryOptions)
             {
                 bool isCovered = false;
                 foreach (List<BinaryOption> config in maxConfigurations)
@@ -196,11 +186,11 @@ namespace MachineLearning.Sampling.Heuristics
                     temp.Add(elem);
                     if (!allAlternativeCombinations)
                     {
-                        maxConfigurations.Add(vg.FindAllMaximizedConfigs(temp, vm, null)[0]);
+                        maxConfigurations.Add(vg.FindAllMaximizedConfigs(temp, null)[0]);
                     }
                     else
                     {
-                        maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(temp, vm, null));
+                        maxConfigurations.AddRange(vg.FindAllMaximizedConfigs(temp, null));
                     }
                 }
             }
@@ -226,7 +216,7 @@ namespace MachineLearning.Sampling.Heuristics
             return maxConfigurations;
         }
 
-        private List<List<BinaryOption>> generateConfig(BinaryOption toConfigure, Dictionary<BinaryOption, List<BinaryOption>> alternatives, List<BinaryOption> alreadyComputed, VariabilityModel vm)
+        private List<List<BinaryOption>> generateConfig(BinaryOption toConfigure, Dictionary<BinaryOption, List<BinaryOption>> alternatives, List<BinaryOption> alreadyComputed)
         {
             List<List<BinaryOption>> configurations = new List<List<BinaryOption>>();
             foreach (BinaryOption next in alternatives.Keys)
@@ -241,7 +231,7 @@ namespace MachineLearning.Sampling.Heuristics
                     config.Add(toConfigure);
                     config.Add(k);
                     List<List<BinaryOption>> temp = new List<List<BinaryOption>>();
-                    temp = SolverManager.DefaultVariantGenerator.FindAllMaximizedConfigs(config, vm, null);
+                    temp = SolverManager.DefaultVariantGenerator.FindAllMaximizedConfigs(config, null);
                     if (temp == null || temp.Count == 0)
                         continue;
                     config = temp[0];

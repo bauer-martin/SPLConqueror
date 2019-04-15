@@ -23,16 +23,15 @@ namespace MachineLearning.Solver
         /// <summary>
         /// Generates all valid combinations of all configuration options in the given model.
         /// </summary>
-        /// <param name="vm">the variability model containing the binary options and their constraints</param>
         /// <param name="optionsToConsider">the options that should be considered. All other options are ignored</param>
         /// <returns>Returns a list of <see cref="Configuration"/></returns>
-        public List<Configuration> GenerateAllVariants(VariabilityModel vm, List<ConfigurationOption> optionsToConsider)
+        public List<Configuration> GenerateAllVariants(List<ConfigurationOption> optionsToConsider)
         {
             List<Configuration> allConfigurations = new List<Configuration>();
             Dictionary<CspTerm, bool> variables;
             Dictionary<ConfigurationOption, CspTerm> optionToTerm;
             Dictionary<CspTerm, ConfigurationOption> termToOption;
-            ConstraintSystem S = CSPsolver.GetGeneralConstraintSystem(out variables, out optionToTerm, out termToOption, vm);
+            ConstraintSystem S = CSPsolver.GetGeneralConstraintSystem(out variables, out optionToTerm, out termToOption, _vm);
 
             ConstraintSolverSolution soln = S.Solve();
 
@@ -67,9 +66,9 @@ namespace MachineLearning.Solver
                 Configuration c = new Configuration(binOpts, numOpts);
 
                 // Check if the non-boolean constraints are satisfied
-                if (vm.configurationIsValid(c)
+                if (_vm.configurationIsValid(c)
                     && !VariantGeneratorUtilities.IsInConfigurationFile(c, allConfigurations)
-                    && VariantGeneratorUtilities.FulfillsMixedConstraints(c, vm))
+                    && VariantGeneratorUtilities.FulfillsMixedConstraints(c, _vm))
                 {
                     allConfigurations.Add(c);
                 }
@@ -86,13 +85,13 @@ namespace MachineLearning.Solver
         /// <param name="m">The variability model containing the binary options and their constraints.</param>
         /// <param name="n">The maximum number of samples that will be generated.</param>
         /// <returns>Returns a list of configurations, in which a configuration is a list of SELECTED binary options (deselected options are not present)</returns>
-        public List<List<BinaryOption>> GenerateUpToN(VariabilityModel m, int n)
+        public List<List<BinaryOption>> GenerateUpToN(int n)
         {
             List<List<BinaryOption>> configurations = new List<List<BinaryOption>>();
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
             Dictionary<CspTerm, BinaryOption> termToElem = new Dictionary<CspTerm, BinaryOption>();
-            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, m);
+            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
 
             ConstraintSolverSolution soln = S.Solve();
 
@@ -118,16 +117,15 @@ namespace MachineLearning.Solver
         /// Simulates a simple method to get valid configurations of binary options of a variability model. The randomness is simulated by the modulu value.
         /// We take only the modulu'th configuration into the result set based on the CSP solvers output. If modulu is larger than the number of valid variants, the result set is empty. 
         /// </summary>
-        /// <param name="vm">The variability model containing the binary options and their constraints.</param>
         /// <param name="treshold">Maximum number of configurations</param>
         /// <param name="modulu">Each configuration that is % modulu == 0 is taken to the result set</param>
         /// <returns>Returns a list of configurations, in which a configuration is a list of SELECTED binary options (deselected options are not present</returns>
-        public List<List<BinaryOption>> GenerateRandomVariants(VariabilityModel vm, int treshold, int modulu)
+        public List<List<BinaryOption>> GenerateRandomVariants(int treshold, int modulu)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
             Dictionary<CspTerm, BinaryOption> termToElem = new Dictionary<CspTerm, BinaryOption>();
-            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
             List<List<BinaryOption>> erglist = new List<List<BinaryOption>>();
             ConstraintSolverSolution soln = S.Solve();
 
@@ -159,15 +157,14 @@ namespace MachineLearning.Solver
         /// This method searches for a corresponding methods in the dynamically loaded assemblies and calls it if found. It prefers due to performance reasons the Microsoft Solver Foundation implementation.
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
-        /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="unWantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them.</param>
         /// <returns>The valid configuration (or null if there is none) that satisfies the VM and the goal.</returns>
-        public List<BinaryOption> FindMinimizedConfig(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unWantedOptions)
+        public List<BinaryOption> FindMinimizedConfig(List<BinaryOption> config, List<BinaryOption> unWantedOptions)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
             Dictionary<CspTerm, BinaryOption> termToElem = new Dictionary<CspTerm, BinaryOption>();
-            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
 
 
             //Feature Selection
@@ -208,15 +205,14 @@ namespace MachineLearning.Solver
         /// Based on a given (partial) configuration and a variability, we aim at finding all optimally maximal or minimal (in terms of selected binary options) configurations.
         /// </summary>
         /// <param name="config">The (partial) configuration which needs to be expaned to be valid.</param>
-        /// <param name="vm">Variability model containing all options and their constraints.</param>
         /// <param name="unwantedOptions">Binary options that we do not want to become part of the configuration. Might be part if there is no other valid configuration without them</param>
         /// <returns>A list of configurations that satisfies the VM and the goal (or null if there is none).</returns>
-        public List<List<BinaryOption>> FindAllMaximizedConfigs(List<BinaryOption> config, VariabilityModel vm, List<BinaryOption> unwantedOptions)
+        public List<List<BinaryOption>> FindAllMaximizedConfigs(List<BinaryOption> config, List<BinaryOption> unwantedOptions)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
             Dictionary<CspTerm, BinaryOption> termToElem = new Dictionary<CspTerm, BinaryOption>();
-            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
             //Feature Selection
             if (config != null)
             {
@@ -264,14 +260,13 @@ namespace MachineLearning.Solver
         /// <param name="optionToBeRemoved">The binary configuration option that must not be part of the new configuration.</param>
         /// <param name="originalConfig">The configuration for which we want to find a similar one.</param>
         /// <param name="removedElements">If further options need to be removed from the given configuration to build a valid configuration, they are outputed in this list.</param>
-        /// <param name="vm">The variability model containing all options and their constraints.</param>
         /// <returns>A configuration that is valid, similar to the original configuration and does not contain the optionToBeRemoved.</returns>
-        public List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved, List<BinaryOption> originalConfig, out List<BinaryOption> removedElements, VariabilityModel vm)
+        public List<BinaryOption> GenerateConfigWithoutOption(BinaryOption optionToBeRemoved, List<BinaryOption> originalConfig, out List<BinaryOption> removedElements)
         {
             List<CspTerm> variables = new List<CspTerm>();
             Dictionary<BinaryOption, CspTerm> elemToTerm = new Dictionary<BinaryOption, CspTerm>();
             Dictionary<CspTerm, BinaryOption> termToElem = new Dictionary<CspTerm, BinaryOption>();
-            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, vm);
+            ConstraintSystem S = CSPsolver.getConstraintSystem(out variables, out elemToTerm, out termToElem, _vm);
 
             removedElements = new List<BinaryOption>();
 
@@ -315,7 +310,7 @@ namespace MachineLearning.Solver
             return null;
         }
 
-        public IBucketSession CreateBucketSession(VariabilityModel vm) { return new MSFBucketSession(vm); }
+        public IBucketSession CreateBucketSession() { return new MSFBucketSession(_vm); }
 
         //public List<List<BinaryOption>> generateTilSize(int i1, int size, int timeout, VariabilityModel vm)
         //{

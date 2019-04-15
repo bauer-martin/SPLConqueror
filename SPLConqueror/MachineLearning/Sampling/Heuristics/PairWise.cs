@@ -17,15 +17,15 @@ namespace MachineLearning.Sampling.Heuristics
         /// </summary>
         /// <param name="vm">The variability model containing the binary options for which we want to generate the pair-wise configurations.</param>
         /// <returns>A list of configurations in which each configuration is represented by a list of SELECTED binary options</returns>
-        public List<List<BinaryOption>> generatePairWiseVariants(VariabilityModel vm)
+        public List<List<BinaryOption>> generatePairWiseVariants()
         {
             //List<String> activeLearning = new List<string>(new string[] { "ls", "inl", "cf", "dcr", "saa", "ive", "wlur", "lir", "vp", "saacyc" });
             this.configurations.Clear();
             List<BinaryOption> measuredElements = new List<BinaryOption>();
-            foreach (BinaryOption current in vm.BinaryOptions)
+            foreach (BinaryOption current in GlobalState.varModel.BinaryOptions)
             {
                 measuredElements.Add(current);
-                foreach (BinaryOption pair in vm.BinaryOptions)
+                foreach (BinaryOption pair in GlobalState.varModel.BinaryOptions)
                 {
                     //if (!activeLearning.Contains(pair.Name))
                     //    continue;
@@ -63,7 +63,7 @@ namespace MachineLearning.Sampling.Heuristics
                         List<BinaryOption> tempConfig = new List<BinaryOption>();
                         tempConfig.Add(current);
                         tempConfig.Add(pair);
-                        tempConfig = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tempConfig, vm, null);
+                        tempConfig = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tempConfig, null);
 
                         if (tempConfig != null && tempConfig.Count > 0 && !Configuration.containsBinaryConfiguration(configurations, tempConfig))
                             configurations.Add(tempConfig);

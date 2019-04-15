@@ -31,9 +31,8 @@ namespace MachineLearning.Sampling.Heuristics
         {
             configurations.Clear();
 
-            VariabilityModel varModel = GlobalState.varModel;
             int seed = 0;
-            int numConfigs = varModel.BinaryOptions.Count;
+            int numConfigs = GlobalState.varModel.BinaryOptions.Count;
 
             // parse parameters
             if (parameters.ContainsKey("numConfigs"))
@@ -45,7 +44,7 @@ namespace MachineLearning.Sampling.Heuristics
                     if (numConfigsValue.Contains("asOW"))
                     {
                         FeatureWise fw = new FeatureWise();
-                        numConfigs = fw.generateFeatureWiseConfigsCSP(varModel).Count;
+                        numConfigs = fw.generateFeatureWiseConfigsCSP().Count;
                     }
                     else if (numConfigsValue.Contains("asTW"))
                     {
@@ -65,7 +64,7 @@ namespace MachineLearning.Sampling.Heuristics
 
             if (parameters.ContainsKey("fromFile"))
             {
-                List<Configuration> allConfigurations = ConfigurationReader.readConfigurations(parameters["fromFile"], varModel);
+                List<Configuration> allConfigurations = ConfigurationReader.readConfigurations(parameters["fromFile"], GlobalState.varModel);
                 foreach (Configuration config in allConfigurations)
                 {
                     allConfigs.Add(config.BinaryOptions.Keys.ToList());
@@ -73,7 +72,7 @@ namespace MachineLearning.Sampling.Heuristics
             }
             else
             {
-                allConfigs = SolverManager.DefaultVariantGenerator.GenerateUpToN(varModel, -1);
+                allConfigs = SolverManager.DefaultVariantGenerator.GenerateUpToN(-1);
             }
 
             //repair wrong parameters

@@ -68,7 +68,6 @@ namespace SPLConqueror_GUI
         private Color deactivatedColor = Color.SlateGray;
 
         private InfluenceFunction originalFunction;
-        private VariabilityModel currentModel;
         private string[] adjustedExpressionTree;
         private bool modelLoaded = false;
         private double maxAbstractConstant = 0.0;
@@ -462,7 +461,7 @@ namespace SPLConqueror_GUI
             occuranceOfOptions.Clear();
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            foreach (List<BinaryOption> variant in vg.GenerateUpToN(GlobalState.varModel, -1))
+            foreach (List<BinaryOption> variant in vg.GenerateUpToN(-1))
             {
                 foreach (BinaryOption opt in variant)
                 {
@@ -1879,7 +1878,7 @@ namespace SPLConqueror_GUI
 
             populatePlot(constantChartRepl, constantValues, constantLabels);
 
-            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateUpToN(GlobalState.varModel, -1).Count;
+            int amountOfVariants = SolverManager.DefaultVariantGenerator.GenerateUpToN(-1).Count;
 
             // Update max and max occurance chart
             foreach (KeyValuePair<string, double> entry in constantMaxInfluences)

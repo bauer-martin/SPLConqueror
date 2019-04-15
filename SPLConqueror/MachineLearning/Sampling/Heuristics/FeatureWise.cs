@@ -19,16 +19,15 @@ namespace MachineLearning.Sampling.Heuristics
         /// <returns>A list of configurations, in which each configuration is a list of binary options that represent the SELECTED options.</returns>
         public List<List<BinaryOption>> generateFeatureWiseConfigurations()
         {
-            VariabilityModel vm = GlobalState.varModel;
             configurations.Clear();
             List<BinaryOption> optionalFirstLevelElements = new List<BinaryOption>();
-            List<BinaryOption> binOptions = vm.BinaryOptions;
+            List<BinaryOption> binOptions = GlobalState.varModel.BinaryOptions;
 
             //First: Add options that are present in all configurations
             List<BinaryOption> firstLevelMandatoryFeatures = new List<BinaryOption>();
             foreach (BinaryOption binOpt in binOptions)
             {
-                if (binOpt.Parent == null || binOpt.Parent == vm.Root)
+                if (binOpt.Parent == null || binOpt.Parent == GlobalState.varModel.Root)
                 {
                     if (!binOpt.Optional)
                     {
@@ -60,7 +59,7 @@ namespace MachineLearning.Sampling.Heuristics
                     }
                     else
                     {
-                        tme = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tme, vm, null);
+                        tme = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(tme, null);
                         if (tme != null && Configuration.containsBinaryConfiguration(this.configurations, tme) == false)
                             this.configurations.Add(tme);
                     }
@@ -75,19 +74,18 @@ namespace MachineLearning.Sampling.Heuristics
         /// <summary>
         /// This algorithm calls for each binary option in the variability model the CSP solver to generate a valid, minimal configuration containing that option.
         /// </summary>
-        /// <param name="vm">The variability model for which the feature-wise configurations should be generated.</param>
         /// <returns>A list of configurations, in which each configuration is a list of binary options that represent the SELECTED options.</returns>
-        public List<List<BinaryOption>> generateFeatureWiseConfigsCSP(VariabilityModel vm)
+        public List<List<BinaryOption>> generateFeatureWiseConfigsCSP()
         {
             this.configurations.Clear();
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            foreach (var opt in vm.BinaryOptions)
+            foreach (var opt in GlobalState.varModel.BinaryOptions)
             {
-                if (opt == vm.Root)
+                if (opt == GlobalState.varModel.Root)
                     continue;
                 List<BinaryOption> temp = new List<BinaryOption>();
                 temp.Add(opt);
-                temp = vg.FindMinimizedConfig(temp, vm, null);
+                temp = vg.FindMinimizedConfig(temp, null);
                 if (temp != null && Configuration.containsBinaryConfiguration(this.configurations, temp) == false)
                     this.configurations.Add(temp);
 
@@ -98,7 +96,7 @@ namespace MachineLearning.Sampling.Heuristics
                 withoutOpt.Remove(opt);
                 List<BinaryOption> excluded = new List<BinaryOption>();
                 excluded.Add(opt);
-                withoutOpt = vg.FindMinimizedConfig(withoutOpt, vm, excluded);
+                withoutOpt = vg.FindMinimizedConfig(withoutOpt, excluded);
                 if (withoutOpt != null && Configuration.containsBinaryConfiguration(this.configurations, withoutOpt) == false)
                     this.configurations.Add(withoutOpt);
             }

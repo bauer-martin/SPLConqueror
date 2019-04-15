@@ -45,16 +45,7 @@ namespace MachineLearning.Sampling
                 {
                     //Binary sampling heuristics
                     case SamplingStrategies.ALLBINARY:
-                        if (optionsToConsider.ContainsKey(SamplingStrategies.ALLBINARY))
-                        {
-                            List<List<BinaryOption>> variants =
-                                vg.GenerateUpToN(vm.reduce(optionsToConsider[SamplingStrategies.ALLBINARY]), -1);
-                            binaryConfigs.AddRange(variants);
-                        }
-                        else
-                        {
-                            binaryConfigs.AddRange(vg.GenerateUpToN(vm, -1));
-                        }
+                        binaryConfigs.AddRange(vg.GenerateUpToN(-1));
                         break;
                     case SamplingStrategies.SAT:
                         int numberSamples = 2;
@@ -73,16 +64,7 @@ namespace MachineLearning.Sampling
                                 }
                             }
 
-                            if (optionsToConsider.ContainsKey(SamplingStrategies.SAT))
-                            {
-                                List<List<BinaryOption>> variants =
-                                    vg.GenerateUpToN(vm.reduce(optionsToConsider[SamplingStrategies.SAT]), numberSamples);
-                                binaryConfigs.AddRange(variants);
-                            }
-                            else
-                            {
-                                binaryConfigs.AddRange(vg.GenerateUpToN(vm, numberSamples));
-                            }
+                            binaryConfigs.AddRange(vg.GenerateUpToN(numberSamples));
                             numberSamples = 2;
                         }
                         break;
@@ -112,31 +94,13 @@ namespace MachineLearning.Sampling
                     case SamplingStrategies.PAIRWISE:
                         {
                             PairWise pw = new PairWise();
-                            if (optionsToConsider.ContainsKey(SamplingStrategies.PAIRWISE))
-                            {
-                                List<List<BinaryOption>> variants = pw.generatePairWiseVariants(GlobalState.varModel
-                                    .reduce(optionsToConsider[SamplingStrategies.PAIRWISE]));
-                                binaryConfigs.AddRange(variants);
-                            }
-                            else
-                            {
-                                binaryConfigs.AddRange(pw.generatePairWiseVariants(GlobalState.varModel));
-                            }
+                            binaryConfigs.AddRange(pw.generatePairWiseVariants());
                         }
                         break;
                     case SamplingStrategies.NEGATIVE_OPTIONWISE:
                         {
                             NegFeatureWise neg = new NegFeatureWise();//2nd option: neg.generateNegativeFWAllCombinations(GlobalState.varModel));
-                            if (optionsToConsider.ContainsKey(SamplingStrategies.NEGATIVE_OPTIONWISE))
-                            {
-                                List<List<BinaryOption>> variants = neg.generateNegativeFW(GlobalState.varModel
-                                    .reduce(optionsToConsider[SamplingStrategies.NEGATIVE_OPTIONWISE]));
-                                binaryConfigs.AddRange(variants);
-                            }
-                            else
-                            {
-                                binaryConfigs.AddRange(neg.generateNegativeFW(GlobalState.varModel));
-                            }
+                            binaryConfigs.AddRange(neg.generateNegativeFW());
                         }
                         break;
 

@@ -98,7 +98,7 @@ namespace MachineLearning.Sampling.Hybrid.Distributive.SelectionHeuristic
 
 
             IVariantGenerator vg = SolverManager.DefaultVariantGenerator;
-            IBucketSession bucketSession = vg.CreateBucketSession(GlobalState.varModel);
+            IBucketSession bucketSession = vg.CreateBucketSession();
             while (selectedConfigurations.Count < count && HasSamples(noSamples))
             {
                 double randomDouble = rand.NextDouble();

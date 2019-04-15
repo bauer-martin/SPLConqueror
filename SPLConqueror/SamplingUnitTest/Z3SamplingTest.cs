@@ -183,7 +183,7 @@ namespace SamplingUnitTest
             
             // Do #SAT and count all variants of the reduced variability model of HiPacc
             Z3VariantGenerator variantGenerator = new Z3VariantGenerator(GlobalState.varModel);
-            List<Configuration> configs = variantGenerator.GenerateAllVariants(GlobalState.varModel, GlobalState.varModel.getOptions());
+            List<Configuration> configs = variantGenerator.GenerateAllVariants(GlobalState.varModel.getOptions());
             Console.WriteLine(configs.Count);
             Assert.AreEqual(configs.Count(), 8060);
         }

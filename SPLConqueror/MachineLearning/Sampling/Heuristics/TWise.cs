@@ -33,7 +33,7 @@ namespace MachineLearning.Sampling.Heuristics
 
             List<BinaryOption> candidate = new List<BinaryOption>();
             List<List<BinaryOption>> result = new List<List<BinaryOption>>();
-            generatePowerSet(GlobalState.varModel, candidate, t, result, 0);
+            generatePowerSet(candidate, t, result, 0);
 
             //remove double entries...
             List<List<BinaryOption>> resultCleaned = new List<List<BinaryOption>>();
@@ -62,11 +62,11 @@ namespace MachineLearning.Sampling.Heuristics
 
         }
 
-        private void generatePowerSet(VariabilityModel vm, List<BinaryOption> candidates, int t, List<List<BinaryOption>> result, int index)
+        private void generatePowerSet(List<BinaryOption> candidates, int t, List<List<BinaryOption>> result, int index)
         {
             if (candidates.Count == t)
             {
-                candidates = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(candidates, vm, null);
+                candidates = SolverManager.DefaultVariantGenerator.FindMinimizedConfig(candidates, null);
                 if (candidates != null && candidates.Count != 0)
                 {
                     result.Add(candidates);
@@ -86,7 +86,7 @@ namespace MachineLearning.Sampling.Heuristics
 
                         if (newOptionIsValidForCandidate(candidates, GlobalState.varModel.BinaryOptions[i]))
                         {
-                            generatePowerSet(vm, newCand, t, result, i + 1);
+                            generatePowerSet(newCand, t, result, i + 1);
                         }
                     }
 
