@@ -54,7 +54,7 @@ namespace MachineLearning.Solver
             {
                 string errorMessage = _processError.ReadToEnd();
                 GlobalState.logError.logLine(errorMessage);
-                throw new ExternalSolverException("external solver execution terminated -> see error log");
+                throw new ExternalSolverException(errorMessage);
             }
             ThrowExceptionIfError(response);
             return response;
