@@ -1014,7 +1014,7 @@ namespace ScriptGenerator
                 cmd.performOneCommand(samplingNamesBinary.First());
             if (samplingNamesNumeric != null)
                 cmd.performOneCommand(samplingNamesNumeric.First());
-            var sampled = MachineLearning.Sampling.ConfigurationBuilder.buildConfigs(GlobalState.varModel, cmd.BinaryToSample
+            var sampled = MachineLearning.Sampling.ConfigurationBuilder.buildConfigs(cmd.BinaryToSample
                 , cmd.NumericToSample, new List<MachineLearning.Sampling.Hybrid.HybridStrategy>());
             var existing = ConfigurationReader.readConfigurations(measurement, GlobalState.varModel);
             return ((sampled.Intersect(existing)).Count() > 0);

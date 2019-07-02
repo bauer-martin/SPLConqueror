@@ -20,7 +20,7 @@ namespace MachineLearning.Solver
             _optionCoding = optionCoding;
         }
 
-        ~ExternalBucketSession() => Reset();
+        ~ExternalBucketSession() { Reset(); }
 
         public List<BinaryOption> GenerateConfiguration(int numberSelectedFeatures,
             Dictionary<List<BinaryOption>, int> featureWeight)
